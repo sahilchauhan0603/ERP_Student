@@ -1,0 +1,169 @@
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FaClipboardList, FaSearch } from "react-icons/fa";
+import { MdVerifiedUser } from "react-icons/md";
+import { FiLogIn } from "react-icons/fi";
+import campusBackground from '../assets/images/BPIT.png'; // Make sure this path is correct
+
+const HomePage = () => {
+  const [showResult, setShowResult] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoaded(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const menuItems = [
+    {
+      href: "/registration",
+      icon: <FaClipboardList className="text-5xl" />,
+      label: "Registration",
+      color: "from-blue-500 to-blue-600",
+      bgColor: "bg-blue-100"
+    },
+    // {
+    //   action: () => setShowResult(true),
+    //   icon: <MdVerifiedUser className="text-5xl" />,
+    //   label: "View Result",
+    //   color: "from-green-500 to-green-600",
+    //   bgColor: "bg-green-100"
+    // },
+    {
+      href: "/login",
+      icon: <FiLogIn className="text-5xl" />,
+      label: "Student Login",
+      color: "from-indigo-500 to-indigo-600",
+      bgColor: "bg-indigo-100"
+    },
+    {
+      href: "/admin",
+      icon: <FaSearch className="text-5xl" />,
+      label: "Admin Login",
+      color: "from-purple-500 to-purple-600",
+      bgColor: "bg-purple-100"
+    },
+  ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    },
+    hover: {
+      y: -10,
+      scale: 1.03,
+      transition: { duration: 0.2 }
+    }
+  };
+
+  return (
+    <div 
+      className="min-h-screen flex flex-col relative"
+      style={{
+        background: `
+          linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+          url(${campusBackground}) center/cover fixed no-repeat
+        `,
+        minHeight: '100vh'
+      }}
+    >
+      {/* Header */}
+      <motion.header 
+        className="text-center my-12 px-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={loaded ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.6 }}
+      >
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+          Bhagwan Parshuram Institute of Technology
+        </h1>
+        <motion.h2 
+          className="text-lg md:text-xl text-gray-600"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          PSP-4, Sec-17, Rohini, Delhi-89
+        </motion.h2>
+      </motion.header>
+
+      {/* Main Content */}
+      <main className="flex-grow flex flex-col items-center justify-center px-4">
+        <motion.div 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full max-w-6xl"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {menuItems.map((item, index) => {
+            const content = (
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                whileHover="hover"
+                className="relative h-full group"
+              >
+                <div className={`absolute -inset-1 bg-gradient-to-r ${item.color} rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-300`}></div>
+                <div className="relative flex flex-col items-center justify-center h-full p-6 bg-white bg-opacity-80 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-transparent group-hover:border-opacity-30 backdrop-blur-sm">
+                  <div className={`p-4 rounded-full ${item.bgColor} mb-4 transition-colors duration-300 group-hover:bg-opacity-70`}>
+                    {React.cloneElement(item.icon, { className: `${item.icon.props.className} text-gradient ${item.color.replace('to', 'to-')}` })}
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-800 mb-2">{item.label}</h2>
+                  <motion.div 
+                    className="h-1 w-8 bg-gradient-to-r rounded-full"
+                    style={{ background: `linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-to))` }}
+                    initial={{ width: 0 }}
+                    animate={{ width: 32 }}
+                    transition={{ delay: 0.5 }}
+                  />
+                </div>
+              </motion.div>
+            );
+
+            if (item.href) {
+              return (
+                <Link
+                  key={item.label}
+                  to={item.href}
+                  className="block h-full"
+                >
+                  {content}
+                </Link>
+              );
+            }
+
+            return (
+              <button
+                key={item.label}
+                onClick={item.action}
+                className="block h-full focus:outline-none"
+              >
+                {content}
+              </button>
+            );
+          })}
+        </motion.div>
+      </main>
+    </div>
+  );
+};
+
+export default HomePage;
