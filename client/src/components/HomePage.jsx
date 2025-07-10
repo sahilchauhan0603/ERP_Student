@@ -20,7 +20,7 @@ const HomePage = () => {
       href: "/registration",
       icon: <FaClipboardList className="text-5xl" />,
       label: "Registration",
-      color: "from-blue-500 to-blue-600",
+      color: "from-blue-800 to-blue-900",
       bgColor: "bg-blue-100"
     },
     // {
@@ -34,14 +34,14 @@ const HomePage = () => {
       href: "/login",
       icon: <FiLogIn className="text-5xl" />,
       label: "Student Login",
-      color: "from-indigo-500 to-indigo-600",
+      color: "from-indigo-800 to-indigo-900",
       bgColor: "bg-indigo-100"
     },
     {
       href: "/admin",
       icon: <FaSearch className="text-5xl" />,
       label: "Admin Login",
-      color: "from-purple-500 to-purple-600",
+      color: "from-purple-800 to-purple-900",
       bgColor: "bg-purple-100"
     },
   ];
@@ -69,7 +69,7 @@ const HomePage = () => {
     },
     hover: {
       y: -10,
-      scale: 1.03,
+      scale: 1.01,
       transition: { duration: 0.2 }
     }
   };
@@ -106,9 +106,9 @@ const HomePage = () => {
       </motion.header>
 
       {/* Main Content */}
-      <main className="flex-grow flex flex-col items-center justify-center px-4">
+      <main className="flex-grow flex flex-col items-center justify-center px-4 mt-28">
         <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full max-w-6xl"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full max-w-3xl"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
