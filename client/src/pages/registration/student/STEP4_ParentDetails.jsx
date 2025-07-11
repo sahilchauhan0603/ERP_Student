@@ -1,47 +1,36 @@
 import React from "react";
 
 const ParentDetails = ({ formData, setFormData }) => {
-  // Initialize parent objects if they don't exist
-  if (!formData.father) {
-    formData.father = {
-      name: "",
-      qualification: "",
-      occupation: "",
-      email: "",
-      mobile: "",
-      telephoneSTD: "",
-      telephone: "",
-      officeAddress: "",
-    };
-  }
-
-  if (!formData.mother) {
-    formData.mother = {
-      name: "",
-      qualification: "",
-      occupation: "",
-      email: "",
-      mobile: "",
-      telephoneSTD: "",
-      telephone: "",
-      officeAddress: "",
-    };
-  }
-
-  if (!formData.familyIncome) {
-    formData.familyIncome = "";
-  }
-
-
-  // Initialize parent objects if they don't exist
-  const handleChange = (section, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [field]: value,
-      },
-    }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const path = name.split('.');
+    
+    setFormData(prev => {
+      // Handle nested objects (parents.father.name, etc.)
+      if (path.length === 3) {
+        return {
+          ...prev,
+          [path[0]]: {
+            ...prev[path[0]],
+            [path[1]]: {
+              ...prev[path[0]][path[1]],
+              [path[2]]: value
+            }
+          }
+        };
+      }
+      // Handle top-level fields (parents.familyIncome)
+      if (path.length === 2) {
+        return {
+          ...prev,
+          [path[0]]: {
+            ...prev[path[0]],
+            [path[1]]: value
+          }
+        };
+      }
+      return prev;
+    });
   };
 
   return (
@@ -84,9 +73,10 @@ const ParentDetails = ({ formData, setFormData }) => {
                 Father's Name<span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                value={formData.father.name || ""}
-                onChange={(e) => handleChange("father", "name", e.target.value)}
+                name="parents.father.name"
+                placeholder="Enter Father's Name"
+                value={formData.parents.father.name || ""}
+                onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
               />
@@ -96,11 +86,10 @@ const ParentDetails = ({ formData, setFormData }) => {
                 Highest Qualification<span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                value={formData.father.qualification || ""}
-                onChange={(e) =>
-                  handleChange("father", "qualification", e.target.value)
-                }
+                name="parents.father.qualification"
+                placeholder="Enter Father's Qualification"
+                value={formData.parents.father.qualification || ""}
+                onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
               />
@@ -110,11 +99,10 @@ const ParentDetails = ({ formData, setFormData }) => {
                 Occupation<span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                value={formData.father.occupation || ""}
-                onChange={(e) =>
-                  handleChange("father", "occupation", e.target.value)
-                }
+                name="parents.father.occupation"
+                placeholder="Enter Father's Occupation"
+                value={formData.parents.father.occupation || ""}
+                onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
               />
@@ -124,11 +112,11 @@ const ParentDetails = ({ formData, setFormData }) => {
                 Email Address<span className="text-red-500">*</span>
               </label>
               <input
+                name="parents.father.email"
+                placeholder="Enter Father's Email"
                 type="email"
-                value={formData.father.email || ""}
-                onChange={(e) =>
-                  handleChange("father", "email", e.target.value)
-                }
+                value={formData.parents.father.email || ""}
+                onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
               />
@@ -138,11 +126,10 @@ const ParentDetails = ({ formData, setFormData }) => {
                 Mobile Number<span className="text-red-500">*</span>
               </label>
               <input
-                type="tel"
-                value={formData.father.mobile || ""}
-                onChange={(e) =>
-                  handleChange("father", "mobile", e.target.value)
-                }
+                name="parents.father.mobile"
+                placeholder="Enter Father's Mobile Number"
+                value={formData.parents.father.mobile || ""}
+                onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
               />
@@ -153,11 +140,10 @@ const ParentDetails = ({ formData, setFormData }) => {
                   Telephone STD
                 </label>
                 <input
-                  type="text"
-                  value={formData.father.telephoneSTD || ""}
-                  onChange={(e) =>
-                    handleChange("father", "telephoneSTD", e.target.value)
-                  }
+                  name="parents.father.telephoneSTD"
+                  placeholder="Enter Father's Telephone STD"
+                  value={formData.parents.father.telephoneSTD || ""}
+                  onChange={handleChange}
                   className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
                 />
               </div>
@@ -166,11 +152,10 @@ const ParentDetails = ({ formData, setFormData }) => {
                   Telephone Number
                 </label>
                 <input
-                  type="text"
-                  value={formData.father.telephone || ""}
-                  onChange={(e) =>
-                    handleChange("father", "telephone", e.target.value)
-                  }
+                  name="parents.father.telephone"
+                  placeholder="Enter Father's Telephone Number"            
+                  value={formData.parents.father.telephone || ""}
+                  onChange={handleChange}
                   className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
                 />
               </div>
@@ -180,10 +165,9 @@ const ParentDetails = ({ formData, setFormData }) => {
                 Office Address
               </label>
               <textarea
-                value={formData.father.officeAddress || ""}
-                onChange={(e) =>
-                  handleChange("father", "officeAddress", e.target.value)
-                }
+                name="parents.father.officeAddress"
+                value={formData.parents.father.officeAddress || ""}
+                onChange={handleChange}
                 rows={3}
                 className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
               />
@@ -219,9 +203,10 @@ const ParentDetails = ({ formData, setFormData }) => {
                 Mother's Name<span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                value={formData.mother.name || ""}
-                onChange={(e) => handleChange("mother", "name", e.target.value)}
+                name="parents.mother.name"
+                placeholder="Enter Mother's Name"
+                value={formData.parents.mother.name || ""}
+                onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
               />
@@ -231,11 +216,10 @@ const ParentDetails = ({ formData, setFormData }) => {
                 Highest Qualification<span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                value={formData.mother.qualification || ""}
-                onChange={(e) =>
-                  handleChange("mother", "qualification", e.target.value)
-                }
+                name="parents.mother.qualification"
+                placeholder="Enter Mother's Qualification"
+                value={formData.parents.mother.qualification || ""}
+                onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
               />
@@ -245,11 +229,10 @@ const ParentDetails = ({ formData, setFormData }) => {
                 Occupation<span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                value={formData.mother.occupation || ""}
-                onChange={(e) =>
-                  handleChange("mother", "occupation", e.target.value)
-                }
+                name="parents.mother.occupation"
+                placeholder="Enter Mother's Occupation"
+                value={formData.parents.mother.occupation || ""}
+                onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
               />
@@ -259,11 +242,11 @@ const ParentDetails = ({ formData, setFormData }) => {
                 Email Address
               </label>
               <input
+                name="parents.mother.email"
+                placeholder="Enter Mother's Email"
                 type="email"
-                value={formData.mother.email || ""}
-                onChange={(e) =>
-                  handleChange("mother", "email", e.target.value)
-                }
+                value={formData.parents.mother.email || ""}
+                onChange={handleChange}
                 className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
               />
             </div>
@@ -272,11 +255,10 @@ const ParentDetails = ({ formData, setFormData }) => {
                 Mobile Number<span className="text-red-500">*</span>
               </label>
               <input
-                type="tel"
-                value={formData.mother.mobile || ""}
-                onChange={(e) =>
-                  handleChange("mother", "mobile", e.target.value)
-                }
+                name="parents.mother.mobile"
+                placeholder="Enter Mother's Mobile Number"
+                value={formData.parents.mother.mobile || ""}
+                onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
               />
@@ -287,11 +269,10 @@ const ParentDetails = ({ formData, setFormData }) => {
                   Telephone STD
                 </label>
                 <input
-                  type="text"
-                  value={formData.mother.telephoneSTD || ""}
-                  onChange={(e) =>
-                    handleChange("mother", "telephoneSTD", e.target.value)
-                  }
+                  name="parents.mother.telephoneSTD"
+                  placeholder="Enter Mother's Telephone STD"
+                  value={formData.parents.mother.telephoneSTD || ""}
+                  onChange={handleChange}
                   className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
                 />
               </div>
@@ -300,11 +281,10 @@ const ParentDetails = ({ formData, setFormData }) => {
                   Telephone Number
                 </label>
                 <input
-                  type="text"
-                  value={formData.mother.telephone || ""}
-                  onChange={(e) =>
-                    handleChange("mother", "telephone", e.target.value)
-                  }
+                  name="parents.mother.telephone"
+                  placeholder="Enter Mother's Telephone Number"            
+                  value={formData.parents.mother.telephone || ""}
+                  onChange={handleChange}
                   className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
                 />
               </div>
@@ -314,10 +294,9 @@ const ParentDetails = ({ formData, setFormData }) => {
                 Office Address
               </label>
               <textarea
-                value={formData.mother.officeAddress || ""}
-                onChange={(e) =>
-                  handleChange("mother", "officeAddress", e.target.value)
-                }
+                name="parents.mother.officeAddress"
+                value={formData.parents.mother.officeAddress || ""}
+                onChange={handleChange}
                 rows={3}
                 className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
               />
@@ -327,7 +306,7 @@ const ParentDetails = ({ formData, setFormData }) => {
 
         {/* Family Income */}
         <div className="bg-white/90 p-6 rounded-xl shadow-sm border border-white/20">
-          <div className="flex items-center mb-4">
+          <div className="flex items-center mb-6 pb-3 border-b border-blue-100/50">
             <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
               <svg
                 className="w-6 h-6 text-blue-600"
@@ -356,22 +335,17 @@ const ParentDetails = ({ formData, setFormData }) => {
                 <div className="relative">
                   <input
                     type="radio"
-                    name="income"
+                    name="parents.familyIncome"
                     value={range}
-                    checked={formData.familyIncome === range}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        familyIncome: e.target.value,
-                      }))
-                    }
+                    checked={formData.parents.familyIncome === range}
+                    onChange={handleChange}
                     className="sr-only peer"
                     required
                   />
                   <div className="w-5 h-5 border-2 border-blue-300 rounded-full peer-checked:border-blue-500 flex items-center justify-center transition-all duration-300">
                     <div
                       className={`w-3 h-3 rounded-full bg-blue-500 scale-0 peer-checked:scale-100 transition-all duration-300 ${
-                        formData.familyIncome === range ? "scale-100" : ""
+                        formData.parents.familyIncome === range ? "scale-100" : ""
                       }`}
                     ></div>
                   </div>

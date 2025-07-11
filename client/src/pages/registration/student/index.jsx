@@ -1,70 +1,66 @@
-import { useState } from 'react';
-import axios from 'axios';
-import ProgressBar from '../../../components/ProgressBar';
-import Instructions from './STEP1_Instructions';
-import PersonalInfo from './STEP2_PersonalInfo';
-import AcademicInfo from './STEP3_AcademicInfo';
-import DocumentsUpload from './STEP5_DocumentsUpload';
-import ReviewSubmit from './STEP6_ReviewSubmit';
-import ParentsInfo from './STEP4_ParentDetails'; // Assuming this is the correct import path
+import { useState } from "react";
+import axios from "axios";
+import ProgressBar from "../../../components/ProgressBar";
+import Instructions from "./STEP1_Instructions";
+import PersonalInfo from "./STEP2_PersonalInfo";
+import AcademicInfo from "./STEP3_AcademicInfo";
+import DocumentsUpload from "./STEP5_DocumentsUpload";
+import ReviewSubmit from "./STEP6_ReviewSubmit";
+import ParentsInfo from "./STEP4_ParentDetails"; // Assuming this is the correct import path
 
 const StudentRegistration = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     personal: {
-      course: '',
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      abcId: '',
-      dob: '',
-      placeOfBirth: '',
-      mobile: '',
-      email: '',
-      examRoll: '',
-      examRank: '',
-      gender: '',
-      category: '',
-      subCategory: '',
-      region: '',
-      currentAddress: '',
-      permanentAddress: '',
-      feeReimbursement: '',
-      antiRaggingRef: '',
+      course: "",
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      abcId: "",
+      dob: "",
+      placeOfBirth: "",
+      mobile: "",
+      email: "",
+      examRoll: "",
+      examRank: "",
+      gender: "",
+      category: "",
+      subCategory: "",
+      region: "",
+      currentAddress: "",
+      permanentAddress: "",
+      feeReimbursement: "",
+      antiRaggingRef: "",
     },
     academic: {
       classX: {
-        institute: '',
-        board: '',
-        year: '',
-        aggregate: '',
-        pcm: '',
-        isDiplomaOrPolytechnic: ''
+        institute: "",
+        board: "",
+        year: "",
+        aggregate: "",
+        pcm: "",
+        isDiplomaOrPolytechnic: "",
       },
       classXII: {
-        institute: '',
-        board: '',
-        year: '',
-        aggregate: '',
-        pcm: ''
+        institute: "",
+        board: "",
+        year: "",
+        aggregate: "",
+        pcm: "",
       },
       otherQualification: {
-        institute: '',
-        board: '',
-        year: '',
-        aggregate: '',
-        pcm: ''
+        institute: "",
+        board: "",
+        year: "",
+        aggregate: "",
+        pcm: "",
       },
-      academicAchievements: [
-        { event: '', date: '', outcome: '' }
-      ],
-      coCurricularAchievements: [
-        { event: '', date: '', outcome: '' }
-      ]
+      academicAchievements: [{ event: "", date: "", outcome: "" }],
+      coCurricularAchievements: [{ event: "", date: "", outcome: "" }],
     },
     documents: {
       photo: null,
@@ -84,31 +80,31 @@ const StudentRegistration = () => {
       specialCategoryCertificate: null,
       academicFeeReceipt: null,
       collegeFeeReceipt: null,
-      parentSignature: null
+      parentSignature: null,
     },
-    parents:{
+    parents: {
       father: {
-        name: '',
-        qualification: '',
-        occupation: '',
-        email: '',
-        mobile: '',
-        telephoneSTD: '',
-        telephone: '',
-        officeAddress: ''
+        name: "",
+        qualification: "",
+        occupation: "",
+        email: "",
+        mobile: "",
+        telephoneSTD: "",
+        telephone: "",
+        officeAddress: "",
       },
       mother: {
-        name: '',
-        qualification: '',
-        occupation: '',
-        email: '',
-        mobile: '',
-        telephoneSTD: '',
-        telephone: '',
-        officeAddress: ''
+        name: "",
+        qualification: "",
+        occupation: "",
+        email: "",
+        mobile: "",
+        telephoneSTD: "",
+        telephone: "",
+        officeAddress: "",
       },
-      familyIncome: ''
-    }
+      familyIncome: "",
+    },
   });
 
   const nextStep = () => {
@@ -117,7 +113,7 @@ const StudentRegistration = () => {
         setCurrentStep(currentStep + 1);
       }
     } else {
-      alert('Please fill all required fields');
+      alert("Please fill all required fields");
     }
   };
 
@@ -128,16 +124,21 @@ const StudentRegistration = () => {
   };
 
   const validateCurrentStep = () => {
-  switch(currentStep) {
-    case 0: return true; // Instructions
-    case 1: return validatePersonalInfo();
-    case 2: return validateAcademicInfo();
-    case 3: return validateParentInfo(); 
-    case 4: return validateDocuments();
-    default: return true;
-  }
-};
-
+    switch (currentStep) {
+      case 0:
+        return true; // Instructions
+      case 1:
+        return validatePersonalInfo();
+      case 2:
+        return validateAcademicInfo();
+      case 3:
+        return validateParentInfo();
+      case 4:
+        return validateDocuments();
+      default:
+        return true;
+    }
+  };
 
   const validatePersonalInfo = () => {
     const { personal } = formData;
@@ -154,201 +155,236 @@ const StudentRegistration = () => {
   };
 
   const validateAcademicInfo = () => {
-  const { academic } = formData;
+    const { academic } = formData;
 
-  const isClassXValid =
-    academic.classX.institute &&
-    academic.classX.board &&
-    academic.classX.year &&
-    academic.classX.aggregate &&
-    academic.classX.pcm &&
-    (academic.classX.isDiplomaOrPolytechnic !== undefined && 
-    academic.classX.isDiplomaOrPolytechnic !== null);
+    const isClassXValid =
+      academic.classX.institute &&
+      academic.classX.board &&
+      academic.classX.year &&
+      academic.classX.aggregate &&
+      academic.classX.pcm &&
+      academic.classX.isDiplomaOrPolytechnic !== undefined &&
+      academic.classX.isDiplomaOrPolytechnic !== null;
 
-  const isClassXIIValid =
-    academic.classXII.institute &&
-    academic.classXII.board &&
-    academic.classXII.year &&
-    academic.classXII.aggregate &&
-    academic.classXII.pcm;
+    const isClassXIIValid =
+      academic.classXII.institute &&
+      academic.classXII.board &&
+      academic.classXII.year &&
+      academic.classXII.aggregate &&
+      academic.classXII.pcm;
 
-  const hasOtherQualification =
-    academic.otherQualification.institute ||
-    academic.otherQualification.board ||
-    academic.otherQualification.year ||
-    academic.otherQualification.aggregate ||
-    academic.otherQualification.pcm;
+    const hasOtherQualification =
+      academic.otherQualification.institute ||
+      academic.otherQualification.board ||
+      academic.otherQualification.year ||
+      academic.otherQualification.aggregate ||
+      academic.otherQualification.pcm;
 
-  const isOtherQualificationValid = !hasOtherQualification || (
-    academic.otherQualification.institute &&
-    academic.otherQualification.board &&
-    academic.otherQualification.year &&
-    academic.otherQualification.aggregate &&
-    academic.otherQualification.pcm
-  );
+    const isOtherQualificationValid =
+      !hasOtherQualification ||
+      (academic.otherQualification.institute &&
+        academic.otherQualification.board &&
+        academic.otherQualification.year &&
+        academic.otherQualification.aggregate &&
+        academic.otherQualification.pcm);
 
-  const isAchievementsValid = academic.academicAchievements.every((ach) => {
-    const anyFilled = ach.event || ach.date || ach.outcome;
-    const allFilled = ach.event && ach.date && ach.outcome;
-    return !anyFilled || allFilled;
-  });
+    const isAchievementsValid = academic.academicAchievements.every((ach) => {
+      const anyFilled = ach.event || ach.date || ach.outcome;
+      const allFilled = ach.event && ach.date && ach.outcome;
+      return !anyFilled || allFilled;
+    });
 
-  const isCoAchievementsValid = academic.coCurricularAchievements.every((ach) => {
-    const anyFilled = ach.event || ach.date || ach.outcome;
-    const allFilled = ach.event && ach.date && ach.outcome;
-    return !anyFilled || allFilled;
-  });
-
-  return (
-    isClassXValid &&
-    isClassXIIValid &&
-    isOtherQualificationValid &&
-    isAchievementsValid &&
-    isCoAchievementsValid
-    // && isCourseValid
-  );
-};
-
-  const validateDocuments = () => {
-  const { documents } = formData;
-  const requiredDocs = [
-    'photo', 'ipuRegistration', 'allotmentLetter', 
-    'examAdmitCard', 'examScoreCard', 'marksheet10',
-    'passing10', 'marksheet12', 'passing12', 'aadhar',
-    'characterCertificate', 'medicalCertificate', 
-    'migrationCertificate', 'academicFeeReceipt',
-    'collegeFeeReceipt', 'parentSignature'
-  ];
-
-  return requiredDocs.every(doc => documents[doc]);
-};
-
-  const validateParentInfo = () => {
-    // const { parents } = formData;
-  
-    // const fatherValid =
-    //   parents.father.name &&
-    //   parents.father.qualification &&
-    //   parents.father.occupation &&
-    //   parents.father.email &&
-    //   parents.father.mobile;
-  
-    // const motherValid =
-    //   parents.mother.name &&
-    //   parents.mother.qualification &&
-    //   parents.mother.occupation &&
-    //   parents.mother.mobile;
-  
-    // const incomeValid = parents.familyIncome;
-  
-    // return fatherValid && motherValid && incomeValid;
-    return true;
-  };
-
-  console.log('Valid Parent Info:', validateParentInfo());
-
-  const handleSubmit = async () => {
-  if (!validateCurrentStep()) {
-    alert('Please complete all required fields');
-    return;
-  }
-
-  setIsSubmitting(true);
-  setSubmitError(null);
-  
-  try {
-    const formDataToSend = new FormData();
-    
-    // Append personal info (flatten nested objects)
-    for (const [key, value] of Object.entries(formData.personal)) {
-      if (value !== null && value !== undefined) {
-        formDataToSend.append(`personal.${key}`, value);
-      }
-    }
-    
-    // Append academic info (handle nested objects)
-    for (const [section, data] of Object.entries(formData.academic)) {
-      if (Array.isArray(data)) {
-        // Handle arrays (achievements)
-        data.forEach((item, index) => {
-          for (const [field, value] of Object.entries(item)) {
-            if (value) formDataToSend.append(`academic.${section}[${index}].${field}`, value);
-          }
-        });
-      } else {
-        // Handle nested objects (classX, classXII, etc.)
-        for (const [field, value] of Object.entries(data)) {
-          if (value) formDataToSend.append(`academic.${section}.${field}`, value);
-        }
-      }
-    }
-
-    // Append parents info
-    for (const [parentType, data] of Object.entries(formData.parents)) {
-      if (parentType === 'familyIncome') {
-        if (data) formDataToSend.append('parents.familyIncome', data);
-        continue;
-      }
-      
-      for (const [field, value] of Object.entries(data)) {
-        if (value) formDataToSend.append(`parents.${parentType}.${field}`, value);
-      }
-    }
-    
-    // Append documents
-    for (const [docType, file] of Object.entries(formData.documents)) {
-      if (file instanceof File) {
-        formDataToSend.append(`documents.${docType}`, file);
-      }
-    }
-
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/register`, 
-      formDataToSend,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        withCredentials: true
+    const isCoAchievementsValid = academic.coCurricularAchievements.every(
+      (ach) => {
+        const anyFilled = ach.event || ach.date || ach.outcome;
+        const allFilled = ach.event && ach.date && ach.outcome;
+        return !anyFilled || allFilled;
       }
     );
 
-    setSubmitSuccess(true);
-    console.log('Registration successful:', response.data);
-    
-  } catch (error) {
-    console.error('Registration error:', error);
-    const errorMessage = error.response?.data?.message || 
-                       error.message || 
-                       'Registration failed. Please try again.';
-    setSubmitError(errorMessage);
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    return (
+      isClassXValid &&
+      isClassXIIValid &&
+      isOtherQualificationValid &&
+      isAchievementsValid &&
+      isCoAchievementsValid
+      // && isCourseValid
+    );
+  };
+
+  const validateDocuments = () => {
+    const { documents } = formData;
+    const requiredDocs = [
+      "photo",
+      "ipuRegistration",
+      "allotmentLetter",
+      "examAdmitCard",
+      "examScoreCard",
+      "marksheet10",
+      "passing10",
+      "marksheet12",
+      "passing12",
+      "aadhar",
+      "characterCertificate",
+      "medicalCertificate",
+      "migrationCertificate",
+      "academicFeeReceipt",
+      "collegeFeeReceipt",
+      "parentSignature",
+    ];
+
+    return requiredDocs.every((doc) => documents[doc]);
+  };
+
+  const validateParentInfo = () => {
+    const { parents } = formData;
+
+    const fatherValid =
+      parents.father.name &&
+      parents.father.qualification &&
+      parents.father.occupation &&
+      parents.father.email &&
+      parents.father.mobile;
+
+    const motherValid =
+      parents.mother.name &&
+      parents.mother.qualification &&
+      parents.mother.occupation &&
+      parents.mother.mobile;
+
+    const incomeValid = parents.familyIncome;
+
+    return fatherValid && motherValid && incomeValid;
+  };
+
+  console.log("Valid Parent Info:", validateParentInfo());
+
+  const handleSubmit = async () => {
+    if (!validateCurrentStep()) {
+      alert("Please complete all required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const formDataToSend = new FormData();
+
+      // Append personal info (flatten nested objects)
+      for (const [key, value] of Object.entries(formData.personal)) {
+        if (value !== null && value !== undefined) {
+          formDataToSend.append(`personal.${key}`, value);
+        }
+      }
+
+      // Append academic info (handle nested objects)
+      for (const [section, data] of Object.entries(formData.academic)) {
+        if (Array.isArray(data)) {
+          // Handle arrays (achievements)
+          data.forEach((item, index) => {
+            for (const [field, value] of Object.entries(item)) {
+              if (value)
+                formDataToSend.append(
+                  `academic.${section}[${index}].${field}`,
+                  value
+                );
+            }
+          });
+        } else {
+          // Handle nested objects (classX, classXII, etc.)
+          for (const [field, value] of Object.entries(data)) {
+            if (value)
+              formDataToSend.append(`academic.${section}.${field}`, value);
+          }
+        }
+      }
+
+      // Append parents info
+      for (const [parentType, data] of Object.entries(formData.parents)) {
+        if (parentType === "familyIncome") {
+          if (data) formDataToSend.append("parents.familyIncome", data);
+          continue;
+        }
+
+        for (const [field, value] of Object.entries(data)) {
+          if (value)
+            formDataToSend.append(`parents.${parentType}.${field}`, value);
+        }
+      }
+
+      // Append documents
+      for (const [docType, file] of Object.entries(formData.documents)) {
+        if (file instanceof File) {
+          formDataToSend.append(`documents.${docType}`, file);
+        }
+      }
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/register`,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+
+      setSubmitSuccess(true);
+      console.log("Registration successful:", response.data);
+    } catch (error) {
+      console.error("Registration error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Registration failed. Please try again.";
+      setSubmitError(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const steps = [
-    { label: 'Instructions', component: <Instructions nextStep={nextStep} /> },
-    { label: 'Personal Info', component: <PersonalInfo formData={formData} setFormData={setFormData} /> },
-    { label: 'Academic Info', component: <AcademicInfo formData={formData} setFormData={setFormData} /> },
-    { label: 'Parents Info', component: <ParentsInfo formData={formData} setFormData={setFormData} /> },
-    { label: 'Documents', component: <DocumentsUpload formData={formData} setFormData={setFormData} /> },
-    { label: 'Review', component: <ReviewSubmit formData={formData} /> }
+    { label: "Instructions", component: <Instructions nextStep={nextStep} /> },
+    {
+      label: "Personal Info",
+      component: <PersonalInfo formData={formData} setFormData={setFormData} />,
+    },
+    {
+      label: "Academic Info",
+      component: <AcademicInfo formData={formData} setFormData={setFormData} />,
+    },
+    {
+      label: "Parents Info",
+      component: <ParentsInfo formData={formData} setFormData={setFormData} />,
+    },
+    {
+      label: "Documents",
+      component: (
+        <DocumentsUpload formData={formData} setFormData={setFormData} />
+      ),
+    },
+    { label: "Review", component: <ReviewSubmit formData={formData} /> },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Student Registration</h1>
-          <p className="mt-2 text-sm text-gray-600">Complete all steps to register</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Student Registration
+          </h1>
+          <p className="mt-2 text-sm text-gray-600">
+            Complete all steps to register
+          </p>
         </div>
 
         <ProgressBar steps={steps} currentStep={currentStep} />
-        
+
         <div className="bg-white shadow rounded-lg p-6">
           {steps[currentStep].component}
-          
+
           <div className="flex justify-between mt-8">
             <button
               onClick={prevStep}
@@ -357,7 +393,7 @@ const StudentRegistration = () => {
             >
               Previous
             </button>
-            
+
             {currentStep < steps.length - 1 ? (
               currentStep !== 0 && (
                 <button
@@ -373,19 +409,37 @@ const StudentRegistration = () => {
                 onClick={handleSubmit}
                 disabled={isSubmitting}
                 className={`px-4 py-2 rounded-md ${
-                  isSubmitting ? 'bg-gray-500' : 'bg-green-600 hover:bg-green-700'
+                  isSubmitting
+                    ? "bg-gray-500"
+                    : "bg-green-600 hover:bg-green-700"
                 } text-white flex items-center justify-center min-w-32`}
               >
                 {isSubmitting ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Processing...
                   </>
                 ) : (
-                  'Submit Registration'
+                  "Submit Registration"
                 )}
               </button>
             )}
@@ -399,7 +453,8 @@ const StudentRegistration = () => {
 
           {submitSuccess && (
             <div className="mt-4 p-3 bg-green-50 text-green-600 rounded-md text-sm">
-              Registration successful! You will receive a confirmation email shortly.
+              Registration successful! You will receive a confirmation email
+              shortly.
             </div>
           )}
         </div>
