@@ -1,3 +1,66 @@
+const sendOtpMail = require('../utils/otpMailer');
+const crypto = require('crypto');
+// In-memory OTP store (for demo; use Redis or DB in production)
+const otpStore = {};
+
+// Send OTP to email if student exists
+exports.sendLoginOtp = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: 'Email is required' });
+  db.query('SELECT * FROM students WHERE email = ?', [email], async (err, results) => {
+    if (err) return res.status(500).json({ message: 'DB error', error: err });
+    if (!results || results.length === 0) return res.status(404).json({ message: 'No student found with this email' });
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
+    try {
+      await sendOtpMail(email, otp);
+      res.json({ message: 'OTP sent to email' });
+    } catch (e) {
+      res.status(500).json({ message: 'Failed to send OTP', error: e });
+    }
+  });
+};
+
+// --- Student Profile ---
+exports.getStudentProfile = (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.status(400).json({ message: 'Email is required' });
+  db.query('SELECT * FROM students WHERE email = ?', [email], (err, results) => {
+    if (err) return res.status(500).json({ message: 'DB error', error: err });
+    if (!results || results.length === 0) return res.status(404).json({ message: 'Student not found' });
+    const student = results[0];
+    res.json({ student });
+  });
+};
+
+// --- Student Dashboard ---
+exports.getStudentDashboard = (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.status(400).json({ message: 'Email is required' });
+  db.query('SELECT * FROM students WHERE email = ?', [email], (err, results) => {
+    if (err) return res.status(500).json({ message: 'DB error', error: err });
+    if (!results || results.length === 0) return res.status(404).json({ message: 'Student not found' });
+    const student = results[0];
+    res.json({ student });
+  });
+};
+
+// Verify OTP and "login"
+exports.verifyLoginOtp = (req, res) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) return res.status(400).json({ message: 'Email and OTP required' });
+  const record = otpStore[email];
+  if (!record) return res.status(400).json({ message: 'No OTP requested for this email' });
+  if (Date.now() > record.expires) {
+    delete otpStore[email];
+    return res.status(400).json({ message: 'OTP expired' });
+  }
+  if (record.otp !== otp) return res.status(400).json({ message: 'Invalid OTP' });
+  delete otpStore[email];
+  // Optionally, create a session or JWT here
+  res.json({ message: 'Login successful' });
+};
 
 const db = require('../config/db');
 const uploadToCloudinary = require('../utils/cloudinaryUpload');
