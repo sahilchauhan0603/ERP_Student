@@ -1,4 +1,7 @@
-export default function ReviewSubmit({ formData }) {
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+export default function ReviewSubmit({ formData, registrationSuccess }) {
   // Format date with proper styling
   const formatDate = (dateString) => {
     if (!dateString) return <span className="text-gray-400 italic">Not provided</span>;
@@ -94,6 +97,43 @@ export default function ReviewSubmit({ formData }) {
       <div className="text-gray-800 font-medium">{value}</div>
     </div>
   );
+
+  const navigate = useNavigate();
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
+  useEffect(() => {
+    if (registrationSuccess) {
+      setShowConfirmation(true);
+      const timer = setTimeout(() => {
+        // Store a flag in localStorage to show popup on homepage
+        if (formData?.personal?.email) {
+          localStorage.setItem('showLoginPopup', JSON.stringify({ show: true, email: formData.personal.email }));
+        } else {
+          localStorage.setItem('showLoginPopup', JSON.stringify({ show: true }));
+        }
+        navigate("/");
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [registrationSuccess, navigate, formData]);
+
+  if (showConfirmation) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="bg-gradient-to-r from-green-400 to-blue-500 p-8 rounded-2xl shadow-xl flex flex-col items-center">
+          <svg className="w-20 h-20 text-white mb-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="#22c55e" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4" stroke="#fff" />
+          </svg>
+          <h2 className="text-3xl font-bold text-white mb-2">Registration Successful!</h2>
+          <p className="text-lg text-white/90 mb-4 text-center">Thank you for registering. You will be redirected to the homepage shortly.</p>
+          <div className="w-full bg-white/30 rounded-full h-2.5 mt-2">
+            <div className="bg-white h-2.5 rounded-full transition-all duration-700 animate-pulse" style={{ width: '100%' }}></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

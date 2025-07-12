@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import CustomModal from "./CustomModal";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaClipboardList, FaSearch } from "react-icons/fa";
@@ -9,6 +10,26 @@ import campusBackground from '../assets/images/BPIT.png'; // Make sure this path
 const HomePage = () => {
   // const [showResult, setShowResult] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [popupEmail, setPopupEmail] = useState("");
+
+  useEffect(() => {
+    // Check localStorage for registration popup
+    const popupData = localStorage.getItem('showLoginPopup');
+    if (popupData) {
+      try {
+        const parsed = JSON.parse(popupData);
+        if (parsed.show) {
+          setShowLoginPopup(true);
+          setPopupEmail(parsed.email || "");
+        }
+      } catch (e) {
+        console.error("Failed to parse popup data from localStorage", e);
+      }
+      // Remove so it doesn't show again
+      localStorage.removeItem('showLoginPopup');
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoaded(true), 100);
@@ -85,6 +106,18 @@ const HomePage = () => {
         minHeight: '100vh'
       }}
     >
+      <CustomModal
+        isOpen={showLoginPopup}
+        onClose={() => setShowLoginPopup(false)}
+        title="Registration Complete!"
+        message={
+          popupEmail
+            ? `You can now login using your email ID: ${popupEmail}`
+            : "You can now login using your email ID given during registration."
+        }
+        type="success"
+        duration={3500}
+      />
       {/* Header */}
       <motion.header 
         className="text-center my-12 px-4"

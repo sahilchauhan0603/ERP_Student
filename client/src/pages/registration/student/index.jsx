@@ -9,8 +9,14 @@ import DocumentsUpload from "./STEP5_DocumentsUpload";
 import ReviewSubmit from "./STEP6_ReviewSubmit";
 import ParentsInfo from "./STEP4_ParentDetails"; // Assuming this is the correct import path
 
+import { useEffect } from "react";
+
 const StudentRegistration = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  // Scroll to top on step change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentStep]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
