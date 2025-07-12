@@ -1,4 +1,5 @@
 import { useState } from "react";
+import CustomModal from "../../../components/CustomModal";
 import axios from "axios";
 import ProgressBar from "../../../components/ProgressBar";
 import Instructions from "./STEP1_Instructions";
@@ -13,6 +14,26 @@ const StudentRegistration = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Modal state
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info",
+    onClose: null,
+  });
+
+  // Helper to show modal
+  const showModal = ({ title, message, type = "info", onClose }) => {
+    setModal({
+      isOpen: true,
+      title,
+      message,
+      type,
+      onClose: onClose || (() => setModal((m) => ({ ...m, isOpen: false }))),
+    });
+  };
 
   const [formData, setFormData] = useState({
     personal: {
@@ -110,10 +131,24 @@ const StudentRegistration = () => {
   const nextStep = () => {
     if (validateCurrentStep()) {
       if (currentStep < steps.length - 1) {
-        setCurrentStep(currentStep + 1);
+        // Show confirmation modal for current step
+        let stepName = steps[currentStep]?.label || "Current form";
+        showModal({
+          title: "Step Completed!",
+          message: `${stepName} successfully filled. Proceeding to next step...`,
+          type: "success",
+          onClose: () => {
+            setModal((m) => ({ ...m, isOpen: false }));
+            setCurrentStep(currentStep + 1);
+          },
+        });
       }
     } else {
-      alert("Please fill all required fields");
+      showModal({
+        title: "Incomplete Fields",
+        message: "Please fill all required fields before proceeding.",
+        type: "error",
+      });
     }
   };
 
@@ -259,6 +294,16 @@ const StudentRegistration = () => {
 
   console.log("Valid Parent Info:", validateParentInfo());
 
+  // Helper: convert File to base64
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleSubmit = async () => {
     if (!validateCurrentStep()) {
       alert("Please complete all required fields");
@@ -269,63 +314,60 @@ const StudentRegistration = () => {
     setSubmitError(null);
 
     try {
-      const formDataToSend = new FormData();
+      // Build a plain object for JSON submission
+      const payload = {};
 
-      // Append personal info (flatten nested objects)
+      // Personal
       for (const [key, value] of Object.entries(formData.personal)) {
         if (value !== null && value !== undefined) {
-          formDataToSend.append(`personal.${key}`, value);
+          payload[`personal.${key}`] = value;
         }
       }
 
-      // Append academic info (handle nested objects)
+      // Academic
       for (const [section, data] of Object.entries(formData.academic)) {
         if (Array.isArray(data)) {
-          // Handle arrays (achievements)
-          data.forEach((item, index) => {
-            for (const [field, value] of Object.entries(item)) {
-              if (value)
-                formDataToSend.append(
-                  `academic.${section}[${index}].${field}`,
-                  value
-                );
-            }
-          });
+          payload[`academic.${section}`] = data;
         } else {
-          // Handle nested objects (classX, classXII, etc.)
           for (const [field, value] of Object.entries(data)) {
             if (value)
-              formDataToSend.append(`academic.${section}.${field}`, value);
+              payload[`academic.${section}.${field}`] = value;
           }
         }
       }
 
-      // Append parents info
+      // Parents
       for (const [parentType, data] of Object.entries(formData.parents)) {
         if (parentType === "familyIncome") {
-          if (data) formDataToSend.append("parents.familyIncome", data);
+          if (data) payload["parents.familyIncome"] = data;
           continue;
         }
-
         for (const [field, value] of Object.entries(data)) {
-          if (value)
-            formDataToSend.append(`parents.${parentType}.${field}`, value);
+          if (value) payload[`parents.${parentType}.${field}`] = value;
         }
       }
 
-      // Append documents
+      // Documents: convert File to base64
       for (const [docType, file] of Object.entries(formData.documents)) {
         if (file instanceof File) {
-          formDataToSend.append(`documents.${docType}`, file);
+          payload[docType] = await fileToBase64(file);
+        } else {
+          payload[docType] = null;
         }
       }
 
+      // Achievements arrays as JSON strings (for backend compatibility)
+      if (formData.academic.academicAchievements)
+        payload["academic.academicAchievements"] = JSON.stringify(formData.academic.academicAchievements);
+      if (formData.academic.coCurricularAchievements)
+        payload["academic.coCurricularAchievements"] = JSON.stringify(formData.academic.coCurricularAchievements);
+
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/register`,
-        formDataToSend,
+        `${import.meta.env.VITE_API_URL}/student/register`,
+        payload,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
           },
           withCredentials: true,
         }
@@ -370,6 +412,13 @@ const StudentRegistration = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <CustomModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        onClose={modal.onClose}
+      />
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">

@@ -74,7 +74,7 @@ const RegistrationPage = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl w-full px-4"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-4xl w-full px-4 mt-28"
         >
           {/* Student Card */}
           <motion.div
@@ -82,22 +82,23 @@ const RegistrationPage = () => {
             whileHover="hover"
             className="relative"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-indigo-600 rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-200"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-indigo-600 rounded-xl blur opacity-20 group-hover:opacity-60 transition duration-200"></div>
             <Link
               to="/registration/student"
-              className="relative flex flex-col items-center justify-center p-8 bg-white bg-opacity-90 rounded-xl shadow-lg h-full text-center text-gray-700 transition-all duration-300 hover:border-blue-500 border-2 border-transparent backdrop-blur-sm"
+              className="relative flex flex-col items-center justify-center p-4 md:p-5 min-w-[220px] max-w-[260px] mx-auto rounded-xl shadow-lg h-full text-center text-gray-700 transition-all duration-300 hover:border-blue-500 border-2 border-black backdrop-blur-[8px]"
+              style={{boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)'}}
             >
-              <div className="p-4 rounded-full bg-blue-50 mb-4">
-                <FaUserGraduate className="text-5xl text-blue-600" />
+              <div className="p-2 rounded-full bg-blue-50 bg-opacity-60 mb-2">
+                <FaUserGraduate className="text-3xl text-blue-600" />
               </div>
-              <h2 className="mt-4 text-2xl font-semibold text-gray-800">
+              <h2 className="mt-2 text-lg font-extrabold text-gray-800">
                 Student Registration
               </h2>
-              <p className="mt-2 text-gray-500">
+              <p className="mt-1 text-gray-900 font-bold text-sm">
                 Join as a student to access all campus resources
               </p>
               <motion.span 
-                className="mt-4 text-blue-600 font-medium inline-flex items-center"
+                className="mt-2 text-blue-800 font-semibold inline-flex items-center text-sm"
                 whileHover={{ x: 5 }}
               >
                 Register now <span className="ml-1">→</span>
@@ -111,22 +112,23 @@ const RegistrationPage = () => {
             whileHover="hover"
             className="relative"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-teal-600 rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-200"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-teal-600 rounded-xl blur opacity-20 group-hover:opacity-60 transition duration-200"></div>
             <Link
               to="/registration/faculty"
-              className="relative flex flex-col items-center justify-center p-8 bg-white bg-opacity-90 rounded-xl shadow-lg h-full text-center text-gray-700 transition-all duration-300 hover:border-green-500 border-2 border-transparent backdrop-blur-sm"
+              className="relative flex flex-col items-center justify-center p-4 md:p-5 min-w-[220px] max-w-[260px] mx-auto rounded-xl shadow-lg h-full text-center text-gray-700 transition-all duration-300 hover:border-green-500 border-2 border-black backdrop-blur-[8px]"
+              style={{boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)'}}
             >
-              <div className="p-4 rounded-full bg-green-50 mb-4">
-                <FaChalkboardTeacher className="text-5xl text-green-600" />
+              <div className="p-2 rounded-full bg-green-50 bg-opacity-60 mb-2">
+                <FaChalkboardTeacher className="text-3xl text-green-600" />
               </div>
-              <h2 className="mt-4 text-2xl font-semibold text-gray-800">
+              <h2 className="mt-2 text-lg font-extrabold text-gray-800">
                 Faculty Registration
               </h2>
-              <p className="mt-2 text-gray-500">
+              <p className="mt-1 text-gray-900 font-bold text-sm">
                 Join as faculty to manage courses and students
               </p>
               <motion.span 
-                className="mt-4 text-green-600 font-medium inline-flex items-center"
+                className="mt-2 text-green-800 font-semibold inline-flex items-center text-sm"
                 whileHover={{ x: 5 }}
               >
                 Register now <span className="ml-1">→</span>
@@ -140,22 +142,23 @@ const RegistrationPage = () => {
             whileHover="hover"
             className="relative"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-purple-400 to-pink-600 rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-200"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-purple-400 to-pink-600 rounded-xl blur opacity-20 group-hover:opacity-60 transition duration-200"></div>
             <Link
               to="/registration/non-teaching-staff"
-              className="relative flex flex-col items-center justify-center p-8 bg-white bg-opacity-90 rounded-xl shadow-lg h-full text-center text-gray-700 transition-all duration-300 hover:border-purple-500 border-2 border-transparent backdrop-blur-sm"
+              className="relative flex flex-col items-center justify-center p-4 md:p-5 min-w-[220px] max-w-[260px] mx-auto rounded-xl shadow-lg h-full text-center text-gray-700 transition-all duration-300 hover:border-purple-500 border-2 border-black backdrop-blur-[8px]"
+              style={{boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)'}}
             >
-              <div className="p-4 rounded-full bg-purple-50 mb-4">
-                <BsPersonBadge className="text-5xl text-purple-600" />
+              <div className="p-2 rounded-full bg-purple-50 bg-opacity-60 mb-2">
+                <BsPersonBadge className="text-3xl text-purple-600" />
               </div>
-              <h2 className="mt-4 text-2xl font-semibold text-gray-800">
+              <h2 className="mt-2 text-lg font-extrabold text-gray-800">
                 Staff Registration
               </h2>
-              <p className="mt-2 text-gray-500">
+              <p className="mt-1 text-gray-900 font-bold text-sm">
                 Join as non-teaching staff to access admin features
               </p>
               <motion.span 
-                className="mt-4 text-purple-600 font-medium inline-flex items-center"
+                className="mt-2 text-purple-800 font-semibold inline-flex items-center text-sm"
                 whileHover={{ x: 5 }}
               >
                 Register now <span className="ml-1">→</span>

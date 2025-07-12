@@ -7,7 +7,7 @@ import { FiLogIn } from "react-icons/fi";
 import campusBackground from '../assets/images/BPIT.png'; // Make sure this path is correct
 
 const HomePage = () => {
-  const [showResult, setShowResult] = useState(false);
+  // const [showResult, setShowResult] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const HomePage = () => {
       href: "/login",
       icon: <FiLogIn className="text-5xl" />,
       label: "Student Login",
-      color: "from-indigo-800 to-indigo-900",
+      color: "from-green-800 to-green-900",
       bgColor: "bg-indigo-100"
     },
     {
@@ -121,19 +121,13 @@ const HomePage = () => {
                 whileHover="hover"
                 className="relative h-full group"
               >
-                <div className={`absolute -inset-1 bg-gradient-to-r ${item.color} rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-300`}></div>
-                <div className="relative flex flex-col items-center justify-center h-full p-6 bg-white bg-opacity-80 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-transparent group-hover:border-opacity-30 backdrop-blur-sm">
-                  <div className={`p-4 rounded-full ${item.bgColor} mb-4 transition-colors duration-300 group-hover:bg-opacity-70`}>
-                    {React.cloneElement(item.icon, { className: `${item.icon.props.className} text-gradient ${item.color.replace('to', 'to-')}` })}
+                <div className={`absolute -inset-1 bg-gradient-to-r ${item.color} rounded-xl blur opacity-20 group-hover:opacity-60 transition duration-200`}></div>
+                <div className="relative flex flex-col items-center justify-center h-full p-4 md:p-5 min-w-[220px] max-w-[260px] mx-auto rounded-xl shadow-lg transition-all duration-300 hover:border-blue-500 border-2 border-black backdrop-blur-[6px]" style={{boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)'}}>
+                  <div className={`p-2 rounded-full ${item.bgColor} bg-opacity-60 mb-2`}>
+                    {React.cloneElement(item.icon, { className: `text-3xl ${item.icon.props.className}` })}
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-2">{item.label}</h2>
-                  <motion.div 
-                    className="h-1 w-8 bg-gradient-to-r rounded-full"
-                    style={{ background: `linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-to))` }}
-                    initial={{ width: 0 }}
-                    animate={{ width: 32 }}
-                    transition={{ delay: 0.5 }}
-                  />
+                  <h2 className="mt-2 text-lg font-bold text-gray-800">{item.label}</h2>
+                  {/* Optionally add a short description here for consistency */}
                 </div>
               </motion.div>
             );
