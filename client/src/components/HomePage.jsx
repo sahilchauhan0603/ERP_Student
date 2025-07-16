@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import CustomModal from "./CustomModal";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaClipboardList, FaSearch } from "react-icons/fa";
+import { FaClipboardList, FaSearch, FaTwitter, FaLinkedinIn, FaYoutube, FaInstagram } from "react-icons/fa";
 import { MdVerifiedUser } from "react-icons/md";
 import { FiLogIn } from "react-icons/fi";
-import campusBackground from '../assets/images/BPIT.png'; // Make sure this path is correct
+import campusBackground from '../assets/images/BPIT.png';
+import bpitLogo from '../assets/icons/BPIT-logo-transparent.png';
+
 
 const HomePage = () => {
   // const [showResult, setShowResult] = useState(false);
@@ -96,16 +98,31 @@ const HomePage = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen flex flex-col relative"
+    <div
+      className="min-h-screen flex flex-col relative bg-gradient-to-br from-white via-blue-50 to-red-50"
       style={{
         background: `
-          linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+          linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)),
           url(${campusBackground}) center/cover fixed no-repeat
         `,
         minHeight: '100vh'
       }}
     >
+      {/* Social Media Bar - Fixed Right */}
+      <div className="fixed top-3/4 right-0 z-40 flex flex-col items-end gap-2 -translate-y-1/2 pr-1">
+        <a href="https://twitter.com/bpitindia" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-white shadow-md bg-[#1da1f2] hover:bg-[#0d8ddb] transition-colors duration-200 w-12 h-12 flex items-center justify-center mb-1">
+          <FaTwitter className="text-white text-2xl" />
+        </a>
+        <a href="https://www.linkedin.com/company/bhagwan-parshuram-institute-of-technology/?lipi=urn%3Ali%3Apage%3Ad_flagship3_search_srp_all%3Boc8pjvY5TNWSbh6X8JuY6w%3D%3D" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-white shadow-md bg-[#0077b5] hover:bg-[#005983] transition-colors duration-200 w-12 h-12 flex items-center justify-center mb-1">
+          <FaLinkedinIn className="text-white text-2xl" />
+        </a>
+        <a href="https://www.youtube.com/@bpitcampus" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-white shadow-md bg-[#ff0000] hover:bg-[#b80000] transition-colors duration-200 w-12 h-12 flex items-center justify-center mb-1">
+          <FaYoutube className="text-white text-2xl" />
+        </a>
+        <a href="https://www.instagram.com/bpitindia/" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-white shadow-md bg-[#c32aa3] hover:bg-[#a21c7a] transition-colors duration-200 w-12 h-12 flex items-center justify-center">
+          <FaInstagram className="text-white text-2xl" />
+        </a>
+      </div>
       <CustomModal
         isOpen={showLoginPopup}
         onClose={() => setShowLoginPopup(false)}
@@ -118,30 +135,50 @@ const HomePage = () => {
         type="success"
         duration={3500}
       />
-      {/* Header */}
-      <motion.header 
-        className="text-center my-12 px-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={loaded ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6 }}
+      {/* BPIT Official Header - Enhanced */}
+      <header
+        className="w-full bg-white border-t-4 border-b-4 border-red-500 shadow-lg flex flex-col md:flex-row items-center justify-between px-2 md:px-10 py-3 relative z-20"
+        style={{ minHeight: 100, borderRadius: '0 0 1.5rem 1.5rem' }}
       >
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-          Bhagwan Parshuram Institute of Technology
-        </h1>
-        <motion.h2 
-          className="text-lg md:text-xl text-gray-600"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
-          PSP-4, Sec-17, Rohini, Delhi-89
-        </motion.h2>
-      </motion.header>
+        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full md:w-auto">
+          <div className="flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-1 md:p-2 shadow-sm border border-blue-200">
+            <img
+              src={bpitLogo}
+              alt="BPIT Logo"
+              className="h-14 sm:h-16 w-auto object-contain drop-shadow-md"
+              style={{ minWidth: 56 }}
+            />
+          </div>
+          <div className="flex flex-col justify-center items-center sm:items-start text-center sm:text-left w-full">
+            <h1
+              className="text-lg xs:text-xl md:text-3xl font-extrabold text-blue-900 leading-tight tracking-tight drop-shadow-sm"
+              style={{ fontFamily: 'serif', letterSpacing: 0.5 }}
+            >
+              Bhagwan Parshuram Institute of Technology
+            </h1>
+            <div className="text-sm xs:text-base md:text-lg font-bold text-red-600 leading-tight mt-0.5 md:mt-1" style={{ fontFamily: 'serif', letterSpacing: 0.2 }}>
+              <span className="tracking-wide">A Unit of Bhartiya Brahmin Charitable Trust (Regd.)</span>
+            </div>
+            <div className="text-xs md:text-sm text-blue-700 font-medium mt-0.5 md:mt-1" style={{ fontFamily: 'serif' }}>
+              <span className="block">(Approved by AICTE, Ministry of Education (MoE))</span>
+              <span className="block">Affiliated to Guru Gobind Singh Indraprastha University, Delhi</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mt-3 md:mt-0 md:ml-4">
+          <img
+            src="https://bpitindia.ac.in/wp-content/uploads/2024/03/Header-1-1-300x88-1.jpg"
+            alt="G20 Logo"
+            className="h-16 sm:h-20 md:h-24 w-auto object-contain bg-white rounded-lg border border-blue-100 shadow-sm p-1"
+            style={{ minWidth: 40 }}
+          />
+        </div>
+      </header>
 
       {/* Main Content */}
-      <main className="flex-grow flex flex-col items-center justify-center px-4 mt-28">
-        <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full max-w-3xl"
+      <main className="flex-grow flex flex-col items-center justify-center px-2 sm:px-4 mt-8 md:mt-16">
+        <motion.div
+          className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8 w-full max-w-xs xs:max-w-2xl md:max-w-3xl mt-10 sm:mt-16 md:mt-20"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -155,12 +192,11 @@ const HomePage = () => {
                 className="relative h-full group"
               >
                 <div className={`absolute -inset-1 bg-gradient-to-r ${item.color} rounded-xl blur opacity-20 group-hover:opacity-60 transition duration-200`}></div>
-                <div className="relative flex flex-col items-center justify-center h-full p-4 md:p-5 min-w-[220px] max-w-[260px] mx-auto rounded-xl shadow-lg transition-all duration-300 hover:border-blue-500 border-2 border-black backdrop-blur-[8px]" style={{boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)'}}>
-                  <div className={`p-2 rounded-full ${item.bgColor} bg-opacity-60 mb-2`}>
+                <div className="relative flex flex-col items-center justify-center h-full p-4 md:p-5 min-w-[220px] max-w-[260px] mx-auto rounded-xl shadow-lg transition-all duration-300 hover:border-blue-500 border-2 border-blue-800/80 backdrop-blur-[12px]" style={{boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)'}}>
+                  <div className={`p-2 rounded-full ${item.bgColor} bg-opacity-60 mb-2 border-2 border-blue-200/60`}>
                     {React.cloneElement(item.icon, { className: `text-3xl ${item.icon.props.className}` })}
                   </div>
-                  <h2 className="mt-2 text-lg font-bold text-gray-800">{item.label}</h2>
-                  {/* Optionally add a short description here for consistency */}
+                  <h2 className="mt-2 text-lg font-bold text-black drop-shadow-sm">{item.label}</h2>
                 </div>
               </motion.div>
             );

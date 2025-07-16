@@ -69,10 +69,10 @@ export default function AcademicInfo({ formData, setFormData }) {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* Class X */}
-      <div className="bg-white/90 p-6 rounded-2xl shadow-md border border-white/30">
-        <div className="flex items-center mb-6 pb-3 border-b border-blue-100/50">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+        <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
           <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
             <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -80,14 +80,14 @@ export default function AcademicInfo({ formData, setFormData }) {
           </div>
           <h2 className="text-xl font-semibold text-blue-800/90">Class X Details</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {renderInput('Institute', 'institute', 'classX', 'text', true)}
           {renderInput('Year', 'year', 'classX', 'text', true)}
           {renderInput('Board', 'board', 'classX', 'text', true)}
           {renderInput('PCM %', 'pcm', 'classX')}
           {renderInput('Aggregate %', 'aggregate', 'classX', 'text', true)}
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-blue-700/90">Have you done Diploma/Polytechnic?<span className="text-red-500">*</span></label>
+            <label className="block text-sm font-semibold text-blue-800">Have you done Diploma/Polytechnic?<span className="text-red-500">*</span></label>
             <div className="flex gap-4 mt-2">
               {['Yes', 'No'].map(option => (
                 <label key={option} className="inline-flex items-center cursor-pointer">
@@ -113,8 +113,8 @@ export default function AcademicInfo({ formData, setFormData }) {
       </div>
 
       {/* Class XII */}
-      <div className="bg-white/90 p-6 rounded-2xl shadow-md border border-white/30">
-        <div className="flex items-center mb-6 pb-3 border-b border-blue-100/50">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+        <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
           <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
             <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -122,7 +122,7 @@ export default function AcademicInfo({ formData, setFormData }) {
           </div>
           <h2 className="text-xl font-semibold text-blue-800/90">Class XII Details</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {renderInput('Institute', 'institute', 'classXII', 'text', true)}
           {renderInput('Year', 'year', 'classXII', 'text', true)}
           {renderInput('Board', 'board', 'classXII', 'text', true)}
@@ -132,8 +132,8 @@ export default function AcademicInfo({ formData, setFormData }) {
       </div>
 
       {/* Other Qualification */}
-      <div className="bg-white/90 p-6 rounded-2xl shadow-md border border-white/30">
-        <div className="flex items-center mb-6 pb-3 border-b border-blue-100/50">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+        <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
           <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
             <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -141,7 +141,7 @@ export default function AcademicInfo({ formData, setFormData }) {
           </div>
           <h2 className="text-xl font-semibold text-blue-800/90">Other Qualification</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {renderInput('Institute', 'institute', 'otherQualification')}
           {renderInput('Year', 'year', 'otherQualification')}
           {renderInput('Board', 'board', 'otherQualification')}
@@ -151,8 +151,8 @@ export default function AcademicInfo({ formData, setFormData }) {
       </div>
 
       {/* Academic Achievements */}
-      <div className="bg-white/90 p-6 rounded-2xl shadow-md border border-white/30">
-        <div className="flex items-center mb-6 pb-3 border-b border-blue-100/50">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+        <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
           <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
             <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
@@ -163,28 +163,28 @@ export default function AcademicInfo({ formData, setFormData }) {
         {formData.academic.academicAchievements.map((item, index) => (
           <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end">
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-blue-700/90">Event</label>
+              <label className="block text-sm font-semibold text-blue-800">Event</label>
               <input
                 type="text"
                 name="event"
                 placeholder="Event name"
                 value={item.event}
                 onChange={(e) => handleChange(e, 'academicAchievements', 'event', index)}
-                className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-blue-700/90">Date</label>
+              <label className="block text-sm font-semibold text-blue-800">Date</label>
               <input
                 type="date"
                 name="date"
                 value={item.date}
                 onChange={(e) => handleChange(e, 'academicAchievements', 'date', index)}
-                className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-blue-700/90">Outcome</label>
+              <label className="block text-sm font-semibold text-blue-800">Outcome</label>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -192,7 +192,7 @@ export default function AcademicInfo({ formData, setFormData }) {
                   placeholder="Achievement"
                   value={item.outcome}
                   onChange={(e) => handleChange(e, 'academicAchievements', 'outcome', index)}
-                  className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                  className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
                 />
                 <button
                   type="button"
@@ -220,8 +220,8 @@ export default function AcademicInfo({ formData, setFormData }) {
       </div>
 
       {/* Co-Curricular Achievements */}
-      <div className="bg-white/90 p-6 rounded-2xl shadow-md border border-white/30">
-        <div className="flex items-center mb-6 pb-3 border-b border-blue-100/50">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+        <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
           <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
             <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
@@ -232,28 +232,28 @@ export default function AcademicInfo({ formData, setFormData }) {
         {formData.academic.coCurricularAchievements.map((item, index) => (
           <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end">
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-blue-700/90">Event</label>
+              <label className="block text-sm font-semibold text-blue-800">Event</label>
               <input
                 type="text"
                 name="event"
                 placeholder="Event name"
                 value={item.event}
                 onChange={(e) => handleChange(e, 'coCurricularAchievements', 'event', index)}
-                className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-blue-700/90">Date</label>
+              <label className="block text-sm font-semibold text-blue-800">Date</label>
               <input
                 type="date"
                 name="date"
                 value={item.date}
                 onChange={(e) => handleChange(e, 'coCurricularAchievements', 'date', index)}
-                className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-blue-700/90">Outcome</label>
+              <label className="block text-sm font-semibold text-blue-800">Outcome</label>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -261,7 +261,7 @@ export default function AcademicInfo({ formData, setFormData }) {
                   placeholder="Achievement"
                   value={item.outcome}
                   onChange={(e) => handleChange(e, 'coCurricularAchievements', 'outcome', index)}
-                  className="w-full px-4 py-2 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                  className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
                 />
                 <button
                   type="button"

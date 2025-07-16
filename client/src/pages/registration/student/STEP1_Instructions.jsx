@@ -4,17 +4,21 @@ const Instructions = ({ nextStep }) => {
   const [agree, setAgree] = useState(false);
 
   return (
-    <div className="max-w-4xl mx-auto bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-2xl shadow-lg">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-2">
-          Registration Instructions
-        </h2>
-        <p className="text-blue-600/80 text-lg">
+    <div className="max-w-4xl mx-auto bg-gradient-to-br from-white via-blue-50 to-red-50 p-10 rounded-3xl shadow-2xl border-2 border-blue-200/40 animate-fade-in">
+      <div className="text-center mb-10">
+        <div className="flex justify-center items-center gap-4 mb-2">
+          <span className="inline-block w-2 h-10 bg-blue-500 rounded-full"></span>
+          <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-red-500 to-blue-700 drop-shadow-lg">
+            Registration Instructions
+          </h2>
+          <span className="inline-block w-2 h-10 bg-red-500 rounded-full"></span>
+        </div>
+        <p className="text-lg text-blue-700/90 font-medium tracking-wide">
           Please read carefully before proceeding
         </p>
       </div>
 
-      <div className="bg-white/90 p-6 rounded-xl shadow-sm border border-white/20 mb-8">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-8 rounded-2xl shadow-lg border-2 border-blue-200/40 mb-10 transition-all duration-300 hover:shadow-xl">
         <div className="prose prose-blue max-w-none">
           <p className="text-lg font-medium text-blue-700/90 mb-6">
             <span className="inline-block bg-blue-100/50 text-blue-600 rounded-full p-2 mr-2">
@@ -99,15 +103,15 @@ const Instructions = ({ nextStep }) => {
         </div>
       </div>
 
-      <div className="flex items-center bg-white/90 p-4 rounded-lg border border-white/20 mb-8">
+      <div className="flex items-center bg-gradient-to-r from-blue-50 via-white to-red-50 p-4 rounded-xl border-2 border-blue-200/40 mb-10">
         <input
           type="checkbox"
           id="agree-terms"
           checked={agree}
           onChange={(e) => setAgree(e.target.checked)}
-          className="h-6 w-6 rounded border-2 border-blue-300 text-blue-600 focus:ring-blue-500 focus:ring-offset-blue-50 transition-all"
+          className="h-6 w-6 rounded border-2 border-blue-400 text-blue-600 focus:ring-blue-500 focus:ring-offset-blue-50 transition-all shadow-sm"
         />
-        <label htmlFor="agree-terms" className="ml-3 text-blue-800/90 font-medium">
+        <label htmlFor="agree-terms" className="ml-3 text-blue-800/90 font-semibold">
           I have read and understood all instructions
         </label>
       </div>
@@ -115,14 +119,14 @@ const Instructions = ({ nextStep }) => {
       <div className="flex justify-end">
         <button
           onClick={() => agree ? nextStep() : alert('Please accept the instructions to continue')}
-          className={`px-6 py-3 rounded-xl text-lg font-medium transition-all duration-300 ${
+          className={`px-7 py-3 rounded-2xl text-lg font-bold transition-all duration-300 flex items-center gap-2 ${
             agree
-              ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-purple-700'
+              ? 'bg-gradient-to-r from-blue-600 via-red-500 to-blue-600 text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-red-600 hover:to-blue-700'
               : 'bg-gray-200 text-gray-500 cursor-not-allowed'
           }`}
         >
           Continue to Registration
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
           </svg>
         </button>

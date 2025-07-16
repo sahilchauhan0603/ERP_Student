@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import bpitLogo from '../../assets/icons/BPIT-logo-transparent.png';
+import campusBackground from '../../assets/images/BPIT.png';
 
 const StudentLogin = () => {
   const [email, setEmail] = useState('');
@@ -47,23 +49,67 @@ const StudentLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col justify-center py-4 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
+    <div
+      className="min-h-screen flex flex-col bg-gradient-to-br from-white via-blue-50 to-red-50"
+      style={{
+        background: `
+          linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)),
+          url(${campusBackground}) center/cover fixed no-repeat
+        `,
+        minHeight: '100vh'
+      }}
+    >
+      {/* BPIT Official Header - Consistent with site theme */}
+      <header
+        className="w-full bg-white border-t-4 border-b-4 border-red-500 shadow-lg flex flex-col md:flex-row items-center justify-between px-2 md:px-10 py-3 relative z-20"
+        style={{ minHeight: 100, borderRadius: '0 0 1.5rem 1.5rem' }}
+      >
+        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full md:w-auto">
+          <div className="flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-1 md:p-2 shadow-sm border border-blue-200">
+            <img
+              src={bpitLogo}
+              alt="BPIT Logo"
+              className="h-14 sm:h-16 w-auto object-contain drop-shadow-md"
+              style={{ minWidth: 56 }}
+            />
+          </div>
+          <div className="flex flex-col justify-center items-center sm:items-start text-center sm:text-left w-full">
+            <h1
+              className="text-lg xs:text-xl md:text-3xl font-extrabold text-blue-900 leading-tight tracking-tight drop-shadow-sm"
+              style={{ fontFamily: 'serif', letterSpacing: 0.5 }}
+            >
+              Bhagwan Parshuram Institute of Technology
+            </h1>
+            <div className="text-sm xs:text-base md:text-lg font-bold text-red-600 leading-tight mt-0.5 md:mt-1" style={{ fontFamily: 'serif', letterSpacing: 0.2 }}>
+              <span className="tracking-wide">A Unit of Bhartiya Brahmin Charitable Trust (Regd.)</span>
+            </div>
+            <div className="text-xs md:text-sm text-blue-700 font-medium mt-0.5 md:mt-1" style={{ fontFamily: 'serif' }}>
+              <span className="block">(Approved by AICTE, Ministry of Education (MoE))</span>
+              <span className="block">Affiliated to Guru Gobind Singh Indraprastha University, Delhi</span>
+            </div>
+          </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Student Portal Login
-        </h2>
-        {/* <p className="mt-2 text-center text-sm text-gray-600">
-          Please use the same email you registered with
-        </p> */}
-      </div>
+        <div className="flex items-center gap-2 mt-3 md:mt-0 md:ml-4">
+          <img
+            src="https://bpitindia.ac.in/wp-content/uploads/2024/03/Header-1-1-300x88-1.jpg"
+            alt="G20 Logo"
+            className="h-16 sm:h-20 md:h-24 w-auto object-contain bg-white rounded-lg border border-blue-100 shadow-sm p-1"
+            style={{ minWidth: 40 }}
+          />
+        </div>
+      </header>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-lg rounded-xl">
+      <div className="flex-1 flex flex-col justify-center items-center py-8 px-2 sm:px-4 mt-2 md:mt-6">
+        <div className="w-full max-w-md mx-auto">
+          <div className="bg-gradient-to-br from-white via-blue-50 to-red-50 p-1 rounded-2xl shadow-lg">
+            <div className="bg-white py-8 px-6 shadow-lg rounded-2xl border-2 border-blue-200/40">
+              <div className="flex flex-col items-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-blue-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <h2 className="text-2xl md:text-3xl font-extrabold text-blue-900 mb-1">Student Portal Login</h2>
+                <p className="text-sm text-blue-700">Please use the same email you registered with</p>
+              </div>
           {error && (
             <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -81,14 +127,12 @@ const StudentLogin = () => {
             </div>
           )}
 
-          <div className="bg-blue-50 p-4 rounded-lg mb-6 border border-blue-100">
-            <p className="text-sm text-blue-800 flex items-start">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-0.5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
-              </svg>
-              <span>Please use the exact email address you provided during registration. If you don't receive the OTP, check your spam folder or contact support.</span>
-            </p>
-          </div>
+              <div className="bg-blue-50 p-4 rounded-lg mb-6 border border-blue-200 flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-0.5 mr-2 flex-shrink-0 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+                </svg>
+                <span className="text-blue-800 text-sm">Please use the exact email address you provided during registration. If you don't receive the OTP, check your spam folder or contact support.</span>
+              </div>
 
           {step === 1 && (
             <form className="space-y-6" onSubmit={handleSendOtp}>
@@ -112,7 +156,7 @@ const StudentLogin = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-2 sm:text-sm border-gray-300 rounded-md"
-                    placeholder="your@university.edu"
+                    placeholder="yourgmail@gmail.com"
                   />
                 </div>
               </div>
@@ -201,6 +245,8 @@ const StudentLogin = () => {
                   </a>
                 </span>
               </div>
+            </div>
+          </div>
             </div>
           </div>
         </div>

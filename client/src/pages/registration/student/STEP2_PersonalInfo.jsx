@@ -29,29 +29,33 @@ const PersonalInfo = ({ formData, setFormData }) => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto bg-gradient-to-br from-blue-50/50 to-purple-50/50 p-8 rounded-3xl shadow-2xl backdrop-blur-sm border border-white/20">
+    <div className="max-w-5xl mx-auto bg-gradient-to-br from-white via-blue-50 to-red-50 p-10 rounded-3xl shadow-2xl border-2 border-blue-200/40 animate-fade-in">
       {/* Header */}
       <div className="mb-10 text-center">
-        <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-3">
-          Personal Information
-        </h2>
-        <p className="text-blue-600/80 text-lg">
+        <div className="flex justify-center items-center gap-4 mb-2">
+          <span className="inline-block w-2 h-10 bg-blue-500 rounded-full"></span>
+          <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-red-500 to-blue-700 drop-shadow-lg">
+            Personal Information
+          </h2>
+          <span className="inline-block w-2 h-10 bg-red-500 rounded-full"></span>
+        </div>
+        <p className="text-blue-700/90 text-lg font-medium tracking-wide">
           Please complete all required fields carefully
         </p>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-12">
         {/* Course Selection */}
-        <div className="bg-white/90 p-6 rounded-2xl shadow-md border border-white/30">
-          <label className="block text-sm font-medium text-blue-700/90 mb-3">
-            <span className="text-lg">🎓</span> Select Course
-            <span className="text-red-500">*</span>
+        <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+          <label className="block text-base font-semibold text-blue-800 mb-3 flex items-center gap-2">
+            <span className="text-xl">🎓</span> Select Course
+            <span className="text-red-500 font-bold">*</span>
           </label>
           <select
             name="course"
             value={formData.personal.course || ""}
             onChange={handleChange}
-            className="w-full px-5 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+            className="w-full px-5 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
             required
           >
             <option value="" className="text-blue-300">
@@ -66,8 +70,8 @@ const PersonalInfo = ({ formData, setFormData }) => {
         </div>
 
         {/* Personal Details Section */}
-        <div className="bg-white/90 p-6 rounded-2xl shadow-md border border-white/30">
-          <div className="flex items-center mb-6 pb-3 border-b border-blue-100/50">
+        <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
             <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
               <svg
                 className="w-6 h-6 text-blue-600"
@@ -88,10 +92,10 @@ const PersonalInfo = ({ formData, setFormData }) => {
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Name Fields */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-blue-700/90">
+              <label className="block text-sm font-semibold text-blue-800">
                 First Name<span className="text-red-500">*</span>
               </label>
               <input
@@ -99,13 +103,13 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="First Name"
                 value={formData.personal.firstName || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-blue-700/90">
+              <label className="block text-sm font-semibold text-blue-800">
                 Middle Name
               </label>
               <input
@@ -113,12 +117,12 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="Middle Name"
                 value={formData.personal.middleName || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-blue-700/90">
+              <label className="block text-sm font-semibold text-blue-800">
                 Last Name<span className="text-red-500">*</span>
               </label>
               <input
@@ -126,14 +130,14 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="Last Name"
                 value={formData.personal.lastName || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
                 required
               />
             </div>
 
             {/* ABC ID */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-blue-700/90">
+              <label className="block text-sm font-semibold text-blue-800">
                 ABC ID<span className="text-red-500">*</span>
               </label>
               <input
@@ -141,14 +145,14 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="ABC ID"
                 value={formData.personal.abcId || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
                 required
               />
             </div>
 
             {/* Date of Birth */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-blue-700/90">
+              <label className="block text-sm font-semibold text-blue-800">
                 Date of Birth<span className="text-red-500">*</span>
               </label>
               <input
@@ -156,14 +160,14 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 name="dob"
                 value={formData.personal.dob || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
                 required
               />
             </div>
 
             {/* Place of Birth */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-blue-700/90">
+              <label className="block text-sm font-semibold text-blue-800">
                 Place of Birth
               </label>
               <input
@@ -171,15 +175,15 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="City, Country"
                 value={formData.personal.placeOfBirth || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
               />
             </div>
           </div>
         </div>
 
         {/* Contact Information Section */}
-        <div className="bg-white/90 p-6 rounded-2xl shadow-md border border-white/30">
-          <div className="flex items-center mb-6 pb-3 border-b border-blue-100/50">
+        <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
             <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
               <svg
                 className="w-6 h-6 text-blue-600"
@@ -200,9 +204,9 @@ const PersonalInfo = ({ formData, setFormData }) => {
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-blue-700/90">
+              <label className="block text-sm font-semibold text-blue-800">
                 Mobile Number<span className="text-red-500">*</span>
               </label>
               <input
@@ -210,13 +214,13 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="+91 98765 43210"
                 value={formData.personal.mobile || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-blue-700/90">
+              <label className="block text-sm font-semibold text-blue-800">
                 Email Address<span className="text-red-500">*</span>
               </label>
               <input
@@ -225,7 +229,7 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="your.email@example.com"
                 value={formData.personal.email || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
                 required
               />
             </div>
@@ -233,8 +237,8 @@ const PersonalInfo = ({ formData, setFormData }) => {
         </div>
 
         {/* Exam Information Section */}
-        <div className="bg-white/90 p-6 rounded-2xl shadow-md border border-white/30">
-          <div className="flex items-center mb-6 pb-3 border-b border-blue-100/50">
+        <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
             <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
               <svg
                 className="w-6 h-6 text-blue-600"
@@ -255,9 +259,9 @@ const PersonalInfo = ({ formData, setFormData }) => {
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-blue-700/90">
+              <label className="block text-sm font-semibold text-blue-800">
                 Exam Roll Number<span className="text-red-500">*</span>
               </label>
               <input
@@ -265,13 +269,13 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="Roll Number"
                 value={formData.personal.examRoll || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-blue-700/90">
+              <label className="block text-sm font-semibold text-blue-800">
                 Exam Rank
               </label>
               <input
@@ -279,15 +283,15 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="Rank (if applicable)"
                 value={formData.personal.examRank || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
               />
             </div>
           </div>
         </div>
 
         {/* Demographic Information Section */}
-        <div className="bg-white/90 p-6 rounded-2xl shadow-md border border-white/30">
-          <div className="flex items-center mb-6 pb-3 border-b border-blue-100/50">
+        <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
             <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
               <svg
                 className="w-6 h-6 text-blue-600"
@@ -310,7 +314,7 @@ const PersonalInfo = ({ formData, setFormData }) => {
 
           {/* Gender Selection */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-blue-700/90 mb-4">
+            <label className="block text-sm font-semibold text-blue-800 mb-4">
               Gender<span className="text-red-500">*</span>
             </label>
             <div className="flex flex-wrap gap-4">
@@ -345,7 +349,7 @@ const PersonalInfo = ({ formData, setFormData }) => {
 
           {/* Category Selection */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-blue-700/90 mb-4">
+            <label className="block text-sm font-semibold text-blue-800 mb-4">
               Category<span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -380,7 +384,7 @@ const PersonalInfo = ({ formData, setFormData }) => {
 
           {/* Sub Category Selection */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-blue-700/90 mb-4">
+            <label className="block text-sm font-semibold text-blue-800 mb-4">
               Sub Category
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -418,7 +422,7 @@ const PersonalInfo = ({ formData, setFormData }) => {
 
           {/* Region Selection */}
           <div>
-            <label className="block text-sm font-medium text-blue-700/90 mb-4">
+            <label className="block text-sm font-semibold text-blue-800 mb-4">
               Region<span className="text-red-500">*</span>
             </label>
             <div className="flex flex-wrap gap-4">
@@ -453,8 +457,8 @@ const PersonalInfo = ({ formData, setFormData }) => {
         </div>
 
         {/* Address Section */}
-        <div className="bg-white/90 p-6 rounded-2xl shadow-md border border-white/30">
-          <div className="flex items-center mb-6 pb-3 border-b border-blue-100/50">
+        <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
             <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
               <svg
                 className="w-6 h-6 text-blue-600"
@@ -481,9 +485,9 @@ const PersonalInfo = ({ formData, setFormData }) => {
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-blue-700/90">
+              <label className="block text-sm font-semibold text-blue-800">
                 Current Address<span className="text-red-500">*</span>
               </label>
               <textarea
@@ -491,14 +495,14 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="Your current residential address"
                 value={formData.personal.currentAddress || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
                 rows={4}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-blue-700/90">
+              <label className="block text-sm font-semibold text-blue-800">
                 Permanent Address<span className="text-red-500">*</span>
               </label>
               <textarea
@@ -506,7 +510,7 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="Your permanent residential address"
                 value={formData.personal.permanentAddress || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+                className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
                 rows={4}
                 required
               />
@@ -515,8 +519,8 @@ const PersonalInfo = ({ formData, setFormData }) => {
         </div>
 
         {/* Additional Information Section */}
-        <div className="bg-white/90 p-6 rounded-2xl shadow-md border border-white/30">
-          <div className="flex items-center mb-6 pb-3 border-b border-blue-100/50">
+        <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
             <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
               <svg
                 className="w-6 h-6 text-blue-600"
@@ -538,7 +542,7 @@ const PersonalInfo = ({ formData, setFormData }) => {
           </div>
 
           <div className="mb-8 relative">
-            <label className="block text-sm font-medium text-blue-700/90 mb-4">
+            <label className="block text-sm font-semibold text-blue-800 mb-4">
               Fee Reimbursement<span className="text-red-500">*</span>
               <div className="group inline-block relative ml-2 cursor-pointer">
                 <svg
@@ -598,7 +602,7 @@ const PersonalInfo = ({ formData, setFormData }) => {
 
           {/* Anti-Ragging Reference */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-blue-700/90">
+            <label className="block text-sm font-semibold text-blue-800">
               Anti Ragging Reference Number
               <span className="text-red-500">*</span>
             </label>
@@ -607,7 +611,7 @@ const PersonalInfo = ({ formData, setFormData }) => {
               placeholder="Enter your reference number"
               value={formData.personal.antiRaggingRef || ""}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-blue-200/70 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 bg-white/50 text-blue-900 placeholder-blue-300 shadow-inner"
+              className="w-full px-4 py-3 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
               required
             />
           </div>
