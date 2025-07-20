@@ -1,15 +1,59 @@
-import React, { useState } from 'react';
-import bpitLogo from '../../assets/icons/BPIT-logo-transparent.png';
-import campusBackground from '../../assets/images/BPIT.png';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import bpitLogo from "../../assets/icons/BPIT-logo-transparent.png";
+import campusBackground from "../../assets/images/BPIT.png";
+
+const ADMIN_EMAILS = [
+  "admin1@example.com",
+  "admin2@example.com",
+  "sahilchauhan0603@gmail.com",
+];
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const AdminLogin = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState(1); // 1: email, 2: otp
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [info, setInfo] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    // Handle admin login logic
-    console.log({ username, password });
+    setError("");
+    setInfo("");
+    if (!ADMIN_EMAILS.includes(email)) {
+      setError("Unauthorized email.");
+      return;
+    }
+    setLoading(true);
+    try {
+      await axios.post(`${API_URL}/admin/send-otp`, { email });
+      setStep(2);
+      setInfo("OTP sent to your email.");
+    } catch {
+      setError("Failed to send OTP.");
+    }
+    setLoading(false);
+  };
+
+  // In AdminLogin.jsx
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await axios.post(`${API_URL}/admin/verify-otp`, { email, otp });
+      localStorage.setItem("adminEmail", email); // Store email
+      setInfo("Login successful! Redirecting...");
+      setTimeout(() => navigate("/admin/dashboard"), 1000);
+    } catch {
+      setError("Invalid OTP.");
+    }
+    setLoading(false);
   };
 
   return (
@@ -20,13 +64,13 @@ const AdminLogin = () => {
           linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)),
           url(${campusBackground}) center/cover fixed no-repeat
         `,
-        minHeight: '100vh'
+        minHeight: "100vh",
       }}
     >
       {/* BPIT Official Header - Consistent with site theme */}
       <header
         className="w-full bg-white border-t-4 border-b-4 border-red-500 shadow-lg flex flex-col md:flex-row items-center justify-between px-2 md:px-10 py-3 relative z-20"
-        style={{ minHeight: 100, borderRadius: '0 0 1.5rem 1.5rem' }}
+        style={{ minHeight: 100, borderRadius: "0 0 1.5rem 1.5rem" }}
       >
         <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full md:w-auto">
           <div className="flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-1 md:p-2 shadow-sm border border-blue-200">
@@ -40,16 +84,28 @@ const AdminLogin = () => {
           <div className="flex flex-col justify-center items-center sm:items-start text-center sm:text-left w-full">
             <h1
               className="text-lg xs:text-xl md:text-3xl font-extrabold text-blue-900 leading-tight tracking-tight drop-shadow-sm"
-              style={{ fontFamily: 'serif', letterSpacing: 0.5 }}
+              style={{ fontFamily: "serif", letterSpacing: 0.5 }}
             >
               Bhagwan Parshuram Institute of Technology
             </h1>
-            <div className="text-sm xs:text-base md:text-lg font-bold text-red-600 leading-tight mt-0.5 md:mt-1" style={{ fontFamily: 'serif', letterSpacing: 0.2 }}>
-              <span className="tracking-wide">A Unit of Bhartiya Brahmin Charitable Trust (Regd.)</span>
+            <div
+              className="text-sm xs:text-base md:text-lg font-bold text-red-600 leading-tight mt-0.5 md:mt-1"
+              style={{ fontFamily: "serif", letterSpacing: 0.2 }}
+            >
+              <span className="tracking-wide">
+                A Unit of Bhartiya Brahmin Charitable Trust (Regd.)
+              </span>
             </div>
-            <div className="text-xs md:text-sm text-blue-700 font-medium mt-0.5 md:mt-1" style={{ fontFamily: 'serif' }}>
-              <span className="block">(Approved by AICTE, Ministry of Education (MoE))</span>
-              <span className="block">Affiliated to Guru Gobind Singh Indraprastha University, Delhi</span>
+            <div
+              className="text-xs md:text-sm text-blue-700 font-medium mt-0.5 md:mt-1"
+              style={{ fontFamily: "serif" }}
+            >
+              <span className="block">
+                (Approved by AICTE, Ministry of Education (MoE))
+              </span>
+              <span className="block">
+                Affiliated to Guru Gobind Singh Indraprastha University, Delhi
+              </span>
             </div>
           </div>
         </div>
@@ -63,78 +119,225 @@ const AdminLogin = () => {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col justify-center items-center py-8 px-2 sm:px-4 mt-2 md:mt-6">
-        <div className="w-full max-w-md mx-auto">
-          <div className="bg-gradient-to-br from-white via-blue-50 to-red-50 p-1 rounded-2xl shadow-lg">
-            <div className="bg-white py-8 px-6 shadow-lg rounded-2xl border-2 border-blue-200/40">
-              <div className="flex flex-col items-center mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-blue-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-                <h2 className="text-2xl md:text-3xl font-extrabold text-blue-900 mb-1">Admin Login</h2>
-                <p className="text-sm text-blue-700">For authorized personnel only</p>
-              </div>
-              <form className="space-y-6" onSubmit={handleSubmit}>
-                <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                    Username
-                  </label>
-                  <div className="mt-1 relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                      </svg>
-                    </div>
-                    <input
-                      id="username"
-                      name="username"
-                      type="text"
-                      required
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-2 sm:text-sm border-gray-300 rounded-md"
-                      placeholder="Admin username"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                    Password
-                  </label>
-                  <div className="mt-1 relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M5 9a7 7 0 1114 0A7 7 0 015 9zm7-3a3 3 0 100 6 3 3 0 000-6z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <input
-                      id="password"
-                      name="password"
-                      type="password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-2 sm:text-sm border-gray-300 rounded-md"
-                      placeholder="Password"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <button
-                    type="submit"
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Sign in
-                  </button>
-                </div>
-              </form>
-            </div>
+      <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+  <div className="w-full max-w-md">
+    <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+      {/* Card Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-6 text-center">
+        <div className="flex justify-center mb-4">
+          <div className="bg-white/20 p-3 rounded-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-10 w-10 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"
+              />
+            </svg>
           </div>
         </div>
+        <h2 className="text-2xl font-bold text-white">Admin Portal</h2>
+        <p className="text-blue-100 mt-1">Secure access for administrators</p>
       </div>
+
+      {/* Card Body */}
+      <div className="p-6 md:p-8">
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {error}
+          </div>
+        )}
+        {info && (
+          <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {info}
+          </div>
+        )}
+
+        {step === 1 ? (
+          <form onSubmit={handleEmailSubmit} className="space-y-5">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Admin Email
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                  </svg>
+                </div>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="your@email.com"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors ${
+                loading ? "opacity-75 cursor-not-allowed" : ""
+              }`}
+            >
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Sending OTP...
+                </>
+              ) : (
+                "Send OTP"
+              )}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleOtpSubmit} className="space-y-5">
+            <div>
+              <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-1">
+                Verification Code
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <input
+                  id="otp"
+                  name="otp"
+                  type="text"
+                  required
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter 6-digit code"
+                  disabled={loading}
+                />
+              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                We've sent a verification code to {email}
+              </p>
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors ${
+                loading ? "opacity-75 cursor-not-allowed" : ""
+              }`}
+            >
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Verifying...
+                </>
+              ) : (
+                "Verify OTP"
+              )}
+            </button>
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                disabled={loading}
+              >
+                Didn't receive code? Resend
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
     </div>
   );
 };

@@ -1,26 +1,9 @@
-const sendOtpMail = require('../utils/otpMailer');
-const crypto = require('crypto');
-// In-memory OTP store (for demo; use Redis or DB in production)
-const otpStore = {};
-
-// Send OTP to email if student exists
-exports.sendLoginOtp = async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ message: 'Email is required' });
-  db.query('SELECT * FROM students WHERE email = ?', [email], async (err, results) => {
-    if (err) return res.status(500).json({ message: 'DB error', error: err });
-    if (!results || results.length === 0) return res.status(404).json({ message: 'No student found with this email' });
-    // Generate 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
-    try {
-      await sendOtpMail(email, otp);
-      res.json({ message: 'OTP sent to email' });
-    } catch (e) {
-      res.status(500).json({ message: 'Failed to send OTP', error: e });
-    }
-  });
-};
+const sendOtpMail = require('../utils/studentOTPMailer');
+// const sendStatusEmail = require('../utils/sendStatusEmail');
+// const crypto = require('crypto');
+const db = require('../config/db');
+const otpStore = {}; // In-memory store for OTPs, consider using Redis or similar in production
+// const Student = require('../modals/student');
 
 // --- Student Profile ---
 exports.getStudentProfile = (req, res) => {
@@ -49,21 +32,67 @@ exports.getStudentDashboard = (req, res) => {
 // Verify OTP and "login"
 exports.verifyLoginOtp = (req, res) => {
   const { email, otp } = req.body;
-  if (!email || !otp) return res.status(400).json({ message: 'Email and OTP required' });
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: 'Email and OTP required' });
+  }
+
   const record = otpStore[email];
-  if (!record) return res.status(400).json({ message: 'No OTP requested for this email' });
+  if (!record) {
+    return res.status(400).json({ message: 'No OTP requested for this email' });
+  }
+
   if (Date.now() > record.expires) {
     delete otpStore[email];
     return res.status(400).json({ message: 'OTP expired' });
   }
-  if (record.otp !== otp) return res.status(400).json({ message: 'Invalid OTP' });
-  delete otpStore[email];
-  // Optionally, create a session or JWT here
-  res.json({ message: 'Login successful' });
+
+  if (record.otp !== otp) {
+    return res.status(400).json({ message: 'Invalid OTP' });
+  }
+
+  // Query the MySQL database for student
+  const query = 'SELECT id, email, firstName, lastName, status FROM students WHERE email = ?';
+  db.query(query, [email], (err, results) => {
+    if (err) {
+      console.error('❌ MySQL error:', err);
+      return res.status(500).json({ message: 'Internal server error during login verification' });
+    }
+
+    if (results.length === 0) {
+      delete otpStore[email];
+      return res.status(404).json({ message: 'Student not found with this email' });
+    }
+
+    const student = results[0];
+    delete otpStore[email]; // Clear OTP
+
+    return res.json({
+      message: 'Login successful',
+      success: true,
+      student,
+    });
+  });
 };
 
-const db = require('../config/db');
-const uploadToCloudinary = require('../utils/cloudinaryUpload');
+// Send OTP to email if student exists
+exports.sendLoginOtp = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: 'Email is required' });
+  db.query('SELECT * FROM students WHERE email = ?', [email], async (err, results) => {
+    if (err) return res.status(500).json({ message: 'DB error', error: err });
+    if (!results || results.length === 0) return res.status(404).json({ message: 'No student found with this email' });
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
+    try {
+      await sendOtpMail(email, otp);
+      res.json({ message: 'OTP sent to email' });
+    } catch (e) {
+      res.status(500).json({ message: 'Failed to send OTP', error: e });
+    }
+  });
+};
 
 // List of all document fields
 const docFields = [
@@ -193,4 +222,272 @@ exports.registerStudent = async (req, res) => {
     console.error('Register Student Error:', error);
     res.status(500).json({ message: 'Server error', error });
   }
+};
+
+
+// Handler to fetch complete student details by ID
+exports.getStudentDetailsById = (req, res) => {
+  const { studentId } = req.params;
+  
+  if (!studentId) {
+    return res.status(400).json({ message: 'studentId required' });
+  }
+
+  db.query('SELECT * FROM students WHERE id = ?', [studentId], (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+    
+    if (!results || results.length === 0) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    const student = results[0];
+
+    // Personal Information
+    const personal = {
+      id: student.id,
+      firstName: student.firstName,
+      middleName: student.middleName,
+      lastName: student.lastName,
+      email: student.email,
+      mobile: student.mobile,
+      dob: student.dob,
+      placeOfBirth: student.placeOfBirth,
+      gender: student.gender,
+      category: student.category,
+      subCategory: student.subCategory,
+      region: student.region,
+      currentAddress: student.currentAddress,
+      permanentAddress: student.permanentAddress,
+      course: student.course,
+      examRoll: student.examRoll,
+      examRank: student.examRank,
+      abcId: student.abcId,
+      feeReimbursement: student.feeReimbursement,
+      antiRaggingRef: student.antiRaggingRef,
+      status: student.status,
+      created_at: student.created_at
+    };
+
+    // Parent Information
+    const parent = {
+      father: {
+        name: student.father_name,
+        qualification: student.father_qualification,
+        occupation: student.father_occupation,
+        email: student.father_email,
+        mobile: student.father_mobile,
+        telephoneSTD: student.father_telephoneSTD,
+        telephone: student.father_telephone,
+        officeAddress: student.father_officeAddress
+      },
+      mother: {
+        name: student.mother_name,
+        qualification: student.mother_qualification,
+        occupation: student.mother_occupation,
+        email: student.mother_email,
+        mobile: student.mother_mobile,
+        telephoneSTD: student.mother_telephoneSTD,
+        telephone: student.mother_telephone,
+        officeAddress: student.mother_officeAddress
+      },
+      familyIncome: student.familyIncome
+    };
+
+    // Documents
+    const documents = {
+      photo: student.photo,
+      ipuRegistration: student.ipuRegistration,
+      allotmentLetter: student.allotmentLetter,
+      examAdmitCard: student.examAdmitCard,
+      examScoreCard: student.examScoreCard,
+      marksheet10: student.marksheet10,
+      passing10: student.passing10,
+      marksheet12: student.marksheet12,
+      passing12: student.passing12,
+      aadhar: student.aadhar,
+      characterCertificate: student.characterCertificate,
+      medicalCertificate: student.medicalCertificate,
+      migrationCertificate: student.migrationCertificate,
+      categoryCertificate: student.categoryCertificate,
+      specialCategoryCertificate: student.specialCategoryCertificate,
+      academicFeeReceipt: student.academicFeeReceipt,
+      collegeFeeReceipt: student.collegeFeeReceipt,
+      parentSignature: student.parentSignature
+    };
+
+    // Academic Information
+    let academicAchievements = student.academicAchievements;
+    let coCurricularAchievements = student.coCurricularAchievements;
+
+    // Parse JSON fields safely
+    try {
+      if (typeof academicAchievements === 'string') {
+        academicAchievements = JSON.parse(academicAchievements);
+      }
+    } catch (e) {
+      console.warn('Failed to parse academicAchievements JSON:', e);
+      academicAchievements = [];
+    }
+
+    try {
+      if (typeof coCurricularAchievements === 'string') {
+        coCurricularAchievements = JSON.parse(coCurricularAchievements);
+      }
+    } catch (e) {
+      console.warn('Failed to parse coCurricularAchievements JSON:', e);
+      coCurricularAchievements = [];
+    }
+
+    const academic = {
+      classX: {
+        institute: student.classX_institute || '',
+        board: student.classX_board || '',
+        year: student.classX_year || '',
+        aggregate: student.classX_aggregate || '',
+        pcm: student.classX_pcm || '',
+        isDiplomaOrPolytechnic: student.classX_isDiplomaOrPolytechnic || ''
+      },
+      classXII: {
+        institute: student.classXII_institute || '',
+        board: student.classXII_board || '',
+        year: student.classXII_year || '',
+        aggregate: student.classXII_aggregate || '',
+        pcm: student.classXII_pcm || ''
+      },
+      otherQualification: {
+        institute: student.otherQualification_institute || '',
+        board: student.otherQualification_board || '',
+        year: student.otherQualification_year || '',
+        aggregate: student.otherQualification_aggregate || '',
+        pcm: student.otherQualification_pcm || ''
+      },
+      academicAchievements: academicAchievements || [],
+      coCurricularAchievements: coCurricularAchievements || []
+    };
+
+    res.json({
+      success: true,
+      data: {
+        personal,
+        parent,
+        documents,
+        academic
+      }
+    });
+  });
+};
+
+
+// Update specific section of student profile
+exports.updateStudentSection = (req, res) => {
+  const studentId = req.params.id;
+  const { section, data } = req.body;
+
+  const validSections = ['personal', 'parent', 'academic'];
+  if (!validSections.includes(section)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid section'
+    });
+  }
+
+  // Mapping section fields to actual DB columns
+  const sectionFieldMap = {
+    personal: [
+      'firstName', 'middleName', 'lastName', 'abcId', 'dob',
+      'placeOfBirth', 'mobile', 'email', 'gender', 'category',
+      'subCategory', 'region', 'currentAddress', 'permanentAddress',
+      'feeReimbursement', 'antiRaggingRef'
+    ],
+    parent: [
+      'father_name', 'father_qualification', 'father_occupation', 'father_email', 'father_mobile',
+      'father_telephoneSTD', 'father_telephone', 'father_officeAddress',
+      'mother_name', 'mother_qualification', 'mother_occupation', 'mother_email', 'mother_mobile',
+      'mother_telephoneSTD', 'mother_telephone', 'mother_officeAddress', 'familyIncome'
+    ],
+    academic: [
+      'classX_institute', 'classX_board', 'classX_year', 'classX_aggregate', 'classX_pcm', 'classX_isDiplomaOrPolytechnic',
+      'classXII_institute', 'classXII_board', 'classXII_year', 'classXII_aggregate', 'classXII_pcm',
+      'otherQualification_institute', 'otherQualification_board', 'otherQualification_year',
+      'otherQualification_aggregate', 'otherQualification_pcm', 'academicAchievements', 'coCurricularAchievements'
+    ]
+  };
+
+  const fieldsToUpdate = sectionFieldMap[section].filter(key => key in data);
+
+  if (fieldsToUpdate.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'No valid fields to update'
+    });
+  }
+
+  const updates = fieldsToUpdate.map(field => `${field} = ?`).join(', ');
+  const values = fieldsToUpdate.map(field => data[field]);
+  values.push(studentId); // for WHERE clause
+
+  const sql = `UPDATE students SET ${updates} WHERE id = ?`;
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error(`❌ Error updating ${section} section:`, err);
+      return res.status(500).json({
+        success: false,
+        message: 'Database error while updating student section'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `${section} section updated successfully`
+    });
+  });
+};
+
+// Final profile update for declined students
+exports.finalProfileUpdate = (req, res) => {
+  const studentId = req.params.id;
+  const updateData = req.body;
+
+  // Step 1: Check if student exists and is declined
+  const checkSql = 'SELECT status FROM students WHERE id = ?';
+  db.query(checkSql, [studentId], (err, results) => {
+    if (err) {
+      console.error('❌ Error checking student status:', err);
+      return res.status(500).json({ success: false, message: 'Database error' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+
+    const currentStatus = results[0].status;
+    if (currentStatus !== 'declined') {
+      return res.status(400).json({ success: false, message: 'Only declined profiles can be resubmitted' });
+    }
+
+    // Step 2: Update student details and reset status to 'pending'
+    const updateFields = Object.keys(updateData).filter(key => key !== 'status'); // Don't allow direct status set
+    const values = updateFields.map(field => updateData[field]);
+    values.push('pending'); // New status
+    values.push(studentId); // WHERE clause
+
+    const setClause = updateFields.map(field => `${field} = ?`).join(', ') + ', status = ?';
+    const updateSql = `UPDATE students SET ${setClause} WHERE id = ?`;
+
+    db.query(updateSql, values, (err2, result2) => {
+      if (err2) {
+        console.error('❌ Error updating final profile:', err2);
+        return res.status(500).json({ success: false, message: 'Failed to update profile' });
+      }
+
+      res.json({
+        success: true,
+        message: 'Profile updated and submitted for review'
+      });
+    });
+  });
 };

@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS students (
   mother_officeAddress VARCHAR(255),
 
   familyIncome VARCHAR(100),
+  status ENUM('pending','approved','declined') DEFAULT 'pending',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 `;

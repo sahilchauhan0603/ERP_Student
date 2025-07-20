@@ -13,8 +13,9 @@ app.use(express.json());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
 
-// Student registration route
+// Student and admin routes
 app.use('/api/student', require('./routes/student'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Test route
 app.get('/', (req, res) => {

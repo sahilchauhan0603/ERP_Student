@@ -1,249 +1,761 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Tab } from "@headlessui/react";
+import { useNavigate } from "react-router-dom";
 
-const Dashboard = () => {
-  const navigate = useNavigate();
-  
-  const [student, setStudent] = useState(null);
+const StudentDetailsDashboard = ({ student }) => {
+  const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const handleLogout = () => {
-    localStorage.removeItem('studentEmail');
-    navigate('/');
-  };
-
-  const email = localStorage.getItem('studentEmail') || "";
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [sectionEdits, setSectionEdits] = useState({});
+  const [saveStatus, setSaveStatus] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!email) {
-      navigate('/login');
+    if (!student?.id) {
+      setLoading(false);
+      setError("No student ID provided");
       return;
     }
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/student/dashboard?email=${encodeURIComponent(email)}`)
-      .then((res) => {
-        setStudent(res.data.student);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.response?.data?.message || "Failed to fetch dashboard data");
-        setLoading(false);
-      });
-  }, [email, navigate]);
 
-  if (loading) return <div className="text-center py-16 text-lg text-blue-700">Loading dashboard...</div>;
-  if (error) return <div className="text-center py-16 text-lg text-red-600">{error}</div>;
-  if (!student) return null;
+    const fetchStudentDetails = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/student/students/${student.id}/details`);
+        
+        if (response.data.success && response.data.data) {
+          setDetails(response.data.data);
+          setFormData(response.data.data);
+        } else {
+          setDetails(response.data);
+          setFormData(response.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch student details:", err);
+        
+        if (err.response?.status === 404) {
+          setError("Student not found");
+        } else if (err.response?.status === 400) {
+          setError("Invalid student ID");
+        } else if (err.response?.status >= 500) {
+          setError("Server error. Please try again later.");
+        } else {
+          setError("Failed to load student details");
+        }
+        setDetails(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudentDetails();
+  }, [student?.id]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("studentEmail");
+    localStorage.removeItem("studentId");
+    localStorage.removeItem("studentName");
+    setShowLogoutModal(false);
+    navigate("/");
+  };
+
+  const handleBackClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleEditToggle = () => {
+    setEditMode(!editMode);
+    if (!editMode) {
+      // Reset section edits when entering edit mode
+      setSectionEdits({});
+      setSaveStatus({});
+    }
+  };
+
+  const handleInputChange = (section, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [field]: value
+      }
+    }));
+    
+    setSectionEdits(prev => ({
+      ...prev,
+      [section]: true
+    }));
+  };
+
+  const handleSaveSection = async (section) => {
+    try {
+      setSaveStatus(prev => ({ ...prev, [section]: { loading: true, error: null } }));
+      
+      const response = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/student/students/${student.id}/update`,
+        { section, data: formData[section] },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data.success) {
+        setDetails(prev => ({
+          ...prev,
+          [section]: formData[section]
+        }));
+        setSaveStatus(prev => ({ ...prev, [section]: { loading: false, success: true } }));
+        setTimeout(() => {
+          setSaveStatus(prev => ({ ...prev, [section]: {} }));
+          setSectionEdits(prev => ({ ...prev, [section]: false }));
+        }, 2000);
+      } else {
+        throw new Error(response.data.message || "Failed to save changes");
+      }
+    } catch (err) {
+      console.error(`Failed to save ${section} section:`, err);
+      setSaveStatus(prev => ({
+        ...prev,
+        [section]: {
+          loading: false,
+          error: err.response?.data?.message || "Failed to save changes"
+        }
+      }));
+    }
+  };
+
+  const handleFinalUpdate = async () => {
+    try {
+      setSaveStatus(prev => ({ ...prev, final: { loading: true, error: null } }));
+      
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/student/students/${student.id}/final-update`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data.success) {
+        setDetails(formData);
+        setEditMode(false);
+        setSaveStatus(prev => ({ ...prev, final: { loading: false, success: true } }));
+        setTimeout(() => {
+          setSaveStatus(prev => ({ ...prev, final: {} }));
+        }, 2000);
+      } else {
+        throw new Error(response.data.message || "Failed to update profile");
+      }
+    } catch (err) {
+      console.error("Failed to update profile:", err);
+      setSaveStatus(prev => ({
+        ...prev,
+        final: {
+          loading: false,
+          error: err.response?.data?.message || "Failed to update profile"
+        }
+      }));
+    }
+  };
+
+  const LogoutModal = () => (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+      <div className="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+        <div className="mt-3 text-center">
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
+            <svg
+              className="h-6 w-6 text-yellow-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mt-2">
+            Confirm Logout
+          </h3>
+          <div className="mt-2 px-7 py-3">
+            <p className="text-sm text-gray-500 dark:text-gray-300">
+              Are you sure you want to log out? You'll need to log in again to access your dashboard.
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <button
+              className="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 text-base font-medium rounded-md shadow-sm hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
+              onClick={() => setShowLogoutModal(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-base font-medium rounded-md shadow-sm hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const DetailCard = ({ title, children, section }) => (
+    <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-6 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+          {title}
+        </h3>
+        {editMode && (
+          <button
+            onClick={() => handleSaveSection(section)}
+            disabled={!sectionEdits[section] || saveStatus[section]?.loading}
+            className={`px-3 py-1 text-sm rounded-md ${
+              sectionEdits[section] 
+                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+            } transition-colors`}
+          >
+            {saveStatus[section]?.loading ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Saving...
+              </span>
+            ) : saveStatus[section]?.success ? (
+              <span className="text-green-500">✓ Saved</span>
+            ) : (
+              'Save Changes'
+            )}
+          </button>
+        )}
+      </div>
+      {saveStatus[section]?.error && (
+        <div className="mb-4 text-sm text-red-500">{saveStatus[section].error}</div>
+      )}
+      <div className="space-y-4">{children}</div>
+    </div>
+  );
+
+  const DetailItem = ({ label, value, field, section, editable = true }) => (
+    <div className="flex justify-between items-start">
+      <span className="text-gray-500 dark:text-gray-400 font-medium">{label}:</span>
+      {editMode && editable ? (
+        <input
+          type="text"
+          value={formData[section]?.[field] || ''}
+          onChange={(e) => handleInputChange(section, field, e.target.value)}
+          className="font-medium text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded px-2 py-1 w-48 text-right"
+        />
+      ) : (
+        <span className="font-medium text-gray-800 dark:text-gray-200 text-right max-w-xs break-words">
+          {value || <span className="text-gray-400 italic">N/A</span>}
+        </span>
+      )}
+    </div>
+  );
+
+  const DocumentCard = ({ title, url }) => (
+    <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-col bg-white dark:bg-gray-800 hover:shadow-md transition-shadow">
+      <h4 className="font-medium text-gray-800 dark:text-white mb-3">{title}</h4>
+      {url ? (
+        <>
+          <div className="flex-1 flex items-center justify-center mb-3 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden min-h-[160px]">
+            <img
+              src={url}
+              alt={title}
+              className="max-h-40 max-w-full object-contain"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/150x150?text=Document+Error";
+              }}
+            />
+          </div>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-center py-2 px-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+          >
+            View Full Document
+          </a>
+        </>
+      ) : (
+        <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <svg className="w-10 h-10 text-gray-400 dark:text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p className="text-gray-400 dark:text-gray-500 text-sm italic">Not uploaded</p>
+        </div>
+      )}
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-gray-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading student details...</p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Please wait while we fetch your information</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !details) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-gray-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="text-center max-w-md">
+          <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg mb-4">
+            <p className="font-medium">Error loading student details</p>
+            <p className="text-sm mt-1">{error}</p>
+          </div>
+          <div className="space-x-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+            >
+              <svg className="w-4 h-4 inline mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Try Again
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all shadow-sm"
+            >
+              <svg className="w-4 h-4 inline mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              Go Home
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <svg className="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              <h1 className="ml-2 text-xl font-bold text-gray-900"><Link to="/">Campus Pro</Link></h1>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="relative group">
-                <button className="flex items-center space-x-2 focus:outline-none">
-                  <img className="h-8 w-8 rounded-full" src={student.photo || "https://ui-avatars.com/api/?name=" + encodeURIComponent(student.firstName + " " + student.lastName)} alt="User avatar" />
-                  <span className="hidden md:inline-block text-sm font-medium text-gray-700">{student.firstName} {student.lastName}</span>
-                </button>
-                <div className="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                  <button onClick={() => navigate('/student/profile')} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</button>
-                  {/* <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a> */}
-                  <button 
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Sign out
-                  </button>
-                </div>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50 dark:from-gray-900 dark:to-gray-800">
+      {showLogoutModal && <LogoutModal />}
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Student Dashboard
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300 mt-2">
+              Welcome back, <span className="font-medium text-blue-600 dark:text-blue-400">{details.personal?.firstName}</span>
+            </p>
           </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Banner */}
-        <div className="bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl shadow-lg overflow-hidden mb-8">
-          <div className="p-6 md:p-8 text-white">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-              <div>
-                <h2 className="text-2xl font-bold mb-2">Welcome back, {student.firstName}!</h2>
-                <p className="opacity-90">Your course: <b>{student.course}</b> | Category: <b>{student.category}</b></p>
-              </div>
-              <button className="mt-4 md:mt-0 bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition">
-                View Notifications
+          <div className="flex items-center gap-4 mt-4 md:mt-0">
+            {details.personal?.status === 'declined' && (
+              <button
+                onClick={handleEditToggle}
+                className={`px-4 py-2 rounded-lg transition-all shadow-sm ${
+                  editMode 
+                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    : 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700'
+                }`}
+              >
+                {editMode ? 'Cancel Editing' : 'Update Profile'}
               </button>
-            </div>
+            )}
+            <button
+              onClick={handleBackClick}
+              className="px-4 py-2 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:from-gray-300 hover:to-gray-400 dark:hover:from-gray-600 dark:hover:to-gray-500 transition-all flex items-center gap-2 shadow-sm"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              Back to Home
+            </button>
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow p-6 flex items-center">
-            <div className="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
+        {/* Student Profile Summary */}
+        <div className={`rounded-xl shadow-lg overflow-hidden mb-8 ${
+          details.personal?.status === 'declined' 
+            ? 'bg-gradient-to-r from-red-600 to-red-700'
+            : 'bg-gradient-to-r from-blue-600 to-blue-700'
+        }`}>
+          <div className="p-6 flex flex-col md:flex-row items-center">
+            <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white/80 shadow-lg mb-4 md:mb-0 md:mr-6">
+              <img
+                src={
+                  details.documents?.photo ||
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    (details.personal?.firstName || '') + " " + (details.personal?.lastName || '')
+                  )}&background=random&size=112`
+                }
+                alt="Student"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    (details.personal?.firstName || 'Student') + " " + (details.personal?.lastName || '')
+                  )}&background=random&size=112`;
+                }}
+              />
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Enrolled Courses</p>
-              <p className="text-2xl font-bold">1</p>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow p-6 flex items-center">
-            <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Mobile</p>
-              <p className="text-2xl font-bold">{student.mobile}</p>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow p-6 flex items-center">
-            <div className="p-3 rounded-full bg-orange-100 text-orange-600 mr-4">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Category</p>
-              <p className="text-2xl font-bold">{student.category}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Courses Card */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-[1.02]">
-            <div className="bg-indigo-600 p-4 text-white">
-              <h3 className="text-lg font-semibold flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-                My Courses
-              </h3>
-            </div>
-            <div className="p-6">
-              <ul className="space-y-3">
-                <li className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                  <span>{student.course}</span>
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+            <div className="flex-1 text-center md:text-left">
+              <h2 className="text-2xl font-bold text-white">
+                {details.personal?.firstName} {details.personal?.middleName ? details.personal.middleName + ' ' : ''}{details.personal?.lastName}
+              </h2>
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-2">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                   </svg>
-                </li>
-              </ul>
-              <button 
-                onClick={() => navigate('/student/courses')}
-                className="mt-4 w-full bg-indigo-50 text-indigo-600 py-2 rounded-lg font-medium hover:bg-indigo-100 transition"
-              >
-                View All Courses
-              </button>
-            </div>
-          </div>
-
-          {/* Assignments Card */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-[1.02]">
-            <div className="bg-blue-600 p-4 text-white">
-              <h3 className="text-lg font-semibold flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Recent Assignments
-              </h3>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                {[
-                  { name: 'Algorithm Design', due: 'Tomorrow', status: 'Pending' },
-                  { name: 'Database Project', due: 'In 3 days', status: 'In Progress' },
-                  { name: 'Web App Prototype', due: 'Submitted', status: 'Completed' }
-                ].map((assignment, index) => (
-                  <div key={index} className="border-b pb-3 last:border-b-0 last:pb-0">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-medium">{assignment.name}</h4>
-                        <p className="text-sm text-gray-500">Due: {assignment.due}</p>
-                      </div>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        assignment.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                        assignment.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {assignment.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  {details.personal?.course}
+                </span>
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                  </svg>
+                  {details.personal?.category}
+                </span>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                  details.personal?.status === 'approved' 
+                    ? 'bg-green-100 text-green-800'
+                    : details.personal?.status === 'declined'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : 'bg-blue-100 text-blue-800'
+                }`}>
+                  {details.personal?.status?.toUpperCase() || 'PENDING'}
+                </span>
               </div>
-              <button 
-                onClick={() => navigate('/student/assignments')}
-                className="mt-4 w-full bg-blue-50 text-blue-600 py-2 rounded-lg font-medium hover:bg-blue-100 transition"
-              >
-                View All Assignments
-              </button>
-            </div>
-          </div>
-
-          {/* Notifications Card */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-[1.02]">
-            <div className="bg-purple-600 p-4 text-white">
-              <h3 className="text-lg font-semibold flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                Notifications
-              </h3>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                {[
-                  { title: 'New course material', message: 'Week 5 slides uploaded', time: '2 hours ago', unread: true },
-                  { title: 'Assignment graded', message: 'Your DB project received 92%', time: '1 day ago', unread: false },
-                  { title: 'Upcoming deadline', message: 'Algorithm assignment due tomorrow', time: '2 days ago', unread: false }
-                ].map((notification, index) => (
-                  <div key={index} className={`p-3 rounded-lg ${notification.unread ? 'bg-purple-50' : 'bg-white'}`}>
-                    <div className="flex items-start">
-                      {notification.unread && (
-                        <span className="h-2 w-2 mt-1.5 mr-2 bg-purple-600 rounded-full"></span>
-                      )}
-                      <div className="flex-1">
-                        <h4 className="font-medium">{notification.title}</h4>
-                        <p className="text-sm text-gray-600">{notification.message}</p>
-                        <p className="text-xs text-gray-400 mt-1">{notification.time}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="mt-3 flex flex-wrap justify-center md:justify-start gap-3 text-sm text-white/90">
+                <span className="flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  {details.personal?.email}
+                </span>
+                <span className="flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  {details.personal?.mobile}
+                </span>
               </div>
-              <button 
-                onClick={() => navigate('/student/notifications')}
-                className="mt-4 w-full bg-purple-50 text-purple-600 py-2 rounded-lg font-medium hover:bg-purple-100 transition"
-              >
-                View All Notifications
-              </button>
+              {details.personal?.status === 'declined' && (
+                <div className="mt-4 bg-white/20 text-white text-sm p-3 rounded-lg">
+                  <p>Your profile has been declined. Please update the required information and resubmit for review.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </main>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 mr-4">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Documents Uploaded</p>
+                <p className="text-2xl font-bold text-gray-800 dark:text-white">
+                  {Object.values(details.documents || {}).filter(doc => doc).length}
+                  <span className="text-sm font-normal text-gray-500 dark:text-gray-400"> / {Object.keys(details.documents || {}).length}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="p-3 rounded-lg bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 mr-4">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Academic Status</p>
+                <p className="text-2xl font-bold text-gray-800 dark:text-white">
+                  {details.academic?.classXII?.aggregate || 'N/A'}%
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="p-3 rounded-lg bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 mr-4">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Family Income</p>
+                <p className="text-2xl font-bold text-gray-800 dark:text-white">
+                  {details.parent?.familyIncome ? `₹${Number(details.parent.familyIncome).toLocaleString('en-IN')}` : 'N/A'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Tabs */}
+        <Tab.Group selectedIndex={activeTab} onChange={setActiveTab}>
+          <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/10 dark:bg-gray-700 p-1 mb-6">
+            {["Personal", "Parent", "Academic", "Documents"].map((category) => (
+              <Tab
+                key={category}
+                className={({ selected }) =>
+                  `w-full rounded-lg py-3 text-sm font-medium leading-5 transition-all duration-200
+                  ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2
+                  ${
+                    selected
+                      ? "bg-white dark:bg-gray-800 shadow text-blue-700 dark:text-blue-400"
+                      : "text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-600 hover:text-blue-600 dark:hover:text-blue-300"
+                  }`
+                }
+              >
+                {category}
+              </Tab>
+            ))}
+          </Tab.List>
+          
+          <Tab.Panels className="mt-2">
+            {/* Personal Information Tab */}
+            <Tab.Panel className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <DetailCard title="Basic Information" section="personal">
+                  <DetailItem
+                    label="Full Name"
+                    value={`${details.personal?.firstName || ''} ${details.personal?.middleName ? details.personal.middleName + ' ' : ''}${details.personal?.lastName || ''}`.trim()}
+                    field="firstName"
+                    section="personal"
+                  />
+                  <DetailItem label="Date of Birth" value={details.personal?.dob} field="dob" section="personal" />
+                  <DetailItem label="Place of Birth" value={details.personal?.placeOfBirth} field="placeOfBirth" section="personal" />
+                  <DetailItem label="Gender" value={details.personal?.gender} field="gender" section="personal" />
+                  <DetailItem
+                    label="Category"
+                    value={`${details.personal?.category || ''}${
+                      details.personal?.subCategory ? ` (${details.personal.subCategory})` : ""
+                    }`}
+                    field="category"
+                    section="personal"
+                  />
+                  <DetailItem label="Region" value={details.personal?.region} field="region" section="personal" />
+                </DetailCard>
+
+                <DetailCard title="Contact Information" section="personal">
+                  <DetailItem label="Email" value={details.personal?.email} field="email" section="personal" />
+                  <DetailItem label="Mobile" value={details.personal?.mobile} field="mobile" section="personal" />
+                  <DetailItem label="Current Address" value={details.personal?.currentAddress} field="currentAddress" section="personal" />
+                  <DetailItem label="Permanent Address" value={details.personal?.permanentAddress} field="permanentAddress" section="personal" />
+                </DetailCard>
+
+                <DetailCard title="Academic Information" section="personal">
+                  <DetailItem label="Course" value={details.personal?.course} field="course" section="personal" />
+                  <DetailItem label="Exam Roll No" value={details.personal?.examRoll} field="examRoll" section="personal" />
+                  <DetailItem label="Exam Rank" value={details.personal?.examRank} field="examRank" section="personal" />
+                  <DetailItem label="ABC ID" value={details.personal?.abcId} field="abcId" section="personal" />
+                  <DetailItem label="Fee Reimbursement" value={details.personal?.feeReimbursement} field="feeReimbursement" section="personal" />
+                  <DetailItem label="Anti-Ragging Ref" value={details.personal?.antiRaggingRef} field="antiRaggingRef" section="personal" />
+                </DetailCard>
+              </div>
+            </Tab.Panel>
+
+            {/* Parent Information Tab */}
+            <Tab.Panel className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <DetailCard title="Father's Details" section="parent">
+                  <DetailItem label="Name" value={details.parent?.father?.name} field="name" section="parent" subSection="father" />
+                  <DetailItem label="Qualification" value={details.parent?.father?.qualification} field="qualification" section="parent" subSection="father" />
+                  <DetailItem label="Occupation" value={details.parent?.father?.occupation} field="occupation" section="parent" subSection="father" />
+                  <DetailItem label="Email" value={details.parent?.father?.email} field="email" section="parent" subSection="father" />
+                  <DetailItem label="Mobile" value={details.parent?.father?.mobile} field="mobile" section="parent" subSection="father" />
+                  <DetailItem label="Telephone (STD)" value={details.parent?.father?.telephoneSTD} field="telephoneSTD" section="parent" subSection="father" />
+                  <DetailItem label="Telephone" value={details.parent?.father?.telephone} field="telephone" section="parent" subSection="father" />
+                  <DetailItem label="Office Address" value={details.parent?.father?.officeAddress} field="officeAddress" section="parent" subSection="father" />
+                </DetailCard>
+
+                <DetailCard title="Mother's Details" section="parent">
+                  <DetailItem label="Name" value={details.parent?.mother?.name} field="name" section="parent" subSection="mother" />
+                  <DetailItem label="Qualification" value={details.parent?.mother?.qualification} field="qualification" section="parent" subSection="mother" />
+                  <DetailItem label="Occupation" value={details.parent?.mother?.occupation} field="occupation" section="parent" subSection="mother" />
+                  <DetailItem label="Email" value={details.parent?.mother?.email} field="email" section="parent" subSection="mother" />
+                  <DetailItem label="Mobile" value={details.parent?.mother?.mobile} field="mobile" section="parent" subSection="mother" />
+                  <DetailItem label="Telephone (STD)" value={details.parent?.mother?.telephoneSTD} field="telephoneSTD" section="parent" subSection="mother" />
+                  <DetailItem label="Telephone" value={details.parent?.mother?.telephone} field="telephone" section="parent" subSection="mother" />
+                  <DetailItem label="Office Address" value={details.parent?.mother?.officeAddress} field="officeAddress" section="parent" subSection="mother" />
+                </DetailCard>
+
+                <DetailCard title="Family Information" section="parent">
+                  <DetailItem 
+                    label="Annual Income" 
+                    value={details.parent?.familyIncome ? `₹${Number(details.parent.familyIncome).toLocaleString('en-IN')}` : 'N/A'}
+                    field="familyIncome"
+                    section="parent"
+                  />
+                  {details.parent?.siblings?.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Siblings</h4>
+                      <div className="space-y-2">
+                        {details.parent.siblings.map((sibling, index) => (
+                          <div key={index} className="text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                            <strong>{sibling.name}</strong> ({sibling.relation})<br />
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{sibling.institution || ''}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </DetailCard>
+              </div>
+            </Tab.Panel>
+
+            {/* Academic Information Tab */}
+            <Tab.Panel className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <DetailCard title="Class X Details" section="academic">
+                  <DetailItem label="Institute" value={details.academic?.classX?.institute} field="institute" section="academic" subSection="classX" />
+                  <DetailItem label="Board" value={details.academic?.classX?.board} field="board" section="academic" subSection="classX" />
+                  <DetailItem label="Year" value={details.academic?.classX?.year} field="year" section="academic" subSection="classX" />
+                  <DetailItem label="Aggregate %" value={details.academic?.classX?.aggregate} field="aggregate" section="academic" subSection="classX" />
+                  <DetailItem label="PCM %" value={details.academic?.classX?.pcm} field="pcm" section="academic" subSection="classX" />
+                  <DetailItem label="Diploma/Polytechnic" value={details.academic?.classX?.isDiplomaOrPolytechnic} field="isDiplomaOrPolytechnic" section="academic" subSection="classX" />
+                </DetailCard>
+
+                <DetailCard title="Class XII Details" section="academic">
+                  <DetailItem label="Institute" value={details.academic?.classXII?.institute} field="institute" section="academic" subSection="classXII" />
+                  <DetailItem label="Board" value={details.academic?.classXII?.board} field="board" section="academic" subSection="classXII" />
+                  <DetailItem label="Year" value={details.academic?.classXII?.year} field="year" section="academic" subSection="classXII" />
+                  <DetailItem label="Aggregate %" value={details.academic?.classXII?.aggregate} field="aggregate" section="academic" subSection="classXII" />
+                  <DetailItem label="PCM %" value={details.academic?.classXII?.pcm} field="pcm" section="academic" subSection="classXII" />
+                </DetailCard>
+
+                {details.academic?.otherQualification?.institute && (
+                  <DetailCard title="Other Qualification" section="academic">
+                    <DetailItem label="Institute" value={details.academic.otherQualification.institute} field="institute" section="academic" subSection="otherQualification" />
+                    <DetailItem label="Board" value={details.academic.otherQualification.board} field="board" section="academic" subSection="otherQualification" />
+                    <DetailItem label="Year" value={details.academic.otherQualification.year} field="year" section="academic" subSection="otherQualification" />
+                    <DetailItem label="Aggregate %" value={details.academic.otherQualification.aggregate} field="aggregate" section="academic" subSection="otherQualification" />
+                    <DetailItem label="PCM %" value={details.academic.otherQualification.pcm} field="pcm" section="academic" subSection="otherQualification" />
+                  </DetailCard>
+                )}
+
+                {details.academic?.academicAchievements?.length > 0 && (
+                  <DetailCard title="Academic Achievements" section="academic">
+                    <div className="space-y-2">
+                      {details.academic.academicAchievements.map((achievement, index) => (
+                        <div key={index} className="text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                          <strong>{achievement.event}</strong> ({achievement.date})<br />
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{achievement.outcome}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </DetailCard>
+                )}
+
+                {details.academic?.coCurricularAchievements?.length > 0 && (
+                  <DetailCard title="Co-Curricular Achievements" section="academic">
+                    <div className="space-y-2">
+                      {details.academic.coCurricularAchievements.map((achievement, index) => (
+                        <div key={index} className="text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                          <strong>{achievement.event}</strong> ({achievement.date})<br />
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{achievement.outcome}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </DetailCard>
+                )}
+              </div>
+            </Tab.Panel>
+
+            {/* Documents Tab */}
+            <Tab.Panel className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <DocumentCard title="Student Photo" url={details.documents?.photo} />
+                <DocumentCard title="IPU Registration" url={details.documents?.ipuRegistration} />
+                <DocumentCard title="Allotment Letter" url={details.documents?.allotmentLetter} />
+                <DocumentCard title="Exam Admit Card" url={details.documents?.examAdmitCard} />
+                <DocumentCard title="Exam Score Card" url={details.documents?.examScoreCard} />
+                <DocumentCard title="10th Marksheet" url={details.documents?.marksheet10} />
+                <DocumentCard title="10th Passing Certificate" url={details.documents?.passing10} />
+                <DocumentCard title="12th Marksheet" url={details.documents?.marksheet12} />
+                <DocumentCard title="12th Passing Certificate" url={details.documents?.passing12} />
+                <DocumentCard title="Aadhar Card" url={details.documents?.aadhar} />
+                <DocumentCard title="Character Certificate" url={details.documents?.characterCertificate} />
+                <DocumentCard title="Medical Certificate" url={details.documents?.medicalCertificate} />
+                <DocumentCard title="Migration Certificate" url={details.documents?.migrationCertificate} />
+                <DocumentCard title="Category Certificate" url={details.documents?.categoryCertificate} />
+                <DocumentCard title="Special Category Certificate" url={details.documents?.specialCategoryCertificate} />
+                <DocumentCard title="Academic Fee Receipt" url={details.documents?.academicFeeReceipt} />
+                <DocumentCard title="College Fee Receipt" url={details.documents?.collegeFeeReceipt} />
+                <DocumentCard title="Parent Signature" url={details.documents?.parentSignature} />
+              </div>
+            </Tab.Panel>
+          </Tab.Panels>
+        </Tab.Group>
+
+        {/* Final Update Button (only in edit mode) */}
+        {editMode && (
+          <div className="mt-8 flex justify-end">
+            <button
+              onClick={handleFinalUpdate}
+              disabled={saveStatus.final?.loading}
+              className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-lg flex items-center gap-2"
+            >
+              {saveStatus.final?.loading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Submitting...
+                </>
+              ) : saveStatus.final?.success ? (
+                <span className="text-white">✓ Profile Updated Successfully</span>
+              ) : (
+                'Submit Profile for Review'
+              )}
+            </button>
+            {saveStatus.final?.error && (
+              <div className="ml-4 text-red-500 text-sm">{saveStatus.final.error}</div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default StudentDetailsDashboard;

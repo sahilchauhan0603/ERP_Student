@@ -16,7 +16,7 @@ async function sendOtpMail(to, otp) {
     html: `
       <div style="max-width:480px;margin:32px auto;padding:32px 24px;background:linear-gradient(135deg,#e0e7ff 0%,#f3e8ff 100%);border-radius:18px;box-shadow:0 4px 24px rgba(80,80,180,0.10);font-family:'Segoe UI',Arial,sans-serif;">
         <div style="text-align:center;margin-bottom:18px;">
-          <img src="https://bpitindia.com/wp-content/uploads/2021/08/BPITd.png" alt="BPIT Logo" style="height:48px;margin-bottom:8px;"/>
+          <img src="https://admissions-enquiry.bpitindia.ac.in/wp-content/uploads/2023/07/BPIT-logo.jpg" alt="BPIT Logo" style="height:48px;margin-bottom:8px;"/>
           <h2 style="color:#3730a3;font-size:1.5rem;margin:0 0 8px 0;">BPIT Student Portal</h2>
         </div>
         <div style="background:#fff;border-radius:12px;padding:24px 16px;text-align:center;box-shadow:0 2px 8px rgba(80,80,180,0.07);">
