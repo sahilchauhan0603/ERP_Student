@@ -6,7 +6,7 @@ const adminController = require('../controllers/adminController');
 router.get('/stats', adminController.getStudentStats);
 // Admin endpoints
 router.get('/list', adminController.listAllStudents);
-router.post('/update-status', adminController.updateStudentStatus);
+router.post('/verify-student', adminController.updateStudentStatus);
 // Admin OTP login endpoints
 router.post('/send-otp', adminController.sendAdminOtp);
 router.post('/verify-otp', adminController.verifyAdminOtp);

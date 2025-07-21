@@ -2,6 +2,7 @@ const sendOtpMail = require('../utils/studentOTPMailer');
 // const sendStatusEmail = require('../utils/sendStatusEmail');
 // const crypto = require('crypto');
 const db = require('../config/db');
+const uploadToCloudinary = require('../utils/cloudinaryUpload');
 const otpStore = {}; // In-memory store for OTPs, consider using Redis or similar in production
 // const Student = require('../modals/student');
 

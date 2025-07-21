@@ -13,6 +13,7 @@ const sectionDefs = [
   { label: 'Documents', key: 'documents', icon: <FiFileText className="mr-2" /> },
 ];
 
+
 export default function AdminStudentDetailsModal({ student, onClose, refresh, tableType }) {
   const [activeTab, setActiveTab] = useState(0);
   const [verifications, setVerifications] = useState({});
@@ -21,6 +22,8 @@ export default function AdminStudentDetailsModal({ student, onClose, refresh, ta
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sectionCompleted, setSectionCompleted] = useState([false, false, false, false]);
+
+    const declinedFields = student?.declinedFields || details?.declinedFields || [];
 
   useEffect(() => {
     if (!student?.id) return;
@@ -106,9 +109,44 @@ export default function AdminStudentDetailsModal({ student, onClose, refresh, ta
     setActionLoading(false);
   };
 
-  const DetailField = ({ label, value, section, field, isDocument, showVerify }) => {
+  const getDeclinedFields = () => {
+  const declined = [];
+  Object.entries(verifications).forEach(([section, fields]) => {
+    Object.entries(fields || {}).forEach(([field, value]) => {
+      if (value === false) {
+        declined.push(field);
+      }
+    });
+  });
+  return declined;
+};
+
+  const handleDone = async () => {
+  setActionLoading(true);
+  const declinedFields = getDeclinedFields();
+  const status = declinedFields.length > 0 ? 'declined' : 'approved';
+  try {
+    await axios.post(`${import.meta.env.VITE_API_URL}/admin/verify-student`, {
+      studentId: student.id,
+      verifications,
+      status,
+      declinedFields,
+    });
+    refresh?.();
+    onClose();
+  } catch (e) {
+    setError('Failed to update: ' + e.message);
+  }
+  setActionLoading(false);
+};
+
+
+const DetailField = ({ label, value, section, field, isDocument, showVerify }) => {
     const verifiedStatus = verifications[section]?.[field];
-    
+
+    // Highlight if this field is declined and tableType is 'declined'
+    const isDeclined = tableType === 'declined' && declinedFields?.includes(field);
+
     let displayValue = value;
     if ((field === 'academicAchievements' || field === 'coCurricularAchievements') && value) {
       try { displayValue = typeof value === 'string' ? JSON.parse(value) : value; } catch {}
@@ -129,14 +167,23 @@ export default function AdminStudentDetailsModal({ student, onClose, refresh, ta
 
     return (
       <div className={`p-4 rounded-lg border transition-all ${
-        verifiedStatus === true ? 'border-green-200 bg-green-50' :
-        verifiedStatus === false ? 'border-red-200 bg-red-50' :
-        'border-gray-200 bg-white hover:bg-gray-50'
+        isDeclined
+          ? 'border-red-400 bg-red-50'
+          : verifiedStatus === true
+          ? 'border-green-200 bg-green-50'
+          : verifiedStatus === false
+          ? 'border-red-200 bg-red-50'
+          : 'border-gray-200 bg-white hover:bg-gray-50'
       }`}>
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h4 className="font-medium text-gray-800 flex items-center">
+            <h4 className={`font-medium flex items-center ${
+              isDeclined ? 'text-red-700' : 'text-gray-800'
+            }`}>
               {label}
+              {isDeclined && (
+                <span className="ml-2 px-2 py-0.5 text-xs bg-red-200 text-red-800 rounded-full">Declined</span>
+              )}
               {verifiedStatus === true && <FiCheckCircle className="ml-2 text-green-500" />}
               {verifiedStatus === false && <FiAlertCircle className="ml-2 text-red-500" />}
             </h4>
@@ -750,24 +797,13 @@ export default function AdminStudentDetailsModal({ student, onClose, refresh, ta
                   </button>
                 ) : (
                   <div className="flex space-x-3">
-                    <button
-                      onClick={handleDecline}
-                      disabled={actionLoading}
-                      className="flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md disabled:opacity-50"
-                    >
-                      <FiXCircle className="mr-2" /> Decline
-                    </button>
-                    <button
-                      onClick={handleApprove}
-                      disabled={actionLoading || !isSectionVerified(sectionDefs[activeTab].key)}
-                      className={`flex items-center px-4 py-2 rounded-md text-white ${
-                        isSectionVerified(sectionDefs[activeTab].key)
-                          ? 'bg-green-600 hover:bg-green-700'
-                          : 'bg-green-300 cursor-not-allowed'
-                      }`}
-                    >
-                      <FiCheck className="mr-2" /> Approve
-                    </button>
+                     <button
+            onClick={handleDone}
+            disabled={actionLoading}
+            className="flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50"
+          >
+            Done
+          </button>
                   </div>
                 )}
               </div>

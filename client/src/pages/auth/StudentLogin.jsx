@@ -86,7 +86,6 @@ const StudentLogin = () => {
         minHeight: "100vh",
       }}
     >
-      {/* BPIT Official Header - Consistent with site theme */}
       <header
         className="w-full bg-white border-t-4 border-b-4 border-red-500 shadow-lg flex flex-col md:flex-row items-center justify-between px-2 md:px-10 py-3 relative z-20"
         style={{ minHeight: 100, borderRadius: "0 0 1.5rem 1.5rem" }}
