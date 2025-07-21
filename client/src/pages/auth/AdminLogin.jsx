@@ -6,7 +6,7 @@ import campusBackground from "../../assets/images/BPIT.png";
 
 const ADMIN_EMAILS = [
   "admin1@example.com",
-  "admin2@example.com",
+  "tandon.aryaman1@gmail.com",
   "sahilchauhan0603@gmail.com",
 ];
 

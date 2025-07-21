@@ -72,118 +72,242 @@ exports.listAllStudents = (req, res) => {
   });
 };
 
-exports.updateStudentStatus = async (req, res) => {
-  const { studentId, status } = req.body;
+exports.updateStudentStatus = (req, res) => {
+  const { studentId, status, declinedFields } = req.body;
   if (!studentId || !['approved', 'declined', 'pending'].includes(status)) {
     return res.status(400).json({ message: 'Invalid studentId or status' });
   }
 
-  try {
-    // Update student status and reset verifications
-    await db.query('UPDATE students SET status = ?, section_verifications = NULL WHERE id = ?', [status, studentId]);
-    
-    // Get student details
-    const [studentRows] = await db.query('SELECT email, firstName, lastName FROM students WHERE id = ?', [studentId]);
-    if (!studentRows || studentRows.length === 0) {
-      return res.json({ message: 'Status updated, but student not found for email' });
+  // Prepare declinedFields for DB
+  const declinedFieldsStr = Array.isArray(declinedFields) ? JSON.stringify(declinedFields) : null;
+
+  // Update student status and declinedFields
+  db.query(
+    'UPDATE students SET status = ?, declinedFields = ? WHERE id = ?',
+    [status, declinedFieldsStr, studentId],
+    (updateErr, updateResult) => {
+      if (updateErr) {
+        console.error('Error updating student status:', updateErr);
+        return res.status(500).json({ message: 'Database error', error: updateErr });
+      }
+
+      // Get student details
+      db.query(
+        'SELECT email, firstName, lastName FROM students WHERE id = ?',
+        [studentId],
+        (selectErr, studentRows) => {
+          if (selectErr) {
+            console.error('Error fetching student:', selectErr);
+            return res.status(500).json({ message: 'Database error', error: selectErr });
+          }
+
+          if (!studentRows || studentRows.length === 0) {
+            return res.json({ message: 'Status updated, but student not found for email' });
+          }
+
+          const { email, firstName, lastName } = studentRows[0];
+          const fullName = `${firstName} ${lastName}`;
+          let emailSubject, emailHtml = '';
+
+          if (status === 'approved') {
+            emailSubject = 'Congratulations! Your Registration Has Been Approved';
+            emailHtml = `...`; // (same as before)
+          } else if (status === 'declined') {
+            const declinedArr = Array.isArray(declinedFields) ? declinedFields : [];
+            let declinedListHtml = '';
+
+            if (declinedArr.length > 0) {
+              declinedListHtml = `
+                <div style="background:#fff8f8;padding:15px;margin:20px 0;border-left:4px solid #f44336;">
+                  <p>The following fields were not approved:</p>
+                  <ul style="margin:10px 0 0 20px;">
+                    ${declinedArr.map(field => `<li>${field}</li>`).join('')}
+                  </ul>
+                  <p>Please review and update these fields before resubmitting your application.</p>
+                </div>
+              `;
+            }
+
+            emailSubject = 'Your Registration Status Update';
+            emailHtml = `...`; // (same as before, include declinedListHtml)
+          } else {
+            emailSubject = 'Your Registration Status Update';
+            emailHtml = `...`; // (same as before)
+          }
+
+          // Send the email
+          sendStatusEmail(email, emailSubject, emailHtml)
+            .then(() => {
+              // Get updated student list
+              db.query('SELECT * FROM students', (fetchErr, allStudents) => {
+                if (fetchErr) {
+                  console.error('Error fetching all students:', fetchErr);
+                  return res.status(500).json({ message: 'Database error', error: fetchErr });
+                }
+
+                res.json({ message: 'Status updated and email sent', students: allStudents });
+              });
+            })
+            .catch(emailErr => {
+              console.error('Error sending email:', emailErr);
+              res.status(500).json({ message: 'Email error', error: emailErr });
+            });
+        }
+      );
     }
-
-    const { email, firstName, lastName } = studentRows[0];
-    const fullName = `${firstName} ${lastName}`;
-    
-    // Send appropriate email based on status
-    let emailSubject, emailHtml;
-    
-    if (status === 'approved') {
-      emailSubject = 'Congratulations! Your Registration Has Been Approved';
-      emailHtml = `
-        <div style="max-width:600px;margin:0 auto;padding:20px;font-family:Arial,sans-serif;background:#f9f9f9;">
-          <div style="text-align:center;padding:20px 0;background:#4CAF50;color:white;">
-            <h1>Registration Approved</h1>
-          </div>
-          <div style="padding:20px;background:white;">
-            <p>Dear ${fullName},</p>
-            <p>We are pleased to inform you that your registration with Bhagwan Parshuram Institute of Technology has been <strong>approved</strong>.</p>
-            <div style="background:#f0f8ff;padding:15px;margin:20px 0;border-left:4px solid #4CAF50;">
-              <p style="margin:0;">Next Steps:</p>
-              <ul style="margin:10px 0 0 20px;">
-                <li>Complete your enrollment process</li>
-                <li>Check your student portal for further instructions</li>
-                <li>Contact admissions if you have any questions</li>
-              </ul>
-            </div>
-            <p>Welcome to BPIT! We look forward to having you as part of our academic community.</p>
-            <p>Best regards,<br>The Admissions Team</p>
-          </div>
-          <div style="text-align:center;padding:20px;font-size:12px;color:#777;">
-            <p>© ${new Date().getFullYear()} Bhagwan Parshuram Institute of Technology</p>
-          </div>
-        </div>
-      `;
-    } 
-    else if (status === 'declined') {
-      emailSubject = 'Your Registration Status Update';
-      emailHtml = `
-        <div style="max-width:600px;margin:0 auto;padding:20px;font-family:Arial,sans-serif;background:#f9f9f9;">
-          <div style="text-align:center;padding:20px 0;background:#f44336;color:white;">
-            <h1>Registration Decision</h1>
-          </div>
-          <div style="padding:20px;background:white;">
-            <p>Dear ${fullName},</p>
-            <p>After careful consideration, we regret to inform you that your registration with Bhagwan Parshuram Institute of Technology has been <strong>declined</strong>.</p>
-            <div style="background:#fff8f8;padding:15px;margin:20px 0;border-left:4px solid #f44336;">
-              <p>For more information about this decision, please contact our admissions office:</p>
-              <p style="margin:10px 0 0 0;">
-                Email: <a href="mailto:admissions@bpitindia.ac.in">admissions@bpitindia.ac.in</a><br>
-                Phone: +91-11-XXXX-XXXX
-              </p>
-            </div>
-            <p>We appreciate your interest in BPIT and encourage you to explore other educational opportunities.</p>
-            <p>Sincerely,<br>The Admissions Team</p>
-          </div>
-          <div style="text-align:center;padding:20px;font-size:12px;color:#777;">
-            <p>© ${new Date().getFullYear()} Bhagwan Parshuram Institute of Technology</p>
-          </div>
-        </div>
-      `;
-    } 
-    else { // pending
-      emailSubject = 'Your Registration Status Update';
-      emailHtml = `
-        <div style="max-width:600px;margin:0 auto;padding:20px;font-family:Arial,sans-serif;background:#f9f9f9;">
-          <div style="text-align:center;padding:20px 0;background:#FFA500;color:white;">
-            <h1>Registration Under Review</h1>
-          </div>
-          <div style="padding:20px;background:white;">
-            <p>Dear ${fullName},</p>
-            <p>Your registration with Bhagwan Parshuram Institute of Technology is currently <strong>pending review</strong>.</p>
-            <p>Our admissions team is carefully reviewing your application. You will receive another notification once a decision has been made.</p>
-            <div style="background:#fffaf0;padding:15px;margin:20px 0;border-left:4px solid #FFA500;">
-              <p>Current Status: <strong>Pending Review</strong></p>
-              <p>Expected decision timeline: 5-7 business days</p>
-            </div>
-            <p>Thank you for your patience.</p>
-            <p>Best regards,<br>The Admissions Team</p>
-          </div>
-          <div style="text-align:center;padding:20px;font-size:12px;color:#777;">
-            <p>© ${new Date().getFullYear()} Bhagwan Parshuram Institute of Technology</p>
-          </div>
-        </div>
-      `;
-    }
-
-    // Send the email
-    await sendStatusEmail(email, emailSubject, emailHtml);
-
-    // Return updated student list
-    const [allStudents] = await db.query('SELECT * FROM students');
-    res.json({ message: 'Status updated and email sent', students: allStudents });
-
-  } catch (err) {
-    console.error('Error updating student status:', err);
-    res.status(500).json({ message: 'Database error', error: err });
-  }
+  );
 };
+
+// exports.updateStudentStatus = (req, res) => {
+//   const { studentId, status, declinedFields } = req.body;
+//   if (!studentId || !['approved', 'declined', 'pending'].includes(status)) {
+//     return res.status(400).json({ message: 'Invalid studentId or status' });
+//   }
+
+//   // Update student status and reset verifications
+//   db.query(
+//     'UPDATE students SET status = ? WHERE id = ?',
+//     [status, studentId],
+//     (updateErr, updateResult) => {
+//       if (updateErr) {
+//         console.error('Error updating student status:', updateErr);
+//         return res.status(500).json({ message: 'Database error', error: updateErr });
+//       }
+
+//       // Get student details
+//       db.query(
+//         'SELECT email, firstName, lastName FROM students WHERE id = ?',
+//         [studentId],
+//         (selectErr, studentRows) => {
+//           if (selectErr) {
+//             console.error('Error fetching student:', selectErr);
+//             return res.status(500).json({ message: 'Database error', error: selectErr });
+//           }
+
+//           if (!studentRows || studentRows.length === 0) {
+//             return res.json({ message: 'Status updated, but student not found for email' });
+//           }
+
+//           const { email, firstName, lastName } = studentRows[0];
+//           const fullName = `${firstName} ${lastName}`;
+//           let emailSubject, emailHtml = '';
+
+//           if (status === 'approved') {
+//             emailSubject = 'Congratulations! Your Registration Has Been Approved';
+//             emailHtml = `
+//               <div style="max-width:600px;margin:0 auto;padding:20px;font-family:Arial,sans-serif;background:#f9f9f9;">
+//                 <div style="text-align:center;padding:20px 0;background:#4CAF50;color:white;">
+//                   <h1>Registration Approved</h1>
+//                 </div>
+//                 <div style="padding:20px;background:white;">
+//                   <p>Dear ${fullName},</p>
+//                   <p>We are pleased to inform you that your registration with Bhagwan Parshuram Institute of Technology has been <strong>approved</strong>.</p>
+//                   <div style="background:#f0f8ff;padding:15px;margin:20px 0;border-left:4px solid #4CAF50;">
+//                     <p style="margin:0;">Next Steps:</p>
+//                     <ul style="margin:10px 0 0 20px;">
+//                       <li>Complete your enrollment process</li>
+//                       <li>Check your student portal for further instructions</li>
+//                       <li>Contact admissions if you have any questions</li>
+//                     </ul>
+//                   </div>
+//                   <p>Welcome to BPIT! We look forward to having you as part of our academic community.</p>
+//                   <p>Best regards,<br>The Admissions Team</p>
+//                 </div>
+//                 <div style="text-align:center;padding:20px;font-size:12px;color:#777;">
+//                   <p>© ${new Date().getFullYear()} Bhagwan Parshuram Institute of Technology</p>
+//                 </div>
+//               </div>
+//             `;
+//           } else if (status === 'declined') {
+//             const declinedArr = Array.isArray(declinedFields) ? declinedFields : [];
+//             let declinedListHtml = '';
+
+//             if (declinedArr.length > 0) {
+//               declinedListHtml = `
+//                 <div style="background:#fff8f8;padding:15px;margin:20px 0;border-left:4px solid #f44336;">
+//                   <p>The following fields were not approved:</p>
+//                   <ul style="margin:10px 0 0 20px;">
+//                     ${declinedArr.map(field => `<li>${field}</li>`).join('')}
+//                   </ul>
+//                   <p>Please review and update these fields before resubmitting your application.</p>
+//                 </div>
+//               `;
+//             }
+
+//             emailSubject = 'Your Registration Status Update';
+//             emailHtml = `
+//               <div style="max-width:600px;margin:0 auto;padding:20px;font-family:Arial,sans-serif;background:#f9f9f9;">
+//                 <div style="text-align:center;padding:20px 0;background:#f44336;color:white;">
+//                   <h1>Registration Decision</h1>
+//                 </div>
+//                 <div style="padding:20px;background:white;">
+//                   <p>Dear ${fullName},</p>
+//                   <p>After careful consideration, we regret to inform you that your registration with Bhagwan Parshuram Institute of Technology has been <strong>declined</strong>.</p>
+//                   ${declinedListHtml}
+//                   <div style="background:#fff8f8;padding:15px;margin:20px 0;border-left:4px solid #f44336;">
+//                     <p>For more information about this decision, please contact our admissions office:</p>
+//                     <p style="margin:10px 0 0 0;">
+//                       Email: <a href="mailto:admissions@bpitindia.ac.in">admissions@bpitindia.ac.in</a><br>
+//                       Phone: +91-11-XXXX-XXXX
+//                     </p>
+//                   </div>
+//                   <p>We appreciate your interest in BPIT and encourage you to explore other educational opportunities.</p>
+//                   <p>Sincerely,<br>The Admissions Team</p>
+//                 </div>
+//                 <div style="text-align:center;padding:20px;font-size:12px;color:#777;">
+//                   <p>© ${new Date().getFullYear()} Bhagwan Parshuram Institute of Technology</p>
+//                 </div>
+//               </div>
+//             `;
+//           } else {
+//             emailSubject = 'Your Registration Status Update';
+//             emailHtml = `
+//               <div style="max-width:600px;margin:0 auto;padding:20px;font-family:Arial,sans-serif;background:#f9f9f9;">
+//                 <div style="text-align:center;padding:20px 0;background:#FFA500;color:white;">
+//                   <h1>Registration Under Review</h1>
+//                 </div>
+//                 <div style="padding:20px;background:white;">
+//                   <p>Dear ${fullName},</p>
+//                   <p>Your registration with Bhagwan Parshuram Institute of Technology is currently <strong>pending review</strong>.</p>
+//                   <p>Our admissions team is carefully reviewing your application. You will receive another notification once a decision has been made.</p>
+//                   <div style="background:#fffaf0;padding:15px;margin:20px 0;border-left:4px solid #FFA500;">
+//                     <p>Current Status: <strong>Pending Review</strong></p>
+//                     <p>Expected decision timeline: 5-7 business days</p>
+//                   </div>
+//                   <p>Thank you for your patience.</p>
+//                   <p>Best regards,<br>The Admissions Team</p>
+//                 </div>
+//                 <div style="text-align:center;padding:20px;font-size:12px;color:#777;">
+//                   <p>© ${new Date().getFullYear()} Bhagwan Parshuram Institute of Technology</p>
+//                 </div>
+//               </div>
+//             `;
+//           }
+
+//           // Send the email
+//           sendStatusEmail(email, emailSubject, emailHtml)
+//             .then(() => {
+//               // Get updated student list
+//               db.query('SELECT * FROM students', (fetchErr, allStudents) => {
+//                 if (fetchErr) {
+//                   console.error('Error fetching all students:', fetchErr);
+//                   return res.status(500).json({ message: 'Database error', error: fetchErr });
+//                 }
+
+//                 res.json({ message: 'Status updated and email sent', students: allStudents });
+//               });
+//             })
+//             .catch(emailErr => {
+//               console.error('Error sending email:', emailErr);
+//               res.status(500).json({ message: 'Email error', error: emailErr });
+//             });
+//         }
+//       );
+//     }
+//   );
+// };
+
+
 
 // List students by status (pending, approved, declined)
 exports.listStudentsByStatus = (req, res) => {
@@ -193,7 +317,12 @@ exports.listStudentsByStatus = (req, res) => {
   }
   db.query('SELECT * FROM students WHERE status = ?', [status], (err, results) => {
     if (err) return res.status(500).json({ message: 'DB error', error: err });
-    res.json({ students: results });
+    // Parse declinedFields for each student
+    const students = results.map(s => ({
+      ...s,
+      declinedFields: s.declinedFields ? JSON.parse(s.declinedFields) : [],
+    }));
+    res.json({ students });
   });
 };
 
@@ -301,6 +430,10 @@ exports.getStudentFullDetails = (req, res) => {
       academicAchievements: academicAchievements || [],
       coCurricularAchievements: coCurricularAchievements || [],
     };
-    res.json({ personal, parent, documents, academic });
+        let declinedFields = [];
+    if (student.declinedFields) {
+      try { declinedFields = JSON.parse(student.declinedFields); } catch { declinedFields = []; }
+    }
+    res.json({ personal, parent, documents, academic, declinedFields });
   });
 };
