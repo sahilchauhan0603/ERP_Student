@@ -229,7 +229,7 @@ exports.registerStudent = async (req, res) => {
 // Handler to fetch complete student details by ID
 exports.getStudentDetailsById = (req, res) => {
   const { studentId } = req.params;
-  
+
   if (!studentId) {
     return res.status(400).json({ message: 'studentId required' });
   }
@@ -239,12 +239,44 @@ exports.getStudentDetailsById = (req, res) => {
       console.error('Database error:', err);
       return res.status(500).json({ message: 'Database error' });
     }
-    
+
     if (!results || results.length === 0) {
       return res.status(404).json({ message: 'Student not found' });
     }
 
     const student = results[0];
+
+    // Parse JSON fields safely
+    let academicAchievements = student.academicAchievements;
+    let coCurricularAchievements = student.coCurricularAchievements;
+    let declinedFields = student.declinedFields;
+
+    try {
+      if (typeof academicAchievements === 'string') {
+        academicAchievements = JSON.parse(academicAchievements);
+      }
+    } catch (e) {
+      console.warn('Failed to parse academicAchievements JSON:', e);
+      academicAchievements = [];
+    }
+
+    try {
+      if (typeof coCurricularAchievements === 'string') {
+        coCurricularAchievements = JSON.parse(coCurricularAchievements);
+      }
+    } catch (e) {
+      console.warn('Failed to parse coCurricularAchievements JSON:', e);
+      coCurricularAchievements = [];
+    }
+
+    try {
+      if (typeof declinedFields === 'string') {
+        declinedFields = JSON.parse(declinedFields);
+      }
+    } catch (e) {
+      console.warn('Failed to parse declinedFields JSON:', e);
+      declinedFields = [];
+    }
 
     // Personal Information
     const personal = {
@@ -320,28 +352,6 @@ exports.getStudentDetailsById = (req, res) => {
     };
 
     // Academic Information
-    let academicAchievements = student.academicAchievements;
-    let coCurricularAchievements = student.coCurricularAchievements;
-
-    // Parse JSON fields safely
-    try {
-      if (typeof academicAchievements === 'string') {
-        academicAchievements = JSON.parse(academicAchievements);
-      }
-    } catch (e) {
-      console.warn('Failed to parse academicAchievements JSON:', e);
-      academicAchievements = [];
-    }
-
-    try {
-      if (typeof coCurricularAchievements === 'string') {
-        coCurricularAchievements = JSON.parse(coCurricularAchievements);
-      }
-    } catch (e) {
-      console.warn('Failed to parse coCurricularAchievements JSON:', e);
-      coCurricularAchievements = [];
-    }
-
     const academic = {
       classX: {
         institute: student.classX_institute || '',
@@ -369,17 +379,20 @@ exports.getStudentDetailsById = (req, res) => {
       coCurricularAchievements: coCurricularAchievements || []
     };
 
+    // ✅ Add declinedFields in the response
     res.json({
       success: true,
       data: {
         personal,
         parent,
         documents,
-        academic
+        academic,
+        declinedFields
       }
     });
   });
 };
+
 
 
 // PATCH /student/students/:id/update-declined
@@ -454,7 +467,3 @@ exports.updateDeclinedFields = (req, res) => {
     });
   });
 };
-
-// so now i want to show the student declined fields as red marked and when user clicks 'update profile' only the declined fields are editable
-
-//  'submit profile for review' button should get enables only when the student updates all the declined fields and clicking it will implement the feature and mark the status of student again as pending with a pop-up message as well

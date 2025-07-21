@@ -1,16 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { FiUser, FiMail, FiClock, FiEye, FiRefreshCw } from 'react-icons/fi';
+import { FiUser, FiClock, FiEye, FiRefreshCw, FiSearch } from 'react-icons/fi';
 import AdminStudentDetailsModal from './AdminStudentDetailsModal';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function PendingStudents() {
+  const courses = [
+    "B.Tech Computer Science Engineering (CSE)",
+    "B.Tech Information Technology Engineering (IT)",
+    "B.Tech Electronics and Communication Engineering (ECE)",
+    "B.Tech Electrical and Electronics Engineering (EEE)",
+    "B.Tech Artificial Intelligence and Data Science Engineering (AI-DS)",
+    "B.Tech Computer Science Engineering with specialization in Data Science (CSE-DS)",
+    "LE-B.Tech Computer Science Engineering (CSE)",
+    "LE-B.Tech Information Technology Engineering (IT)",
+    "LE-B.Tech Electronics and Communication Engineering (ECE)",
+    "LE-B.Tech Electrical and Electronics Engineering (EEE)",
+    "BBA",
+    "MBA",
+  ];
+
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCourse, setSelectedCourse] = useState('');
+  const [selectedGender, setSelectedGender] = useState('');
 
   useEffect(() => {
     fetchPendingStudents();
@@ -32,22 +49,26 @@ export default function PendingStudents() {
     setModalOpen(true);
   };
 
-  const filteredStudents = students.filter(student => {
+  const filteredStudents = students.filter((student) => {
     const searchLower = searchTerm.toLowerCase();
-    return (
+    const matchesSearch =
       student.firstName.toLowerCase().includes(searchLower) ||
       student.lastName.toLowerCase().includes(searchLower) ||
       student.email.toLowerCase().includes(searchLower) ||
-      student.studentId?.toLowerCase().includes(searchLower)
-    );
+      (student.studentId && student.studentId.toLowerCase().includes(searchLower));
+    const matchesCourse = selectedCourse ? student.course === selectedCourse : true;
+    const matchesGender = selectedGender ? student.gender === selectedGender : true;
+
+    return matchesSearch && matchesCourse && matchesGender;
   });
 
   return (
     <div className="p-6 w-full max-w-7xl mx-auto">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        {/* Header with title and search */}
-        <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden">
+        {/* Header with Filters */}
+        <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-yellow-50 via-white to-white">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            {/* Title */}
             <div>
               <h1 className="text-2xl font-bold text-gray-800 flex items-center">
                 <FiClock className="mr-2 text-yellow-500" />
@@ -57,20 +78,51 @@ export default function PendingStudents() {
                 {students.length} student{students.length !== 1 ? 's' : ''} awaiting review
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="relative">
+
+            {/* Filters */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:flex gap-4 items-center">
+              {/* Search */}
+              <div className="relative w-full">
                 <input
                   type="text"
-                  placeholder="Search students..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="name, email, ID..."
+                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <FiUser className="absolute left-3 top-3 text-gray-400" />
+                <FiSearch className="absolute left-3 top-3 text-gray-400" />
               </div>
+
+              {/* Course Filter */}
+              <select
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
+                className="px-3 py-2 w-full border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              >
+                <option value="">All Courses</option>
+                {courses.map((course) => (
+                  <option key={course} value={course}>
+                    {course}
+                  </option>
+                ))}
+              </select>
+
+              {/* Gender Filter */}
+              <select
+                value={selectedGender}
+                onChange={(e) => setSelectedGender(e.target.value)}
+                className="px-3 py-2 w-full border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              >
+                <option value="">All Genders</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+
+              {/* Refresh */}
               <button
                 onClick={fetchPendingStudents}
-                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg shadow-sm transition-all duration-150"
                 title="Refresh"
               >
                 <FiRefreshCw className={`${loading ? 'animate-spin' : ''}`} />
@@ -79,79 +131,91 @@ export default function PendingStudents() {
           </div>
         </div>
 
-        {/* Content */}
+        {/* Content Section */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
           </div>
         ) : filteredStudents.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-16">
             <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <FiUser className="text-gray-400 text-3xl" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900">
-              {searchTerm ? 'No matching students found' : 'No pending applications'}
+            <h3 className="text-lg font-semibold text-gray-800">
+              {searchTerm || selectedCourse || selectedGender
+                ? 'No matching students found'
+                : 'No pending applications'}
             </h3>
-            <p className="mt-1 text-gray-500">
-              {searchTerm ? 'Try a different search term' : 'All applications have been processed'}
+            <p className="mt-2 text-gray-500">
+              {searchTerm || selectedCourse || selectedGender
+                ? 'Try different filters or keywords'
+                : 'All applications have been processed.'}
             </p>
-            {searchTerm && (
+            {(searchTerm || selectedCourse || selectedGender) && (
               <button
-                onClick={() => setSearchTerm('')}
-                className="mt-4 text-sm text-blue-600 hover:text-blue-800"
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedCourse('');
+                  setSelectedGender('');
+                }}
+                className="mt-4 text-sm text-yellow-600 hover:text-yellow-800"
               >
-                Clear search
+                Clear Filters
               </button>
             )}
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">
                     Student
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">
                     Contact
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">
                     Status
                   </th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right font-semibold text-gray-500 uppercase">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-100">
                 {filteredStudents.map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                          {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                  <tr key={student.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap flex items-center">
+                      <div className="h-10 w-10 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center font-bold">
+                        {student.firstName.charAt(0)}
+                        {student.lastName.charAt(0)}
+                      </div>
+                      <div className="ml-4">
+                        <div className="font-medium text-gray-900">
+                          {student.firstName} {student.middleName}{' '}
+                          {student.lastName}
                         </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {student.firstName} {student.middleName} {student.lastName}
-                          </div>
-                          <div className="text-sm text-gray-500">{student.studentId}</div>
+                        <div className="text-gray-500 text-xs">
+                          {student.studentId}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{student.email}</div>
-                      <div className="text-sm text-gray-500">{student.mobile}</div>
+                    <td className="px-6 py-4">
+                      <div className="text-gray-800">{student.email}</div>
+                      <div className="text-gray-500 text-xs">
+                        {student.mobile}
+                      </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">
                         Pending Review
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => handleViewDetails(student)}
-                        className="text-blue-600 hover:text-blue-900 flex items-center"
+                        className="text-yellow-600 hover:text-yellow-800 inline-flex items-center"
                       >
                         <FiEye className="mr-1" /> Review
                       </button>

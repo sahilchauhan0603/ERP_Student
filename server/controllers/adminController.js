@@ -390,19 +390,63 @@ exports.listStudentsByStatus = (req, res) => {
   });
 };
 
-// Search students by name or email
 exports.searchStudents = (req, res) => {
-  const { q } = req.query;
-  if (!q) return res.status(400).json({ message: 'Query required' });
-  const like = `%${q}%`;
-  db.query(
-    'SELECT * FROM students WHERE firstName LIKE ? OR lastName LIKE ? OR email LIKE ?',
-    [like, like, like],
-    (err, results) => {
-      if (err) return res.status(500).json({ message: 'DB error', error: err });
-      res.json({ students: results });
+  const { q = '', gender = '', course = '', page = 1 } = req.query;
+  const pageSize = 10;
+  const offset = (parseInt(page) - 1) * pageSize;
+
+  let baseQuery = `SELECT * FROM students WHERE 1=1`;
+  let countQuery = `SELECT COUNT(*) as total FROM students WHERE 1=1`;
+  const params = [];
+  const countParams = [];
+
+  // Apply search filter
+  if (q) {
+    baseQuery += ` AND (firstName LIKE ? OR lastName LIKE ? OR email LIKE ? OR studentId LIKE ?)`;
+    countQuery += ` AND (firstName LIKE ? OR lastName LIKE ? OR email LIKE ? OR studentId LIKE ?)`;
+    const likeQ = `%${q}%`;
+    params.push(likeQ, likeQ, likeQ, likeQ);
+    countParams.push(likeQ, likeQ, likeQ, likeQ);
+  }
+
+  // Apply gender filter
+  if (gender) {
+    baseQuery += ` AND gender = ?`;
+    countQuery += ` AND gender = ?`;
+    params.push(gender);
+    countParams.push(gender);
+  }
+
+  // Apply course filter
+  if (course) {
+    baseQuery += ` AND course = ?`;
+    countQuery += ` AND course = ?`;
+    params.push(course);
+    countParams.push(course);
+  }
+
+  // Pagination and ordering
+  baseQuery += ` ORDER BY id DESC LIMIT ? OFFSET ?`;
+  params.push(pageSize, offset);
+
+  // First get students
+  db.query(baseQuery, params, (err, students) => {
+    if (err) {
+      console.error('Student query error:', err);
+      return res.status(500).json({ message: 'Database error', error: err });
     }
-  );
+
+    // Then get total count
+    db.query(countQuery, countParams, (err2, countResult) => {
+      if (err2) {
+        console.error('Count query error:', err2);
+        return res.status(500).json({ message: 'Database error', error: err2 });
+      }
+
+      const totalPages = Math.ceil(countResult[0].total / pageSize);
+      res.json({ students, totalPages });
+    });
+  });
 };
 
 // Get full details of a student (all registration sections) - for admin
