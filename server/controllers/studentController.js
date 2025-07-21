@@ -382,113 +382,79 @@ exports.getStudentDetailsById = (req, res) => {
 };
 
 
-// Update specific section of student profile
-exports.updateStudentSection = (req, res) => {
+// PATCH /student/students/:id/update-declined
+exports.updateDeclinedFields = (req, res) => {
   const studentId = req.params.id;
-  const { section, data } = req.body;
+  const { data } = req.body;
 
-  const validSections = ['personal', 'parent', 'academic'];
-  if (!validSections.includes(section)) {
-    return res.status(400).json({
-      success: false,
-      message: 'Invalid section'
-    });
+  if (!data || Object.keys(data).length === 0) {
+    return res.status(400).json({ success: false, message: 'No data provided' });
   }
 
-  // Mapping section fields to actual DB columns
-  const sectionFieldMap = {
-    personal: [
-      'firstName', 'middleName', 'lastName', 'abcId', 'dob',
-      'placeOfBirth', 'mobile', 'email', 'gender', 'category',
-      'subCategory', 'region', 'currentAddress', 'permanentAddress',
-      'feeReimbursement', 'antiRaggingRef'
-    ],
-    parent: [
-      'father_name', 'father_qualification', 'father_occupation', 'father_email', 'father_mobile',
-      'father_telephoneSTD', 'father_telephone', 'father_officeAddress',
-      'mother_name', 'mother_qualification', 'mother_occupation', 'mother_email', 'mother_mobile',
-      'mother_telephoneSTD', 'mother_telephone', 'mother_officeAddress', 'familyIncome'
-    ],
-    academic: [
-      'classX_institute', 'classX_board', 'classX_year', 'classX_aggregate', 'classX_pcm', 'classX_isDiplomaOrPolytechnic',
-      'classXII_institute', 'classXII_board', 'classXII_year', 'classXII_aggregate', 'classXII_pcm',
-      'otherQualification_institute', 'otherQualification_board', 'otherQualification_year',
-      'otherQualification_aggregate', 'otherQualification_pcm', 'academicAchievements', 'coCurricularAchievements'
-    ]
-  };
-
-  const fieldsToUpdate = sectionFieldMap[section].filter(key => key in data);
-
-  if (fieldsToUpdate.length === 0) {
-    return res.status(400).json({
-      success: false,
-      message: 'No valid fields to update'
-    });
-  }
-
-  const updates = fieldsToUpdate.map(field => `${field} = ?`).join(', ');
-  const values = fieldsToUpdate.map(field => data[field]);
-  values.push(studentId); // for WHERE clause
-
-  const sql = `UPDATE students SET ${updates} WHERE id = ?`;
-
-  db.query(sql, values, (err, result) => {
+  // Step 1: Fetch declinedFields and status from DB
+  const getDeclinedSql =
+    'SELECT declinedFields, status FROM students WHERE id = ?';
+  db.query(getDeclinedSql, [studentId], (err, results) => {
     if (err) {
-      console.error(`❌ Error updating ${section} section:`, err);
-      return res.status(500).json({
-        success: false,
-        message: 'Database error while updating student section'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: `${section} section updated successfully`
-    });
-  });
-};
-
-// Final profile update for declined students
-exports.finalProfileUpdate = (req, res) => {
-  const studentId = req.params.id;
-  const updateData = req.body;
-
-  // Step 1: Check if student exists and is declined
-  const checkSql = 'SELECT status FROM students WHERE id = ?';
-  db.query(checkSql, [studentId], (err, results) => {
-    if (err) {
-      console.error('❌ Error checking student status:', err);
+      console.error('❌ Error fetching declinedFields:', err);
       return res.status(500).json({ success: false, message: 'Database error' });
     }
-
     if (results.length === 0) {
       return res.status(404).json({ success: false, message: 'Student not found' });
     }
 
-    const currentStatus = results[0].status;
-    if (currentStatus !== 'declined') {
-      return res.status(400).json({ success: false, message: 'Only declined profiles can be resubmitted' });
+    const declinedFields = results[0].declinedFields 
+      ? JSON.parse(results[0].declinedFields)
+      : [];
+
+    const status = results[0].status;
+
+    // 2. Only allow updates if student is 'declined'
+    if (status !== 'declined') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only declined profiles can be edited'
+      });
     }
 
-    // Step 2: Update student details and reset status to 'pending'
-    const updateFields = Object.keys(updateData).filter(key => key !== 'status'); // Don't allow direct status set
-    const values = updateFields.map(field => updateData[field]);
-    values.push('pending'); // New status
-    values.push(studentId); // WHERE clause
+    // 3. Only allow updates to declined fields
+    const updatableFields = Object.keys(data).filter(field => declinedFields.includes(field));
+    if (updatableFields.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No declined fields specified for update',
+      });
+    }
 
-    const setClause = updateFields.map(field => `${field} = ?`).join(', ') + ', status = ?';
-    const updateSql = `UPDATE students SET ${setClause} WHERE id = ?`;
+    const updates = updatableFields.map(field => `${field} = ?`).join(', ');
 
-    db.query(updateSql, values, (err2, result2) => {
+    const values = updatableFields.map(field => data[field]);
+
+    // Also, mark status as 'pending' and update declinedFields
+    // Remove updated fields from declinedFields
+    const updatedDeclinedFields = declinedFields.filter(f => !updatableFields.includes(f));
+    values.push('pending'); // new status
+    values.push(JSON.stringify(updatedDeclinedFields)); // new declinedFields
+    values.push(studentId); // for WHERE clause
+
+    const sql = `UPDATE students SET ${updates}, status = ?, declinedFields = ? WHERE id = ?`;
+
+    db.query(sql, values, (err2, result2) => {
       if (err2) {
-        console.error('❌ Error updating final profile:', err2);
-        return res.status(500).json({ success: false, message: 'Failed to update profile' });
+        console.error('❌ Error updating declined fields:', err2);
+        return res.status(500).json({ success: false, message: 'Failed to update declined fields' });
       }
 
-      res.json({
+      return res.json({
         success: true,
-        message: 'Profile updated and submitted for review'
+        message: 'Declined fields updated, profile marked pending for review',
+        updatedFields: updatableFields,
+        declinedFields: updatedDeclinedFields
       });
     });
   });
 };
+
+// so now i want to show the student declined fields as red marked and when user clicks 'update profile' only the declined fields are editable
+
+//  'submit profile for review' button should get enables only when the student updates all the declined fields and clicking it will implement the feature and mark the status of student again as pending with a pop-up message as well

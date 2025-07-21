@@ -43,7 +43,6 @@ exports.verifyAdminOtp = (req, res) => {
   res.json({ message: 'Login successful' });
 };
 
-
 exports.getStudentStats = (req, res) => {
   const stats = {};
   db.query('SELECT COUNT(*) as total FROM students', (err, totalResult) => {
@@ -111,7 +110,30 @@ exports.updateStudentStatus = (req, res) => {
 
           if (status === 'approved') {
             emailSubject = 'Congratulations! Your Registration Has Been Approved';
-            emailHtml = `...`; // (same as before)
+            emailHtml = `
+              <div style="max-width:600px;margin:0 auto;padding:20px;font-family:Arial,sans-serif;background:#f9f9f9;">
+                <div style="text-align:center;padding:20px 0;background:#4CAF50;color:white;">
+                  <h1>Registration Approved</h1>
+                </div>
+                <div style="padding:20px;background:white;">
+                  <p>Dear ${fullName},</p>
+                  <p>We are pleased to inform you that your registration with Bhagwan Parshuram Institute of Technology has been <strong>approved</strong>.</p>
+                  <div style="background:#f0f8ff;padding:15px;margin:20px 0;border-left:4px solid #4CAF50;">
+                    <p style="margin:0;">Next Steps:</p>
+                    <ul style="margin:10px 0 0 20px;">
+                      <li>Complete your enrollment process</li>
+                      <li>Check your student portal for further instructions</li>
+                      <li>Contact admissions if you have any questions</li>
+                    </ul>
+                  </div>
+                  <p>Welcome to BPIT! We look forward to having you as part of our academic community.</p>
+                  <p>Best regards,<br>The Admissions Team</p>
+                </div>
+                <div style="text-align:center;padding:20px;font-size:12px;color:#777;">
+                  <p>© ${new Date().getFullYear()} Bhagwan Parshuram Institute of Technology</p>
+                </div>
+              </div>
+            `;
           } else if (status === 'declined') {
             const declinedArr = Array.isArray(declinedFields) ? declinedFields : [];
             let declinedListHtml = '';
@@ -129,10 +151,53 @@ exports.updateStudentStatus = (req, res) => {
             }
 
             emailSubject = 'Your Registration Status Update';
-            emailHtml = `...`; // (same as before, include declinedListHtml)
+            emailHtml = `
+              <div style="max-width:600px;margin:0 auto;padding:20px;font-family:Arial,sans-serif;background:#f9f9f9;">
+                <div style="text-align:center;padding:20px 0;background:#f44336;color:white;">
+                  <h1>Registration Decision</h1>
+                </div>
+                <div style="padding:20px;background:white;">
+                  <p>Dear ${fullName},</p>
+                  <p>After careful consideration, we regret to inform you that your registration with Bhagwan Parshuram Institute of Technology has been <strong>declined</strong>.</p>
+                  ${declinedListHtml}
+                  <div style="background:#fff8f8;padding:15px;margin:20px 0;border-left:4px solid #f44336;">
+                    <p>For more information about this decision, please contact our admissions office:</p>
+                    <p style="margin:10px 0 0 0;">
+                      Email: <a href="mailto:admissions@bpitindia.ac.in">admissions@bpitindia.ac.in</a><br>
+                      Phone: +91-11-XXXX-XXXX
+                    </p>
+                  </div>
+                  <p>We appreciate your interest in BPIT and encourage you to explore other educational opportunities.</p>
+                  <p>Sincerely,<br>The Admissions Team</p>
+                </div>
+                <div style="text-align:center;padding:20px;font-size:12px;color:#777;">
+                  <p>© ${new Date().getFullYear()} Bhagwan Parshuram Institute of Technology</p>
+                </div>
+              </div>
+            `;
           } else {
             emailSubject = 'Your Registration Status Update';
-            emailHtml = `...`; // (same as before)
+            emailHtml = `
+              <div style="max-width:600px;margin:0 auto;padding:20px;font-family:Arial,sans-serif;background:#f9f9f9;">
+                <div style="text-align:center;padding:20px 0;background:#FFA500;color:white;">
+                  <h1>Registration Under Review</h1>
+                </div>
+                <div style="padding:20px;background:white;">
+                  <p>Dear ${fullName},</p>
+                  <p>Your registration with Bhagwan Parshuram Institute of Technology is currently <strong>pending review</strong>.</p>
+                  <p>Our admissions team is carefully reviewing your application. You will receive another notification once a decision has been made.</p>
+                  <div style="background:#fffaf0;padding:15px;margin:20px 0;border-left:4px solid #FFA500;">
+                    <p>Current Status: <strong>Pending Review</strong></p>
+                    <p>Expected decision timeline: 5-7 business days</p>
+                  </div>
+                  <p>Thank you for your patience.</p>
+                  <p>Best regards,<br>The Admissions Team</p>
+                </div>
+                <div style="text-align:center;padding:20px;font-size:12px;color:#777;">
+                  <p>© ${new Date().getFullYear()} Bhagwan Parshuram Institute of Technology</p>
+                </div>
+              </div>
+            `;
           }
 
           // Send the email
@@ -306,7 +371,6 @@ exports.updateStudentStatus = (req, res) => {
 //     }
 //   );
 // };
-
 
 
 // List students by status (pending, approved, declined)
