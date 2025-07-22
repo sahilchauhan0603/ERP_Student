@@ -84,8 +84,10 @@ exports.verifyLoginOtp = (req, res) => {
     const token = signToken({ id: student.id, email: student.email, role: 'student' });
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      // secure: process.env.NODE_ENV === 'production',
+      // sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 2 * 60 * 60 * 1000 // 2 hours
     });
 

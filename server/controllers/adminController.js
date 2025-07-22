@@ -53,8 +53,10 @@ exports.verifyAdminOtp = (req, res) => {
   const token = signToken({ email, role: 'admin' });
   res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    // secure: process.env.NODE_ENV === 'production',
+    // sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    secure: true,
+    sameSite: 'none',
     maxAge: 2 * 60 * 60 * 1000 // 2 hours
   });
   res.json({ message: 'Login successful' });
