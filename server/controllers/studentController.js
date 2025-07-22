@@ -319,6 +319,7 @@ function formatDateToYMD(val) {
 
 // Handler to fetch complete student details by ID
 exports.getStudentDetailsById = (req, res) => {
+  res.set('Cache-Control', 'no-store'); // Prevent caching
   const { studentId } = req.params;
 
   // Only allow access if the logged-in user matches the requested studentId
@@ -493,6 +494,7 @@ exports.getStudentDetailsById = (req, res) => {
 };
 
 exports.getStudentDetailsMe = (req, res) => {
+  res.set('Cache-Control', 'no-store'); // Prevent caching
   const studentId = req.user && req.user.id;
   
   if (!studentId) {

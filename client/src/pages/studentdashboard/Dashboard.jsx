@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Tab } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
+import { forceLogout } from '../../App';
 
 const StudentDetailsDashboard = () => {
   const [details, setDetails] = useState(null);
@@ -62,9 +63,11 @@ const StudentDetailsDashboard = () => {
   const handleLogout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_URL}/student/logout`, {}, { withCredentials: true });
-    } catch {}
+      forceLogout();
+    } catch (err) {
+      // Optionally show error
+    }
     setShowLogoutModal(false);
-    navigate('/');
   };
 
   const handleBackClick = () => {

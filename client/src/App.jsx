@@ -48,6 +48,11 @@ function AuthRoute({ children, role }) {
   return children;
 }
 
+export function forceLogout() {
+  // Clear any local state if needed, then force reload
+  window.location.href = '/login';
+}
+
 function App() {
   return (
     <Router>
