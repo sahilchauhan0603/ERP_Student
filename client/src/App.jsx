@@ -27,7 +27,7 @@ function AuthRoute({ children, role }) {
   useEffect(() => {
     let endpoint = '';
     if (role === 'admin') endpoint = '/admin/stats';
-    else endpoint = '/student/profile';
+    else endpoint = '/student/students/me/details'; // Use a valid endpoint or skip check
     axios.get(`${import.meta.env.VITE_API_URL}${endpoint}`, { withCredentials: true })
       .catch(err => {
         if (err.response && (err.response.status === 401 || err.response.status === 403)) {
@@ -62,7 +62,7 @@ function App() {
         <Route path="/admin" element={<AdminLogin />} />
 
         {/* Student Routes */}
-        <Route path="/student/:studentId" element={
+        <Route path="/student/me" element={
           <AuthRoute role="student">
             <StudentDetailsDashboardPage />
           </AuthRoute>

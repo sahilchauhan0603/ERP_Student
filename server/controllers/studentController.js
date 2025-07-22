@@ -8,8 +8,8 @@ const { signToken } = require('../utils/jwt');
 const rateLimit = require('express-rate-limit');
 
 const otpLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
+  windowMs: 30 * 60 * 1000, // 10 minutes
+  max: 15, // limit each IP to 5 requests per windowMs
   message: { message: 'Too many OTP requests, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -246,6 +246,74 @@ exports.registerStudent = async (req, res) => {
   }
 };
 
+// Helper to normalize declined field names to full paths
+function normalizeDeclinedField(field) {
+  // Personal fields
+  const personalFields = [
+    'firstName', 'middleName', 'lastName', 'email', 'mobile', 'dob', 'placeOfBirth', 'gender', 'category', 'subCategory', 'region', 'currentAddress', 'permanentAddress', 'course', 'examRoll', 'examRank', 'abcId', 'feeReimbursement', 'antiRaggingRef', 'status', 'created_at'
+  ];
+  if (personalFields.includes(field)) return `personal.${field}`;
+  // Parent fields
+  if (field.startsWith('father_')) return `parent.father.${field.replace('father_', '')}`;
+  if (field.startsWith('mother_')) return `parent.mother.${field.replace('mother_', '')}`;
+  if (field === 'familyIncome') return 'parent.familyIncome';
+  // Academic fields (not usually declined, but for completeness)
+  if (field.startsWith('classX_')) return `academic.classX.${field.replace('classX_', '')}`;
+  if (field.startsWith('classXII_')) return `academic.classXII.${field.replace('classXII_', '')}`;
+  if (field.startsWith('otherQualification_')) return `academic.otherQualification.${field.replace('otherQualification_', '')}`;
+  // Document fields
+  const docFields = [
+    'photo', 'ipuRegistration', 'allotmentLetter', 'examAdmitCard', 'examScoreCard',
+    'marksheet10', 'passing10', 'marksheet12', 'passing12', 'aadhar', 'characterCertificate',
+    'medicalCertificate', 'migrationCertificate', 'categoryCertificate', 'specialCategoryCertificate',
+    'academicFeeReceipt', 'collegeFeeReceipt', 'parentSignature'
+  ];
+  if (docFields.includes(field)) return `documents.${field}`;
+  // Fallback: return as is
+  return field;
+}
+
+// Helper to flatten nested objects to dot-notated keys
+function flattenObject(obj, prefix = '') {
+  return Object.keys(obj).reduce((acc, k) => {
+    const pre = prefix.length ? prefix + '.' : '';
+    if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k]) && !(obj[k] instanceof Buffer)) {
+      Object.assign(acc, flattenObject(obj[k], pre + k));
+    } else {
+      acc[pre + k] = obj[k];
+    }
+    return acc;
+  }, {});
+}
+
+// Helper to map dot-notated keys to flat MySQL column names
+function mapToColumn(key) {
+  // Personal fields
+  if (key.startsWith('personal.')) return key.replace('personal.', '');
+  // Parent fields
+  if (key.startsWith('parent.father.')) return 'father_' + key.replace('parent.father.', '');
+  if (key.startsWith('parent.mother.')) return 'mother_' + key.replace('parent.mother.', '');
+  if (key === 'parent.familyIncome') return 'familyIncome';
+  // Academic fields
+  if (key.startsWith('academic.classX.')) return 'classX_' + key.replace('academic.classX.', '');
+  if (key.startsWith('academic.classXII.')) return 'classXII_' + key.replace('academic.classXII.', '');
+  if (key.startsWith('academic.otherQualification.')) return 'otherQualification_' + key.replace('academic.otherQualification.', '');
+  // Document fields
+  if (key.startsWith('documents.')) return key.replace('documents.', '');
+  // Fallback
+  return key;
+}
+
+// Helper to format ISO date strings to YYYY-MM-DD
+function formatDateToYMD(val) {
+  if (!val) return null;
+  // If already in YYYY-MM-DD, return as is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+  // Try to parse and format
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return val;
+  return d.toISOString().slice(0, 10);
+}
 
 // Handler to fetch complete student details by ID
 exports.getStudentDetailsById = (req, res) => {
@@ -298,6 +366,9 @@ exports.getStudentDetailsById = (req, res) => {
     try {
       if (typeof declinedFields === 'string') {
         declinedFields = JSON.parse(declinedFields);
+      }
+      if (Array.isArray(declinedFields)) {
+        declinedFields = declinedFields.map(normalizeDeclinedField);
       }
     } catch (e) {
       console.warn('Failed to parse declinedFields JSON:', e);
@@ -419,12 +490,157 @@ exports.getStudentDetailsById = (req, res) => {
   });
 };
 
+exports.getStudentDetailsMe = (req, res) => {
+  const studentId = req.user && req.user.id;
+  
+  if (!studentId) {
+    return res.status(401).json({ message: 'Unauthorized: No student ID in token.' });
+  }
+  db.query('SELECT * FROM students WHERE id = ?', [studentId], (err, results) => {
+    if (err) return res.status(500).json({ message: 'DB error', error: err });
+    if (!results || results.length === 0) return res.status(404).json({ message: 'Student not found' });
+    const student = results[0];
+
+    // Parse JSON fields safely
+    let academicAchievements = student.academicAchievements;
+    let coCurricularAchievements = student.coCurricularAchievements;
+    let declinedFields = student.declinedFields;
+    try {
+      if (typeof academicAchievements === 'string') academicAchievements = JSON.parse(academicAchievements);
+    } catch (e) { academicAchievements = []; }
+    try {
+      if (typeof coCurricularAchievements === 'string') coCurricularAchievements = JSON.parse(coCurricularAchievements);
+    } catch (e) { coCurricularAchievements = []; }
+    try {
+      if (typeof declinedFields === 'string') declinedFields = JSON.parse(declinedFields);
+      if (Array.isArray(declinedFields)) declinedFields = declinedFields.map(normalizeDeclinedField);
+    } catch (e) { declinedFields = []; }
+
+    // Personal Information
+    const personal = {
+      id: student.id,
+      firstName: student.firstName,
+      middleName: student.middleName,
+      lastName: student.lastName,
+      email: student.email,
+      mobile: student.mobile,
+      dob: student.dob,
+      placeOfBirth: student.placeOfBirth,
+      gender: student.gender,
+      category: student.category,
+      subCategory: student.subCategory,
+      region: student.region,
+      currentAddress: student.currentAddress,
+      permanentAddress: student.permanentAddress,
+      course: student.course,
+      examRoll: student.examRoll,
+      examRank: student.examRank,
+      abcId: student.abcId,
+      feeReimbursement: student.feeReimbursement,
+      antiRaggingRef: student.antiRaggingRef,
+      status: student.status,
+      created_at: student.created_at
+    };
+    // Parent Information
+    const parent = {
+      father: {
+        name: student.father_name,
+        qualification: student.father_qualification,
+        occupation: student.father_occupation,
+        email: student.father_email,
+        mobile: student.father_mobile,
+        telephoneSTD: student.father_telephoneSTD,
+        telephone: student.father_telephone,
+        officeAddress: student.father_officeAddress
+      },
+      mother: {
+        name: student.mother_name,
+        qualification: student.mother_qualification,
+        occupation: student.mother_occupation,
+        email: student.mother_email,
+        mobile: student.mother_mobile,
+        telephoneSTD: student.mother_telephoneSTD,
+        telephone: student.mother_telephone,
+        officeAddress: student.mother_officeAddress
+      },
+      familyIncome: student.familyIncome
+    };
+    // Documents
+    const documents = {
+      photo: student.photo,
+      ipuRegistration: student.ipuRegistration,
+      allotmentLetter: student.allotmentLetter,
+      examAdmitCard: student.examAdmitCard,
+      examScoreCard: student.examScoreCard,
+      marksheet10: student.marksheet10,
+      passing10: student.passing10,
+      marksheet12: student.marksheet12,
+      passing12: student.passing12,
+      aadhar: student.aadhar,
+      characterCertificate: student.characterCertificate,
+      medicalCertificate: student.medicalCertificate,
+      migrationCertificate: student.migrationCertificate,
+      categoryCertificate: student.categoryCertificate,
+      specialCategoryCertificate: student.specialCategoryCertificate,
+      academicFeeReceipt: student.academicFeeReceipt,
+      collegeFeeReceipt: student.collegeFeeReceipt,
+      parentSignature: student.parentSignature
+    };
+    // Academic Information
+    const academic = {
+      classX: {
+        institute: student.classX_institute || '',
+        board: student.classX_board || '',
+        year: student.classX_year || '',
+        aggregate: student.classX_aggregate || '',
+        pcm: student.classX_pcm || '',
+        isDiplomaOrPolytechnic: student.classX_isDiplomaOrPolytechnic || ''
+      },
+      classXII: {
+        institute: student.classXII_institute || '',
+        board: student.classXII_board || '',
+        year: student.classXII_year || '',
+        aggregate: student.classXII_aggregate || '',
+        pcm: student.classXII_pcm || ''
+      },
+      otherQualification: {
+        institute: student.otherQualification_institute || '',
+        board: student.otherQualification_board || '',
+        year: student.otherQualification_year || '',
+        aggregate: student.otherQualification_aggregate || '',
+        pcm: student.otherQualification_pcm || ''
+      },
+      academicAchievements: academicAchievements || [],
+      coCurricularAchievements: coCurricularAchievements || []
+    };
+    res.json({
+      success: true,
+      data: {
+        personal,
+        parent,
+        documents,
+        academic,
+        declinedFields
+      }
+    });
+  });
+};
 
 
-// PATCH /student/students/:id/update-declined
-exports.updateDeclinedFields = (req, res) => {
-  const studentId = req.params.id;
-  const { data } = req.body;
+// PATCH /student/students/me/update-declined
+exports.updateDeclinedFields = async (req, res) => {
+  const studentId = req.user && req.user.id;
+  let data;
+  // Support both JSON and multipart/form-data
+  if (req.is('multipart/form-data')) {
+    try {
+      data = JSON.parse(req.body.data);
+    } catch {
+      return res.status(400).json({ success: false, message: 'Invalid data format' });
+    }
+  } else {
+    data = req.body.data;
+  }
 
   if (!data || Object.keys(data).length === 0) {
     return res.status(400).json({ success: false, message: 'No data provided' });
@@ -433,7 +649,7 @@ exports.updateDeclinedFields = (req, res) => {
   // Step 1: Fetch declinedFields and status from DB
   const getDeclinedSql =
     'SELECT declinedFields, status FROM students WHERE id = ?';
-  db.query(getDeclinedSql, [studentId], (err, results) => {
+  db.query(getDeclinedSql, [studentId], async (err, results) => {
     if (err) {
       console.error('❌ Error fetching declinedFields:', err);
       return res.status(500).json({ success: false, message: 'Database error' });
@@ -442,9 +658,12 @@ exports.updateDeclinedFields = (req, res) => {
       return res.status(404).json({ success: false, message: 'Student not found' });
     }
 
-    const declinedFields = results[0].declinedFields 
+    let declinedFields = results[0].declinedFields 
       ? JSON.parse(results[0].declinedFields)
       : [];
+    if (Array.isArray(declinedFields)) {
+      declinedFields = declinedFields.map(normalizeDeclinedField);
+    }
 
     const status = results[0].status;
 
@@ -456,8 +675,9 @@ exports.updateDeclinedFields = (req, res) => {
       });
     }
 
-    // 3. Only allow updates to declined fields
-    const updatableFields = Object.keys(data).filter(field => declinedFields.includes(field));
+    // In updateDeclinedFields, flatten data before matching
+    const flatData = flattenObject(data);
+    const updatableFields = Object.keys(flatData).filter(field => declinedFields.includes(normalizeDeclinedField(field)));
     if (updatableFields.length === 0) {
       return res.status(400).json({
         success: false,
@@ -465,18 +685,46 @@ exports.updateDeclinedFields = (req, res) => {
       });
     }
 
-    const updates = updatableFields.map(field => `${field} = ?`).join(', ');
+    // Handle file uploads (if any)
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const field = file.fieldname;
+        if (declinedFields.includes(`documents.${field}`)) {
+          // Upload to Cloudinary
+          try {
+            const url = await uploadToCloudinary(file.buffer, `${field}_${Date.now()}`);
+            if (!data.documents) data.documents = {};
+            data.documents[field] = url;
+          } catch (e) {
+            return res.status(500).json({ success: false, message: `Failed to upload ${field}` });
+          }
+        }
+      }
+    }
 
-    const values = updatableFields.map(field => data[field]);
+    // Prepare updates for SQL
+    const updates = [];
+    const values = [];
+    for (const field of updatableFields) {
+      const column = mapToColumn(field);
+      let value = flatData[field];
+      // Format date fields
+      if (column === 'dob') {
+        value = formatDateToYMD(value);
+      }
+      updates.push(`${column} = ?`);
+      values.push(value);
+    }
 
     // Also, mark status as 'pending' and update declinedFields
-    // Remove updated fields from declinedFields
     const updatedDeclinedFields = declinedFields.filter(f => !updatableFields.includes(f));
-    values.push('pending'); // new status
-    values.push(JSON.stringify(updatedDeclinedFields)); // new declinedFields
+    updates.push('status = ?');
+    values.push('pending');
+    updates.push('declinedFields = ?');
+    values.push(JSON.stringify(updatedDeclinedFields));
     values.push(studentId); // for WHERE clause
 
-    const sql = `UPDATE students SET ${updates}, status = ?, declinedFields = ? WHERE id = ?`;
+    const sql = `UPDATE students SET ${updates.join(', ')} WHERE id = ?`;
 
     db.query(sql, values, (err2, result2) => {
       if (err2) {

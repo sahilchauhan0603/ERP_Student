@@ -3,7 +3,7 @@ import axios from "axios";
 import { Tab } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
 
-const StudentDetailsDashboard = ({ student }) => {
+const StudentDetailsDashboard = () => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,43 +11,30 @@ const StudentDetailsDashboard = ({ student }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({});
-  const [sectionEdits, setSectionEdits] = useState({});
-  const [saveStatus, setSaveStatus] = useState({});
   const [declinedFields, setDeclinedFields] = useState([]);
   const [updatedFields, setUpdatedFields] = useState([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [saveStatus, setSaveStatus] = useState({ final: { loading: false, error: null, success: false } });
+  const [updatedDocuments, setUpdatedDocuments] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!student?.id) {
-      setLoading(false);
-      setError("No student ID provided");
-      return;
-    }
-
     const fetchStudentDetails = async () => {
       try {
         setLoading(true);
         setError(null);
-        
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/student/students/${student.id}/details`,
+          `${import.meta.env.VITE_API_URL}/student/students/me/details`,
           { withCredentials: true }
         );
-
         if (response.data.success && response.data.data) {
           setDetails(response.data.data);
           setFormData(response.data.data);
-          
-          // Parse declined fields if they exist
           if (response.data.data.declinedFields) {
-            // Check if declinedFields is already an array or needs parsing
-            const fields = Array.isArray(response.data.data.declinedFields) 
+            const fields = Array.isArray(response.data.data.declinedFields)
               ? response.data.data.declinedFields
               : JSON.parse(response.data.data.declinedFields || '[]');
             setDeclinedFields(fields);
-
-            // console.log("Declined fields:", fields);
           }
         } else {
           setDetails(response.data);
@@ -55,7 +42,6 @@ const StudentDetailsDashboard = ({ student }) => {
         }
       } catch (err) {
         console.error("Failed to fetch student details:", err);
-        
         if (err.response?.status === 404) {
           setError("Student not found");
         } else if (err.response?.status === 400) {
@@ -70,9 +56,8 @@ const StudentDetailsDashboard = ({ student }) => {
         setLoading(false);
       }
     };
-
     fetchStudentDetails();
-  }, [student?.id]);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -90,8 +75,6 @@ const StudentDetailsDashboard = ({ student }) => {
     if (!editMode) {
       // Reset when entering edit mode
       setUpdatedFields([]);
-      setSectionEdits({});
-      setSaveStatus({});
     }
     setEditMode(!editMode);
   };
@@ -113,19 +96,18 @@ const StudentDetailsDashboard = ({ student }) => {
         setUpdatedFields(prev => [...prev, fieldPath]);
       }
     }
-
-    setSectionEdits(prev => ({
-      ...prev,
-      [section]: true
-    }));
   };
 
-  const isFieldDeclined = (section, field) => {
+  // Helper to check if a field is declined (handles nested fields)
+  const isFieldDeclined = (section, field, subSection) => {
+    if (subSection) {
+      return declinedFields.includes(`${section}.${subSection}.${field}`);
+    }
     return declinedFields.includes(`${section}.${field}`);
   };
 
-  const isFieldEditable = (section, field) => {
-    return editMode && isFieldDeclined(section, field);
+  const isFieldEditable = (section, field, subSection) => {
+    return editMode && isFieldDeclined(section, field, subSection);
   };
 
   const allDeclinedFieldsUpdated = () => {
@@ -136,23 +118,32 @@ const StudentDetailsDashboard = ({ student }) => {
   const handleUpdateDeclinedFields = async () => {
     try {
       setSaveStatus(prev => ({ ...prev, final: { loading: true, error: null } }));
-      
-      // Prepare data for only declined fields
       const updateData = {};
       declinedFields.forEach(fieldPath => {
         const [section, field] = fieldPath.split('.');
         if (!updateData[section]) updateData[section] = {};
         updateData[section][field] = formData[section]?.[field];
       });
-
+      // Prepare FormData if there are updated documents
+      let dataToSend = { data: updateData };
+      if (Object.keys(updatedDocuments).length > 0) {
+        const formDataObj = new FormData();
+        formDataObj.append('data', JSON.stringify(updateData));
+        Object.entries(updatedDocuments).forEach(([field, file]) => {
+          formDataObj.append(field, file);
+        });
+        dataToSend = formDataObj;
+      }
+      const config = {
+        withCredentials: true,
+        headers: Object.keys(updatedDocuments).length > 0 ? { 'Content-Type': 'multipart/form-data' } : undefined
+      };
       const response = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/student/students/${student.id}/update-declined`,
-        { data: updateData },
-        { withCredentials: true }
+        `${import.meta.env.VITE_API_URL}/student/students/me/update-declined`,
+        dataToSend,
+        config
       );
-
       if (response.data.success) {
-        // Update local state to reflect changes
         setDetails(prev => ({
           ...prev,
           ...formData,
@@ -163,6 +154,7 @@ const StudentDetailsDashboard = ({ student }) => {
         setEditMode(false);
         setShowSuccessModal(true);
         setSaveStatus(prev => ({ ...prev, final: { loading: false, success: true } }));
+        setUpdatedDocuments({});
       } else {
         throw new Error(response.data.message || "Failed to update profile");
       }
@@ -272,61 +264,47 @@ const StudentDetailsDashboard = ({ student }) => {
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
           {title}
         </h3>
-        {editMode && sectionEdits[section] && (
-          <button
-            onClick={() => handleSaveSection(section)}
-            disabled={saveStatus[section]?.loading}
-            className={`px-3 py-1 text-sm rounded-md ${
-              saveStatus[section]?.loading
-                ? "bg-blue-400 text-white cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            } transition-colors`}
-          >
-            {saveStatus[section]?.loading ? (
-              <span className="flex items-center">
-                <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Saving...
-              </span>
-            ) : saveStatus[section]?.success ? (
-              <span className="text-green-500">✓ Saved</span>
-            ) : (
-              "Save Changes"
-            )}
-          </button>
-        )}
       </div>
-      {saveStatus[section]?.error && (
-        <div className="mb-4 text-sm text-red-500">
-          {saveStatus[section].error}
-        </div>
-      )}
       <div className="space-y-4">{children}</div>
     </div>
   );
 
   const DetailItem = ({ label, value, field, section, subSection, editable = true }) => {
-    const fieldPath = subSection ? `${section}.${subSection}.${field}` : `${section}.${field}`;
-    const isDeclined = isFieldDeclined(section, field);
-    const isEditable = isFieldEditable(section, field);
+    const isDeclined = isFieldDeclined(section, field, subSection);
+    const isEditable = isFieldEditable(section, field, subSection);
+    // Document fields
+    const isDocument = section === 'documents';
+
+    if (isEditable && isDocument) {
+      return (
+        <div className="flex justify-between items-center">
+          <span className="text-red-600 dark:text-red-400 font-semibold">{label}:</span>
+          <input
+            type="file"
+            accept="image/*,application/pdf"
+            onChange={e => {
+              const file = e.target.files[0];
+              if (file) {
+                setUpdatedDocuments(prev => ({ ...prev, [field]: file }));
+                setFormData(prev => ({
+                  ...prev,
+                  documents: {
+                    ...prev.documents,
+                    [field]: URL.createObjectURL(file)
+                  }
+                }));
+                const fieldPath = `documents.${field}`;
+                setUpdatedFields(prev => prev.includes(fieldPath) ? prev : [...prev, fieldPath]);
+              }
+            }}
+            className="ml-2"
+          />
+          {formData.documents?.[field] && (
+            <a href={formData.documents[field]} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-600 underline text-xs">Preview</a>
+          )}
+        </div>
+      );
+    }
 
     return (
       <div className="flex justify-between items-start">
@@ -339,9 +317,35 @@ const StudentDetailsDashboard = ({ student }) => {
         {isEditable ? (
           <input
             type="text"
-            value={formData[section]?.[field] || ''}
-            onChange={(e) => handleInputChange(section, field, e.target.value)}
-            className={`font-medium ${isDeclined ? 'text-red-600 dark:text-red-400' : 'text-gray-800 dark:text-gray-200'} bg-gray-100 dark:bg-gray-700 rounded px-2 py-1 w-48 text-right border ${isDeclined ? 'border-red-300' : 'border-gray-300'}`}
+            value={subSection ? (formData[section]?.[subSection]?.[field] || '') : (formData[section]?.[field] || '')}
+            onChange={e => {
+              const newValue = e.target.value;
+              setFormData(prev => {
+                if (subSection) {
+                  return {
+                    ...prev,
+                    [section]: {
+                      ...prev[section],
+                      [subSection]: {
+                        ...prev[section]?.[subSection],
+                        [field]: newValue
+                      }
+                    }
+                  };
+                } else {
+                  return {
+                    ...prev,
+                    [section]: {
+                      ...prev[section],
+                      [field]: newValue
+                    }
+                  };
+                }
+              });
+              const fieldPath = subSection ? `${section}.${subSection}.${field}` : `${section}.${field}`;
+              setUpdatedFields(prev => prev.includes(fieldPath) ? prev : [...prev, fieldPath]);
+            }}
+            className={`font-medium bg-gray-100 dark:bg-gray-700 rounded px-2 py-1 w-48 text-right border ${isDeclined ? 'border-red-500 text-red-600 dark:text-red-400' : 'border-gray-300'} focus:border-blue-500 focus:outline-none`}
           />
         ) : (
           <span className={`font-medium ${isDeclined ? 'text-red-600 dark:text-red-400' : 'text-gray-800 dark:text-gray-200'} text-right max-w-xs break-words`}>
@@ -352,7 +356,8 @@ const StudentDetailsDashboard = ({ student }) => {
     );
   };
 
-  const DocumentCard = ({ title, url }) => (
+  // Update DocumentCard to support edit mode and declined fields
+  const DocumentCard = ({ title, url, field, editMode, isDeclined, onFileChange }) => (
     <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-col bg-white dark:bg-gray-800 hover:shadow-md transition-shadow">
       <h4 className="font-medium text-gray-800 dark:text-white mb-3">
         {title}
@@ -364,10 +369,9 @@ const StudentDetailsDashboard = ({ student }) => {
               src={url}
               alt={title}
               className="max-h-40 max-w-full object-contain"
-              onError={(e) => {
+              onError={e => {
                 e.target.onerror = null;
-                e.target.src =
-                  "https://via.placeholder.com/150x150?text=Document+Error";
+                e.target.src = "https://via.placeholder.com/150x150?text=Document+Error";
               }}
             />
           </div>
@@ -400,8 +404,25 @@ const StudentDetailsDashboard = ({ student }) => {
           </p>
         </div>
       )}
+      {editMode && isDeclined && (
+        <input
+          type="file"
+          accept="image/*,application/pdf"
+          className="mt-2"
+          onChange={e => onFileChange(field, e.target.files[0])}
+        />
+      )}
     </div>
   );
+
+  // Helper to convert field name to label
+  function fieldToLabel(field) {
+    return field
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, str => str.toUpperCase())
+      .replace(/\b10th\b/, '10th')
+      .replace(/\b12th\b/, '12th');
+  }
 
   if (loading) {
     return (
@@ -1234,78 +1255,30 @@ const StudentDetailsDashboard = ({ student }) => {
             {/* Documents Tab */}
             <Tab.Panel className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <DocumentCard
-                  title="Student Photo"
-                  url={details.documents?.photo}
-                />
-                <DocumentCard
-                  title="IPU Registration"
-                  url={details.documents?.ipuRegistration}
-                />
-                <DocumentCard
-                  title="Allotment Letter"
-                  url={details.documents?.allotmentLetter}
-                />
-                <DocumentCard
-                  title="Exam Admit Card"
-                  url={details.documents?.examAdmitCard}
-                />
-                <DocumentCard
-                  title="Exam Score Card"
-                  url={details.documents?.examScoreCard}
-                />
-                <DocumentCard
-                  title="10th Marksheet"
-                  url={details.documents?.marksheet10}
-                />
-                <DocumentCard
-                  title="10th Passing Certificate"
-                  url={details.documents?.passing10}
-                />
-                <DocumentCard
-                  title="12th Marksheet"
-                  url={details.documents?.marksheet12}
-                />
-                <DocumentCard
-                  title="12th Passing Certificate"
-                  url={details.documents?.passing12}
-                />
-                <DocumentCard
-                  title="Aadhar Card"
-                  url={details.documents?.aadhar}
-                />
-                <DocumentCard
-                  title="Character Certificate"
-                  url={details.documents?.characterCertificate}
-                />
-                <DocumentCard
-                  title="Medical Certificate"
-                  url={details.documents?.medicalCertificate}
-                />
-                <DocumentCard
-                  title="Migration Certificate"
-                  url={details.documents?.migrationCertificate}
-                />
-                <DocumentCard
-                  title="Category Certificate"
-                  url={details.documents?.categoryCertificate}
-                />
-                <DocumentCard
-                  title="Special Category Certificate"
-                  url={details.documents?.specialCategoryCertificate}
-                />
-                <DocumentCard
-                  title="Academic Fee Receipt"
-                  url={details.documents?.academicFeeReceipt}
-                />
-                <DocumentCard
-                  title="College Fee Receipt"
-                  url={details.documents?.collegeFeeReceipt}
-                />
-                <DocumentCard
-                  title="Parent Signature"
-                  url={details.documents?.parentSignature}
-                />
+                {Object.entries(details.documents || {}).map(([field, url]) => (
+                  <DocumentCard
+                    key={field}
+                    title={fieldToLabel(field)}
+                    url={formData.documents?.[field] || url}
+                    field={field}
+                    editMode={editMode}
+                    isDeclined={declinedFields.includes(`documents.${field}`)}
+                    onFileChange={(docField, file) => {
+                      if (file) {
+                        setUpdatedDocuments(prev => ({ ...prev, [docField]: file }));
+                        setFormData(prev => ({
+                          ...prev,
+                          documents: {
+                            ...prev.documents,
+                            [docField]: URL.createObjectURL(file)
+                          }
+                        }));
+                        const fieldPath = `documents.${docField}`;
+                        setUpdatedFields(prev => prev.includes(fieldPath) ? prev : [...prev, fieldPath]);
+                      }
+                    }}
+                  />
+                ))}
               </div>
             </Tab.Panel>
           </Tab.Panels>

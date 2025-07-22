@@ -51,7 +51,7 @@ const StudentLogin = () => {
         response.data.student.id
       ) {
         setTimeout(() => {
-          navigate(`/student/${response.data.student.id}`);
+          navigate('/student/me');
         }, 1200);
       } else {
         setError(
