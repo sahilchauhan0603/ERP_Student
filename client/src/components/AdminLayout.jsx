@@ -29,9 +29,10 @@ export default function AdminLayout() {
         </div>
       )}
       {/* Main content */}
-      <div className="flex-1 md:ml-64 p-4 md:p-6 bg-gray-50 transition-all duration-300">
+      <div className="flex-1 p-4 md:p-6 bg-gray-50 transition-all duration-300">
         <Outlet />
       </div>
     </div>
   );
 }
+// md:ml-64
