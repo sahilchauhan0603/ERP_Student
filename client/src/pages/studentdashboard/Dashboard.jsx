@@ -31,7 +31,8 @@ const StudentDetailsDashboard = ({ student }) => {
         setError(null);
         
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/student/students/${student.id}/details`
+          `${import.meta.env.VITE_API_URL}/student/students/${student.id}/details`,
+          { withCredentials: true }
         );
 
         if (response.data.success && response.data.data) {
@@ -73,12 +74,12 @@ const StudentDetailsDashboard = ({ student }) => {
     fetchStudentDetails();
   }, [student?.id]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("studentEmail");
-    localStorage.removeItem("studentId");
-    localStorage.removeItem("studentName");
+  const handleLogout = async () => {
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/student/logout`, {}, { withCredentials: true });
+    } catch {}
     setShowLogoutModal(false);
-    navigate("/");
+    navigate('/');
   };
 
   const handleBackClick = () => {
@@ -147,11 +148,7 @@ const StudentDetailsDashboard = ({ student }) => {
       const response = await axios.patch(
         `${import.meta.env.VITE_API_URL}/student/students/${student.id}/update-declined`,
         { data: updateData },
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+        { withCredentials: true }
       );
 
       if (response.data.success) {

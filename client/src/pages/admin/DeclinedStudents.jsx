@@ -36,7 +36,7 @@ export default function DeclinedStudents() {
   const fetchDeclinedStudents = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/admin/list/declined`);
+      const res = await axios.get(`${API_URL}/admin/list/declined`, { withCredentials: true });
       setStudents(res.data.students || []);
     } catch {
       setStudents([]);

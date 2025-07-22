@@ -38,7 +38,7 @@ export default function AdminDashboard() {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/admin/stats`);
+      const res = await axios.get(`${API_URL}/admin/stats`, { withCredentials: true });
       setStats(res.data);
     } catch {
       setStats({ total: 0, pending: 0, approved: 0, declined: 0 });

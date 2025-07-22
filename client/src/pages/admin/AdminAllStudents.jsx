@@ -60,7 +60,7 @@ export default function AdminAllStudents() {
       let url = `${API_URL}/admin/list`;
       if (status) url = `${API_URL}/admin/list/${status}`;
       url += `?page=${currentPage}`;
-      const res = await axios.get(url);
+      const res = await axios.get(url, { withCredentials: true });
       setStudents(res.data.students);
       setTotalPages(res.data.totalPages || 1);
     } catch {
@@ -80,7 +80,8 @@ export default function AdminAllStudents() {
       params.append("page", currentPage);
 
       const res = await axios.get(
-        `${API_URL}/admin/search?${params.toString()}`
+        `${API_URL}/admin/search?${params.toString()}`,
+        { withCredentials: true }
       );
       setStudents(res.data.students);
       setTotalPages(res.data.totalPages || 1);

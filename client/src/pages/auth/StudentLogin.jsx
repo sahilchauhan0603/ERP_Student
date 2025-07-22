@@ -21,7 +21,8 @@ const StudentLogin = () => {
     try {
       await axios.post(
         `${import.meta.env.VITE_API_URL}/student/send-login-otp`,
-        { email }
+        { email },
+        { withCredentials: true }
       );
       setStep(2);
       setSuccess("OTP sent to your email. Please check your inbox.");
@@ -40,30 +41,19 @@ const StudentLogin = () => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/student/verify-login-otp`,
-        { email, otp }
+        { email, otp },
+        { withCredentials: true }
       );
-
       setSuccess("Login successful! Redirecting...");
-      localStorage.setItem("studentEmail", email);
-
-      // Now we can access the student ID from the response
       if (
         response.data.success &&
         response.data.student &&
         response.data.student.id
       ) {
-        // Store additional student info if needed
-        localStorage.setItem("studentId", response.data.student.id);
-        localStorage.setItem(
-          "studentName",
-          `${response.data.student.firstName} ${response.data.student.lastName}`
-        );
-
         setTimeout(() => {
           navigate(`/student/${response.data.student.id}`);
         }, 1200);
       } else {
-        // Fallback if student ID is not available
         setError(
           "Login successful but unable to redirect. Please contact support."
         );

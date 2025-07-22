@@ -27,7 +27,10 @@ const StudentDetailsDashboard = ({ student }) => {
         setLoading(true);
         setError(null);
 
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/student/students/${student.id}/details`);
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/student/students/${student.id}/details`,
+          { withCredentials: true }
+        );
 
         if (response.data.success && response.data.data) {
           setDetails(response.data.data);
@@ -100,11 +103,7 @@ const StudentDetailsDashboard = ({ student }) => {
       const response = await axios.patch(
         `${import.meta.env.VITE_API_URL}/student/students/${student.id}/update`,
         { section, data: formData[section] },
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+        { withCredentials: true }
       );
 
       if (response.data.success) {
@@ -139,11 +138,7 @@ const StudentDetailsDashboard = ({ student }) => {
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/student/students/${student.id}/final-update`,
         formData,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+        { withCredentials: true }
       );
 
       if (response.data.success) {

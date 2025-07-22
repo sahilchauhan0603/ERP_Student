@@ -36,7 +36,7 @@ export default function ApprovedStudents() {
   const fetchApprovedStudents = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/admin/list/approved`);
+      const res = await axios.get(`${API_URL}/admin/list/approved`, { withCredentials: true });
       setStudents(res.data.students || []);
     } catch {
       setStudents([]);

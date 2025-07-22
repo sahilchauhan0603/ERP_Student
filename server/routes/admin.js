@@ -1,26 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
+const { authenticate, authorizeRole } = require('../middleware/auth');
+const { otpLimiter } = require('../controllers/adminController');
 
 // Admin dashboard stats
-router.get('/stats', adminController.getStudentStats);
+router.get('/stats', authenticate, authorizeRole('admin'), adminController.getStudentStats);
 
 // Admin endpoints
-router.get('/list', adminController.listAllStudents);
+router.get('/list', authenticate, authorizeRole('admin'), adminController.listAllStudents);
 
-router.post('/verify-student', adminController.updateStudentStatus);
+router.post('/verify-student', authenticate, authorizeRole('admin'), adminController.updateStudentStatus);
 
 // Admin OTP login endpoints
-router.post('/send-otp', adminController.sendAdminOtp);
-router.post('/verify-otp', adminController.verifyAdminOtp);
+router.post('/send-otp', otpLimiter, adminController.sendAdminOtp);
+router.post('/verify-otp', otpLimiter, adminController.verifyAdminOtp);
+router.post('/logout', adminController.logout);
 
 // Filtered students by status
-router.get('/list/:status', adminController.listStudentsByStatus);
+router.get('/list/:status', authenticate, authorizeRole('admin'), adminController.listStudentsByStatus);
 
 // Search students by name or email
-router.get('/search', adminController.searchStudents);
+router.get('/search', authenticate, authorizeRole('admin'), adminController.searchStudents);
 
 // Get full details of a student (all registration sections)
-router.get('/student-details/:studentId', adminController.getStudentFullDetails);
+router.get('/student-details/:studentId', authenticate, authorizeRole('admin'), adminController.getStudentFullDetails);
 
 module.exports = router;

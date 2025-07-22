@@ -1,6 +1,6 @@
 // src/App.js
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import StudentRegistration from './pages/registration/student/index';
 import FacultyRegistration from './pages/registration/faculty/FacultyRegistration';
@@ -16,6 +16,37 @@ import AdminAllStudents from './pages/admin/AdminAllStudents';
 import PendingStudents from './pages/admin/PendingStudents';
 import ApprovedStudents from './pages/admin/ApprovedStudents';
 import DeclinedStudents from './pages/admin/DeclinedStudents';
+import CustomModal from './components/CustomModal';
+import axios from 'axios';
+
+function AuthRoute({ children, role }) {
+  const [unauthorized, setUnauthorized] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let endpoint = '';
+    if (role === 'admin') endpoint = '/admin/stats';
+    else endpoint = '/student/profile';
+    axios.get(`${import.meta.env.VITE_API_URL}${endpoint}`, { withCredentials: true })
+      .catch(err => {
+        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+          setUnauthorized(true);
+          setTimeout(() => {
+            setRedirecting(true);
+            if (role === 'admin') navigate('/admin');
+            else navigate('/login');
+          }, 1800);
+        }
+      });
+  }, [role, navigate]);
+
+  if (unauthorized) {
+    return <CustomModal isOpen title="Unauthorized" message="You must be logged in to access this page." type="error" duration={1800} />;
+  }
+  if (redirecting) return null;
+  return children;
+}
 
 function App() {
   return (
@@ -31,15 +62,39 @@ function App() {
         <Route path="/admin" element={<AdminLogin />} />
 
         {/* Student Routes */}
-        <Route path="/student/:studentId" element={<StudentDetailsDashboardPage  />} />
+        <Route path="/student/:studentId" element={
+          <AuthRoute role="student">
+            <StudentDetailsDashboardPage />
+          </AuthRoute>
+        } />
 
         {/* Admin Routes - Wrapped in AdminLayout */}
         <Route element={<AdminLayout />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/students" element={<AdminAllStudents />} />
-          <Route path="/admin/students/pending" element={<PendingStudents />} />
-          <Route path="/admin/students/approved" element={<ApprovedStudents />} />
-          <Route path="/admin/students/declined" element={<DeclinedStudents />} />
+          <Route path="/admin/dashboard" element={
+            <AuthRoute role="admin">
+              <AdminDashboard />
+            </AuthRoute>
+          } />
+          <Route path="/admin/students" element={
+            <AuthRoute role="admin">
+              <AdminAllStudents />
+            </AuthRoute>
+          } />
+          <Route path="/admin/students/pending" element={
+            <AuthRoute role="admin">
+              <PendingStudents />
+            </AuthRoute>
+          } />
+          <Route path="/admin/students/approved" element={
+            <AuthRoute role="admin">
+              <ApprovedStudents />
+            </AuthRoute>
+          } />
+          <Route path="/admin/students/declined" element={
+            <AuthRoute role="admin">
+              <DeclinedStudents />
+            </AuthRoute>
+          } />
         </Route>
 
         {/* 404 Page */}

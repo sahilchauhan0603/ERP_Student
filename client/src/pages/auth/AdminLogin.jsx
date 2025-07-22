@@ -4,12 +4,6 @@ import { useNavigate } from "react-router-dom";
 import bpitLogo from "../../assets/icons/BPIT-logo-transparent.png";
 import campusBackground from "../../assets/images/BPIT.png";
 
-const ADMIN_EMAILS = [
-  "admin1@example.com",
-  "tandon.aryaman1@gmail.com",
-  "sahilchauhan0603@gmail.com",
-];
-
 const API_URL = import.meta.env.VITE_API_URL;
 
 const AdminLogin = () => {
@@ -25,17 +19,13 @@ const AdminLogin = () => {
     e.preventDefault();
     setError("");
     setInfo("");
-    if (!ADMIN_EMAILS.includes(email)) {
-      setError("Unauthorized email.");
-      return;
-    }
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/admin/send-otp`, { email });
+      await axios.post(`${API_URL}/admin/send-otp`, { email }, { withCredentials: true });
       setStep(2);
       setInfo("OTP sent to your email.");
-    } catch {
-      setError("Failed to send OTP.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to send OTP.");
     }
     setLoading(false);
   };
@@ -46,12 +36,11 @@ const AdminLogin = () => {
     setError("");
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/admin/verify-otp`, { email, otp });
-      localStorage.setItem("adminEmail", email); // Store email
+      await axios.post(`${API_URL}/admin/verify-otp`, { email, otp }, { withCredentials: true });
       setInfo("Login successful! Redirecting...");
       setTimeout(() => navigate("/admin/dashboard"), 1000);
-    } catch {
-      setError("Invalid OTP.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid OTP.");
     }
     setLoading(false);
   };

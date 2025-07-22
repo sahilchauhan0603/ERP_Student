@@ -1,19 +1,28 @@
 // All admin logic separated from student logic
 const sendStatusEmail = require('../utils/sendStatusEmail');
 const adminOTPMailer = require('../utils/adminOTPMailer');
+const { signToken } = require('../utils/jwt');
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim()).filter(Boolean);
+const rateLimit = require('express-rate-limit');
+
+const otpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 5, // limit each IP to 5 requests per windowMs
+  message: { message: 'Too many OTP requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+module.exports.otpLimiter = otpLimiter;
+
 // --- Admin Dashboard/Student Management ---
 const db = require('../config/db');
 
 // --- Admin OTP Login ---
-const ADMIN_EMAILS = [
-  'admin1@example.com',
-  'tandon.aryaman1@gmail.com',
-  'sahilchauhan0603@gmail.com',
-];
 const adminOtpStore = {};
 
 exports.sendAdminOtp = async (req, res) => {
   const { email } = req.body;
+ 
   if (!email || !ADMIN_EMAILS.includes(email)) {
     return res.status(401).json({ message: 'Unauthorized email' });
   }
@@ -40,7 +49,24 @@ exports.verifyAdminOtp = (req, res) => {
   }
   if (record.otp !== otp) return res.status(400).json({ message: 'Invalid OTP' });
   delete adminOtpStore[email];
+  // Issue JWT and set as HTTP-only cookie
+  const token = signToken({ email, role: 'admin' });
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    maxAge: 2 * 60 * 60 * 1000 // 2 hours
+  });
   res.json({ message: 'Login successful' });
+};
+
+exports.logout = (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+  });
+  res.json({ message: 'Logged out successfully' });
 };
 
 exports.getStudentStats = (req, res) => {

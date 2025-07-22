@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FiLogOut } from 'react-icons/fi';
+import axios from 'axios';
 
 const navItems = [
   { label: 'Dashboard', path: '/admin/dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -13,10 +14,11 @@ const navItems = [
 export default function AdminSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const adminEmail = localStorage.getItem('adminEmail') || 'admin@example.com';
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminEmail');
+  const handleLogout = async () => {
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/admin/logout`, {}, { withCredentials: true });
+    } catch {}
     navigate('/');
   };
 
@@ -65,11 +67,12 @@ export default function AdminSidebar() {
       <div className="px-4 py-5 border-t border-blue-700">
         <div className="flex items-center space-x-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-blue-300 font-bold">
-            {adminEmail.charAt(0).toUpperCase()}
+            {/* REMOVE: adminEmail.charAt(0).toUpperCase() */}
+            A
           </div>
           <div>
             <p className="font-medium text-white">Admin User</p>
-            <p className="text-xs text-blue-200 break-all">{adminEmail}</p>
+            {/* REMOVE: <p className="text-xs text-blue-200 break-all">{adminEmail}</p> */}
           </div>
         </div>
         <button

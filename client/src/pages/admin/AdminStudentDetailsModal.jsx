@@ -57,7 +57,8 @@ export default function AdminStudentDetailsModal({
     setLoading(true);
     axios
       .get(
-        `${import.meta.env.VITE_API_URL}/admin/student-details/${student.id}`
+        `${import.meta.env.VITE_API_URL}/admin/student-details/${student.id}`,
+        { withCredentials: true }
       )
       .then((res) => setDetails(res.data))
       .catch(() => setDetails(null))
@@ -246,7 +247,7 @@ export default function AdminStudentDetailsModal({
         studentId: student.id,
         verifications,
         status: "approved",
-      });
+      }, { withCredentials: true });
       refresh?.();
       onClose();
     } catch (e) {
@@ -263,7 +264,7 @@ export default function AdminStudentDetailsModal({
         verifications,
         status: "declined",
         declineReason: "Details not correct",
-      });
+      }, { withCredentials: true });
       refresh?.();
       onClose();
     } catch (e) {
@@ -294,7 +295,7 @@ export default function AdminStudentDetailsModal({
         verifications,
         status,
         declinedFields,
-      });
+      }, { withCredentials: true });
       refresh?.();
       onClose();
     } catch (e) {

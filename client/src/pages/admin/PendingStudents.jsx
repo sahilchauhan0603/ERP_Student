@@ -36,7 +36,7 @@ export default function PendingStudents() {
   const fetchPendingStudents = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/admin/list/pending`);
+      const res = await axios.get(`${API_URL}/admin/list/pending`, { withCredentials: true });
       setStudents(res.data.students || []);
     } catch {
       setStudents([]);

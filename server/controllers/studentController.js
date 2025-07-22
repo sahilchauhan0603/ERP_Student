@@ -4,6 +4,18 @@ const sendOtpMail = require('../utils/studentOTPMailer');
 const db = require('../config/db');
 const uploadToCloudinary = require('../utils/cloudinaryUpload');
 const otpStore = {}; // In-memory store for OTPs, consider using Redis or similar in production
+const { signToken } = require('../utils/jwt');
+const rateLimit = require('express-rate-limit');
+
+const otpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 5, // limit each IP to 5 requests per windowMs
+  message: { message: 'Too many OTP requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+module.exports.otpLimiter = otpLimiter;
+
 // const Student = require('../modals/student');
 
 // --- Student Profile ---
@@ -67,6 +79,15 @@ exports.verifyLoginOtp = (req, res) => {
 
     const student = results[0];
     delete otpStore[email]; // Clear OTP
+
+    // Issue JWT and set as HTTP-only cookie
+    const token = signToken({ id: student.id, email: student.email, role: 'student' });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      maxAge: 2 * 60 * 60 * 1000 // 2 hours
+    });
 
     return res.json({
       message: 'Login successful',
@@ -229,6 +250,11 @@ exports.registerStudent = async (req, res) => {
 // Handler to fetch complete student details by ID
 exports.getStudentDetailsById = (req, res) => {
   const { studentId } = req.params;
+
+  // Only allow access if the logged-in user matches the requested studentId
+  if (!req.user || req.user.role !== 'student' || String(req.user.id) !== String(studentId)) {
+    return res.status(403).json({ message: 'Forbidden: You can only access your own dashboard.' });
+  }
 
   if (!studentId) {
     return res.status(400).json({ message: 'studentId required' });
@@ -466,4 +492,13 @@ exports.updateDeclinedFields = (req, res) => {
       });
     });
   });
+};
+
+exports.logout = (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+  });
+  res.json({ message: 'Logged out successfully' });
 };

@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const db = require('./config/db'); // MySQL connection file
 
 dotenv.config();
@@ -31,7 +32,8 @@ app.use((req, res, next) => {
 });
 
 
-app.use(express.json({limit:'50mb'}));
+app.use(express.json({ limit: '10mb' }));
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
