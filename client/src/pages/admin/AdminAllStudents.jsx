@@ -11,6 +11,7 @@ import {
   FiCheck,
   FiX,
 } from "react-icons/fi";
+import Swal from 'sweetalert2';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -65,6 +66,11 @@ export default function AdminAllStudents() {
       setTotalPages(res.data.totalPages || 1);
     } catch {
       setStudents([]);
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to load students',
+        text: 'Could not fetch student list. Please try again later.',
+      });
     }
     setLoading(false);
   };
@@ -87,6 +93,11 @@ export default function AdminAllStudents() {
       setTotalPages(res.data.totalPages || 1);
     } catch {
       setStudents([]);
+      Swal.fire({
+        icon: 'error',
+        title: 'Search failed',
+        text: 'Could not search students. Please try again later.',
+      });
     }
     setLoading(false);
   };

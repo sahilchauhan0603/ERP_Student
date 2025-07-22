@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import Swal from 'sweetalert2';
 
 ChartJS.register(
   CategoryScale,
@@ -42,6 +43,11 @@ export default function AdminDashboard() {
       setStats(res.data);
     } catch {
       setStats({ total: 0, pending: 0, approved: 0, declined: 0 });
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to load stats',
+        text: 'Could not fetch dashboard statistics. Please try again later.',
+      });
     }
     setLoading(false);
   };

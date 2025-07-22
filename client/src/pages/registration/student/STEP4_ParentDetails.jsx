@@ -34,7 +34,7 @@ const ParentDetails = ({ formData, setFormData }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-gradient-to-br from-white via-blue-50 to-red-50 p-10 rounded-3xl shadow-2xl border-2 border-blue-200/40 animate-fade-in">
+    <div className="max-w-4xl mx-auto bg-gradient-to-br from-white via-blue-50 to-red-50 p-6 sm:p-10 rounded-3xl shadow-2xl border-2 border-blue-200/40 animate-fade-in">
       <div className="text-center mb-10">
         <div className="flex justify-center items-center gap-4 mb-2">
           <span className="inline-block w-2 h-10 bg-blue-500 rounded-full"></span>

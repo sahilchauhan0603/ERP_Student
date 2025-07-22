@@ -4,7 +4,7 @@ const Instructions = ({ nextStep }) => {
   const [agree, setAgree] = useState(false);
 
   return (
-    <div className="max-w-4xl mx-auto bg-gradient-to-br from-white via-blue-50 to-red-50 p-10 rounded-3xl shadow-2xl border-2 border-blue-200/40 animate-fade-in">
+    <div className="max-w-4xl mx-auto bg-gradient-to-br from-white via-blue-50 to-red-50 p-6 sm:p-10 rounded-3xl shadow-2xl border-2 border-blue-200/40 animate-fade-in">
       <div className="text-center mb-10">
         <div className="flex justify-center items-center gap-4 mb-2">
           <span className="inline-block w-2 h-10 bg-blue-500 rounded-full"></span>
@@ -18,7 +18,7 @@ const Instructions = ({ nextStep }) => {
         </p>
       </div>
 
-      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-8 rounded-2xl shadow-lg border-2 border-blue-200/40 mb-10 transition-all duration-300 hover:shadow-xl">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-4 sm:p-8 rounded-2xl shadow-lg border-2 border-blue-200/40 mb-10 transition-all duration-300 hover:shadow-xl">
         <div className="prose prose-blue max-w-none">
           <p className="text-lg font-medium text-blue-700/90 mb-6">
             <span className="inline-block bg-blue-100/50 text-blue-600 rounded-full p-2 mr-2">

@@ -18,6 +18,7 @@ import {
   FiUsers,
   FiCalendar,
 } from "react-icons/fi";
+import Swal from 'sweetalert2';
 
 const sectionDefs = [
   { label: "Personal", key: "personal", icon: <FiUser className="mr-2" /> },
@@ -251,7 +252,11 @@ export default function AdminStudentDetailsModal({
       refresh?.();
       onClose();
     } catch (e) {
-      setError("Failed to approve: " + e.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to approve',
+        text: e.message || 'Failed to approve student.',
+      });
     }
     setActionLoading(false);
   };
@@ -268,7 +273,11 @@ export default function AdminStudentDetailsModal({
       refresh?.();
       onClose();
     } catch (e) {
-      setError("Failed to decline: " + e.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to decline',
+        text: e.message || 'Failed to decline student.',
+      });
     }
     setActionLoading(false);
   };
@@ -299,7 +308,11 @@ export default function AdminStudentDetailsModal({
       refresh?.();
       onClose();
     } catch (e) {
-      setError("Failed to update: " + e.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to update',
+        text: e.message || 'Failed to update student.',
+      });
     }
     setActionLoading(false);
   };

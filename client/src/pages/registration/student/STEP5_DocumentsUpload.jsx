@@ -32,7 +32,7 @@ export default function DocumentsUpload({ formData, setFormData }) {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto bg-gradient-to-br from-white via-blue-50 to-red-50 p-10 rounded-3xl shadow-2xl border-2 border-blue-200/40 animate-fade-in">
+    <div className="max-w-4xl mx-auto bg-gradient-to-br from-white via-blue-50 to-red-50 p-6 sm:p-10 rounded-3xl shadow-2xl border-2 border-blue-200/40 animate-fade-in">
       <div className="text-center mb-10">
         <div className="flex justify-center items-center gap-4 mb-2">
           <span className="inline-block w-2 h-10 bg-blue-500 rounded-full"></span>
@@ -46,7 +46,7 @@ export default function DocumentsUpload({ formData, setFormData }) {
         </p>
       </div>
 
-      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-4 sm:p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
         <div className="mt-2 mb-4 p-4 bg-blue-50/50 rounded-lg border border-blue-100">
           <div className="flex">
             <svg

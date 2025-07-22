@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FiUser, FiCheck, FiEye, FiRefreshCw, FiSearch } from "react-icons/fi";
 import AdminStudentDetailsModal from "./AdminStudentDetailsModal";
+import Swal from 'sweetalert2';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -40,6 +41,11 @@ export default function ApprovedStudents() {
       setStudents(res.data.students || []);
     } catch {
       setStudents([]);
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to load students',
+        text: 'Could not fetch approved students. Please try again later.',
+      });
     }
     setLoading(false);
   };

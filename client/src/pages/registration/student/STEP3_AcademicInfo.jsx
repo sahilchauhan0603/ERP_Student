@@ -71,7 +71,7 @@ export default function AcademicInfo({ formData, setFormData }) {
   return (
     <div className="space-y-12">
       {/* Class X */}
-      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-4 sm:p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
         <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
           <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
             <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,7 +113,7 @@ export default function AcademicInfo({ formData, setFormData }) {
       </div>
 
       {/* Class XII */}
-      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-4 sm:p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
         <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
           <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
             <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,7 +132,7 @@ export default function AcademicInfo({ formData, setFormData }) {
       </div>
 
       {/* Other Qualification */}
-      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-4 sm:p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
         <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
           <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
             <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +151,7 @@ export default function AcademicInfo({ formData, setFormData }) {
       </div>
 
       {/* Academic Achievements */}
-      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-4 sm:p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
         <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
           <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
             <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,7 +220,7 @@ export default function AcademicInfo({ formData, setFormData }) {
       </div>
 
       {/* Co-Curricular Achievements */}
-      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-4 sm:p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
         <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
           <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
             <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

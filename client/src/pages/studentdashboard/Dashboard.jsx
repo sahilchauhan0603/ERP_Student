@@ -258,14 +258,23 @@ const StudentDetailsDashboard = () => {
     </div>
   );
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    if (isNaN(date)) return dateStr;
+    return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  };
+
   const DetailCard = ({ title, children, section }) => (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-6 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-          {title}
-        </h3>
+    <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-6 overflow-hidden min-w-[340px] md:min-w-[400px]">
+      <div className="px-6 py-4 bg-blue-50 border-b border-blue-200 flex items-center">
+        <h3 className="text-lg font-semibold text-blue-800">{title}</h3>
       </div>
-      <div className="space-y-4">{children}</div>
+      <div className="px-0 py-0">
+        <table className="w-full">
+          <tbody>{children}</tbody>
+        </table>
+      </div>
     </div>
   );
 
@@ -274,97 +283,62 @@ const StudentDetailsDashboard = () => {
     const isEditable = isFieldEditable(section, field, subSection);
     // Document fields
     const isDocument = section === 'documents';
+    // Format date fields
+    const isDateField = /date|dob/i.test(field);
+    const displayValue = isDateField ? formatDate(value) : value;
 
     if (isEditable && isDocument) {
       return (
-        <div className="flex justify-between items-center">
-          <span className="text-red-600 dark:text-red-400 font-semibold">{label}:</span>
-          <input
-            type="file"
-            accept="image/*,application/pdf"
-            onChange={e => {
-              const file = e.target.files[0];
-              if (file) {
-                setUpdatedDocuments(prev => ({ ...prev, [field]: file }));
-                setFormData(prev => ({
-                  ...prev,
-                  documents: {
-                    ...prev.documents,
-                    [field]: URL.createObjectURL(file)
-                  }
-                }));
-                const fieldPath = `documents.${field}`;
-                setUpdatedFields(prev => prev.includes(fieldPath) ? prev : [...prev, fieldPath]);
-              }
-            }}
-            className="ml-2"
-          />
-          {formData.documents?.[field] && (
-            <a href={formData.documents[field]} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-600 underline text-xs">Preview</a>
-          )}
-        </div>
+        <tr className="border-b last:border-b-0">
+          <td className="py-2 px-6 text-red-600 font-semibold w-1/3 text-left align-top">
+            {label}:
+          </td>
+          <td className="py-2 px-6">
+            <input
+              type="file"
+              accept="image/*,application/pdf"
+              onChange={e => {
+                const file = e.target.files[0];
+                if (file) {
+                  setUpdatedDocuments(prev => ({ ...prev, [field]: file }));
+                  setFormData(prev => ({
+                    ...prev,
+                    documents: {
+                      ...prev.documents,
+                      [field]: URL.createObjectURL(file)
+                    }
+                  }));
+                  const fieldPath = `documents.${field}`;
+                  setUpdatedFields(prev => prev.includes(fieldPath) ? prev : [...prev, fieldPath]);
+                }
+              }}
+              className="ml-2"
+            />
+            {formData.documents?.[field] && (
+              <a href={formData.documents[field]} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-600 underline text-xs">Preview</a>
+            )}
+          </td>
+        </tr>
       );
     }
 
     return (
-      <div className="flex justify-between items-start">
-        <span className={`${isDeclined ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-500 dark:text-gray-400'} font-medium`}>
-          {label}:
-          {isDeclined && !editMode && (
-            <span className="ml-2 text-xs text-red-500 dark:text-red-400">(Requires update)</span>
-          )}
-        </span>
-        {isEditable ? (
-          <input
-            type="text"
-            value={subSection ? (formData[section]?.[subSection]?.[field] || '') : (formData[section]?.[field] || '')}
-            onChange={e => {
-              const newValue = e.target.value;
-              setFormData(prev => {
-                if (subSection) {
-                  return {
-                    ...prev,
-                    [section]: {
-                      ...prev[section],
-                      [subSection]: {
-                        ...prev[section]?.[subSection],
-                        [field]: newValue
-                      }
-                    }
-                  };
-                } else {
-                  return {
-                    ...prev,
-                    [section]: {
-                      ...prev[section],
-                      [field]: newValue
-                    }
-                  };
-                }
-              });
-              const fieldPath = subSection ? `${section}.${subSection}.${field}` : `${section}.${field}`;
-              setUpdatedFields(prev => prev.includes(fieldPath) ? prev : [...prev, fieldPath]);
-            }}
-            className={`font-medium bg-gray-100 dark:bg-gray-700 rounded px-2 py-1 w-48 text-right border ${isDeclined ? 'border-red-500 text-red-600 dark:text-red-400' : 'border-gray-300'} focus:border-blue-500 focus:outline-none`}
-          />
-        ) : (
-          <span className={`font-medium ${isDeclined ? 'text-red-600 dark:text-red-400' : 'text-gray-800 dark:text-gray-200'} text-right max-w-xs break-words`}>
-            {value || <span className="text-gray-400 italic">N/A</span>}
-          </span>
-        )}
-      </div>
+      <tr className="border-b last:border-b-0">
+        <td className={`py-2 px-6 text-gray-600 font-medium w-1/3 text-left align-top border-r border-gray-200 ${isDeclined ? 'text-red-600' : ''}`}>{label}:</td>
+        <td className={`py-2 px-6 text-gray-900 font-semibold w-2/3 text-left align-top break-words ${isDeclined ? 'text-red-600' : ''}`}>{displayValue || <span className="text-gray-400 italic">N/A</span>}</td>
+      </tr>
     );
   };
 
   // Update DocumentCard to support edit mode and declined fields
   const DocumentCard = ({ title, url, field, editMode, isDeclined, onFileChange }) => (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-col bg-white dark:bg-gray-800 hover:shadow-md transition-shadow">
-      <h4 className="font-medium text-gray-800 dark:text-white mb-3">
+    <div className="border border-gray-200 rounded-xl p-4 flex flex-col bg-white hover:shadow-md transition-shadow">
+      <h4 className="font-medium text-gray-800 mb-3">
         {title}
       </h4>
       {url ? (
         <>
-          <div className="flex-1 flex items-center justify-center mb-3 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden min-h-[160px]">
+          <div className="flex-1 flex items-center justify-center mb-3 bg-gray-100 rounded-lg overflow-hidden min-h-[160px]">
             <img
               src={url}
               alt={title}
@@ -385,9 +359,9 @@ const StudentDetailsDashboard = () => {
           </a>
         </>
       ) : (
-        <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] bg-gray-50 rounded-lg">
           <svg
-            className="w-10 h-10 text-gray-400 dark:text-gray-500 mb-2"
+            className="w-10 h-10 text-gray-400 mb-2"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -399,7 +373,7 @@ const StudentDetailsDashboard = () => {
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <p className="text-gray-400 dark:text-gray-500 text-sm italic">
+          <p className="text-gray-400 text-sm italic">
             Not uploaded
           </p>
         </div>
@@ -426,13 +400,13 @@ const StudentDetailsDashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-gray-50 dark:from-gray-900 dark:to-gray-800">
+      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600">
             Loading student details...
           </p>
-          <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
+          <p className="text-gray-400 text-sm mt-1">
             Please wait while we fetch your information
           </p>
         </div>
@@ -442,9 +416,9 @@ const StudentDetailsDashboard = () => {
 
   if (error || !details) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-gray-50 dark:from-gray-900 dark:to-gray-800">
+      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-gray-50">
         <div className="text-center max-w-md">
-          <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg mb-4">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
             <p className="font-medium">Error loading student details</p>
             <p className="text-sm mt-1">{error}</p>
           </div>
@@ -494,7 +468,7 @@ const StudentDetailsDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50 dark:from-gray-700 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50">
       {showLogoutModal && <LogoutModal />}
       {showSuccessModal && <SuccessModal />}
 
@@ -502,14 +476,11 @@ const StudentDetailsDashboard = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-gray-900">
               Student Dashboard
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">
-              Welcome back,{" "}
-              <span className="font-medium text-blue-600 dark:text-blue-400">
-                {details.personal?.firstName}
-              </span>
+            <p className="text-gray-600 mt-2">
+              Welcome back, <span className="font-medium text-blue-600">{details.personal?.firstName}</span>
             </p>
           </div>
           <div className="flex items-center gap-4 mt-4 md:mt-0">
@@ -518,7 +489,7 @@ const StudentDetailsDashboard = () => {
                 onClick={handleEditToggle}
                 className={`px-4 py-2 rounded-lg transition-all shadow-sm ${
                   editMode
-                    ? "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                    ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
                     : "bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700"
                 }`}
               >
@@ -527,7 +498,7 @@ const StudentDetailsDashboard = () => {
             )}
             <button
               onClick={handleBackClick}
-              className="px-4 py-2 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:from-gray-300 hover:to-gray-400 dark:hover:from-gray-600 dark:hover:to-gray-500 transition-all flex items-center gap-2 shadow-sm"
+              className="px-4 py-2 bg-gradient-to-r from-gray-200 to-gray-300 text-gray-700 rounded-lg hover:from-gray-300 hover:to-gray-400 transition-all flex items-center gap-2 shadow-sm"
             >
               <svg
                 className="w-4 h-4"
@@ -548,13 +519,13 @@ const StudentDetailsDashboard = () => {
         </div>
 
         {/* Student Profile Summary */}
-        <div
-          className={`rounded-xl shadow-lg overflow-hidden mb-8 ${
-            details.personal?.status === "declined"
-              ? "bg-gradient-to-r from-red-600 to-red-700"
-              : "bg-gradient-to-r from-blue-600 to-blue-700"
-          }`}
-        >
+        <div className={`rounded-xl shadow-lg overflow-hidden mb-8 ${
+  details.personal?.status === "declined"
+    ? "bg-gradient-to-r from-red-500 to-red-600"
+    : details.personal?.status === "approved"
+    ? "bg-gradient-to-r from-green-500 to-green-600"
+    : "bg-gradient-to-r from-orange-400 to-yellow-400"
+}`}>
           <div className="p-6 flex flex-col md:flex-row items-center">
             <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white/80 shadow-lg mb-4 md:mb-0 md:mr-6">
               <img
@@ -580,11 +551,7 @@ const StudentDetailsDashboard = () => {
             </div>
             <div className="flex-1 text-center md:text-left">
               <h2 className="text-2xl font-bold text-white">
-                {details.personal?.firstName}{" "}
-                {details.personal?.middleName
-                  ? details.personal.middleName + " "
-                  : ""}
-                {details.personal?.lastName}
+                {details.personal?.firstName} {details.personal?.middleName ? details.personal.middleName + " " : ""}{details.personal?.lastName}
               </h2>
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-2">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
@@ -611,15 +578,13 @@ const StudentDetailsDashboard = () => {
                   </svg>
                   {details.personal?.category}
                 </span>
-                <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                    details.personal?.status === "approved"
-                      ? "bg-green-100 text-green-800"
-                      : details.personal?.status === "declined"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : "bg-blue-100 text-blue-800"
-                  }`}
-                >
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+          details.personal?.status === "approved"
+            ? "bg-green-100 text-green-800"
+            : details.personal?.status === "declined"
+            ? "bg-red-100 text-red-800"
+            : "bg-orange-100 text-orange-800"
+        }`}>
                   {details.personal?.status?.toUpperCase() || "PENDING"}
                 </span>
               </div>
@@ -676,9 +641,9 @@ const StudentDetailsDashboard = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border-t-4 border-blue-400">
             <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 mr-4">
+              <div className="p-3 rounded-lg bg-blue-100 text-blue-600 mr-4">
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -694,15 +659,15 @@ const StudentDetailsDashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-500">
                   Documents Uploaded
                 </p>
-                <p className="text-2xl font-bold text-gray-800 dark:text-white">
+                <p className="text-2xl font-bold text-gray-800">
                   {
                     Object.values(details.documents || {}).filter((doc) => doc)
                       .length
                   }
-                  <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                  <span className="text-sm font-normal text-gray-500">
                     {" "}
                     / {Object.keys(details.documents || {}).length}
                   </span>
@@ -711,9 +676,9 @@ const StudentDetailsDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border-t-4 border-green-400">
             <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 mr-4">
+              <div className="p-3 rounded-lg bg-green-100 text-green-600 mr-4">
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -729,19 +694,19 @@ const StudentDetailsDashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-500">
                   Academic Status
                 </p>
-                <p className="text-2xl font-bold text-gray-800 dark:text-white">
+                <p className="text-2xl font-bold text-gray-800">
                   {details.academic?.classXII?.aggregate || "N/A"}%
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border-t-4 border-yellow-400">
             <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 mr-4">
+              <div className="p-3 rounded-lg bg-purple-100 text-purple-600 mr-4">
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -757,10 +722,10 @@ const StudentDetailsDashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-500">
                   Family Income
                 </p>
-                <p className="text-2xl font-bold text-gray-800 dark:text-white">
+                <p className="text-2xl font-bold text-gray-800">
                   {details.parent?.familyIncome
                     ? `₹${Number(details.parent.familyIncome).toLocaleString(
                         "en-IN"
@@ -774,18 +739,14 @@ const StudentDetailsDashboard = () => {
 
         {/* Main Content Tabs */}
         <Tab.Group selectedIndex={activeTab} onChange={setActiveTab}>
-          <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/10 dark:bg-gray-700 p-1 mb-6">
+          <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/10 p-1 mb-6">
             {["Personal", "Parent", "Academic", "Documents"].map((category) => (
               <Tab
                 key={category}
                 className={({ selected }) =>
                   `w-full rounded-lg py-3 text-sm font-medium leading-5 transition-all duration-200
                   ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2
-                  ${
-                    selected
-                      ? "bg-white dark:bg-gray-800 shadow text-blue-700 dark:text-blue-400"
-                      : "text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-600 hover:text-blue-600 dark:hover:text-blue-300"
-                  }`
+                  ${selected ? "bg-white shadow text-blue-700" : "text-gray-600 hover:bg-white/50 hover:text-blue-600"}`
                 }
               >
                 {category}
@@ -795,7 +756,7 @@ const StudentDetailsDashboard = () => {
 
           <Tab.Panels className="mt-2">
             {/* Personal Information Tab */}
-            <Tab.Panel className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow">
+            <Tab.Panel className="rounded-xl bg-white p-6 shadow">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <DetailCard title="Basic Information" section="personal">
                   <DetailItem
@@ -921,7 +882,7 @@ const StudentDetailsDashboard = () => {
             </Tab.Panel>
 
             {/* Parent Information Tab */}
-            <Tab.Panel className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow">
+            <Tab.Panel className="rounded-xl bg-white p-6 shadow">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <DetailCard title="Father's Details" section="parent">
                   <DetailItem
@@ -1056,18 +1017,18 @@ const StudentDetailsDashboard = () => {
                   />
                   {details.parent?.siblings?.length > 0 && (
                     <div className="mt-4">
-                      <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+                      <h4 className="text-sm font-medium text-gray-500 mb-2">
                         Siblings
                       </h4>
                       <div className="space-y-2">
                         {details.parent.siblings.map((sibling, index) => (
                           <div
                             key={index}
-                            className="text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded"
+                            className="text-sm text-gray-600 p-2 bg-gray-50 rounded"
                           >
                             <strong>{sibling.name}</strong> ({sibling.relation})
                             <br />
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-xs text-gray-500">
                               {sibling.institution || ""}
                             </span>
                           </div>
@@ -1080,7 +1041,7 @@ const StudentDetailsDashboard = () => {
             </Tab.Panel>
 
             {/* Academic Information Tab */}
-            <Tab.Panel className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow">
+            <Tab.Panel className="rounded-xl bg-white p-6 shadow">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <DetailCard title="Class X Details" section="academic">
                   <DetailItem
@@ -1212,11 +1173,11 @@ const StudentDetailsDashboard = () => {
                         (achievement, index) => (
                           <div
                             key={index}
-                            className="text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded"
+                            className="text-sm text-gray-600 p-2 bg-gray-50 rounded"
                           >
                             <strong>{achievement.event}</strong> (
                             {achievement.date})<br />
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-xs text-gray-500">
                               {achievement.outcome}
                             </span>
                           </div>
@@ -1236,11 +1197,11 @@ const StudentDetailsDashboard = () => {
                         (achievement, index) => (
                           <div
                             key={index}
-                            className="text-sm text-gray-600 dark:text-gray-300 p-2 bg-gray-50 dark:bg-gray-700 rounded"
+                            className="text-sm text-gray-600 p-2 bg-gray-50 rounded"
                           >
                             <strong>{achievement.event}</strong> (
                             {achievement.date})<br />
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-xs text-gray-500">
                               {achievement.outcome}
                             </span>
                           </div>
@@ -1253,7 +1214,7 @@ const StudentDetailsDashboard = () => {
             </Tab.Panel>
 
             {/* Documents Tab */}
-            <Tab.Panel className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow">
+            <Tab.Panel className="rounded-xl bg-white p-6 shadow">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {Object.entries(details.documents || {}).map(([field, url]) => (
                   <DocumentCard
@@ -1287,15 +1248,12 @@ const StudentDetailsDashboard = () => {
         {/* Final Update Button (only in edit mode for declined status) */}
         {editMode && details.personal?.status === "declined" && (
           <div className="mt-8 flex justify-end items-center">
-            <div className="mr-4 text-sm text-gray-600 dark:text-gray-300">
-              {updatedFields.length} of {declinedFields.length} required fields
-              updated
+            <div className="mr-4 text-sm text-gray-600">
+              {updatedFields.length} of {declinedFields.length} required fields updated
             </div>
             <button
               onClick={handleUpdateDeclinedFields}
-              disabled={
-                !allDeclinedFieldsUpdated() || saveStatus.final?.loading
-              }
+              disabled={!allDeclinedFieldsUpdated() || saveStatus.final?.loading}
               className={`px-6 py-3 text-white font-medium rounded-lg transition-all shadow-lg flex items-center gap-2 ${
                 allDeclinedFieldsUpdated()
                   ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"

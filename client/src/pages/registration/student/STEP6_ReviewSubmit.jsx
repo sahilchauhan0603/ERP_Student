@@ -136,7 +136,7 @@ export default function ReviewSubmit({ formData, registrationSuccess }) {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-gradient-to-br from-white via-blue-50 to-red-50 rounded-3xl shadow-2xl border-2 border-blue-200/40 animate-fade-in">
+    <div className="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-6 sm:py-10 bg-gradient-to-br from-white via-blue-50 to-red-50 rounded-3xl shadow-2xl border-2 border-blue-200/40 animate-fade-in">
       <div className="text-center mb-12">
         <div className="flex justify-center items-center gap-4 mb-2">
           <span className="inline-block w-2 h-10 bg-blue-500 rounded-full"></span>

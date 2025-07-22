@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from 'sweetalert2';
 import bpitLogo from "../../assets/icons/BPIT-logo-transparent.png";
 import campusBackground from "../../assets/images/BPIT.png";
 
@@ -50,9 +51,34 @@ const StudentLogin = () => {
         response.data.student &&
         response.data.student.id
       ) {
-        setTimeout(() => {
-          navigate('/student/me');
-        }, 1200);
+        // Fetch student details to get status
+        try {
+          const detailsRes = await axios.get(`${import.meta.env.VITE_API_URL}/student/students/me/details`, { withCredentials: true });
+          const status = detailsRes.data?.data?.personal?.status || detailsRes.data?.personal?.status || 'pending';
+          if (status === 'approved') {
+            await Swal.fire({
+              icon: 'success',
+              title: 'Congratulations!',
+              text: 'Your profile is approved. You have full access to the portal.',
+              confirmButtonColor: '#22c55e',
+            });
+          } else if (status === 'pending') {
+            await Swal.fire({
+              icon: 'info',
+              title: 'Profile Pending',
+              text: 'Your profile is under review. Please wait for approval.',
+              confirmButtonColor: '#f59e42',
+            });
+          } else if (status === 'declined') {
+            await Swal.fire({
+              icon: 'warning',
+              title: 'Profile Declined',
+              text: 'Your profile was declined. Please update the required information.',
+              confirmButtonColor: '#ef4444',
+            });
+          }
+        } catch {}
+        navigate('/student/me');
       } else {
         setError(
           "Login successful but unable to redirect. Please contact support."
