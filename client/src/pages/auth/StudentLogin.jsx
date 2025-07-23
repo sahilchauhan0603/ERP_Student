@@ -264,7 +264,7 @@ const StudentLogin = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-2 sm:text-sm border-gray-300 rounded-md"
-                        placeholder="yourgmail@gmail.com"
+                        placeholder="your@email.com"
                       />
                     </div>
                   </div>

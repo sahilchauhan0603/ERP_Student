@@ -178,7 +178,7 @@ const HomePage = () => {
       {/* Main Content */}
       <main className="flex-grow flex flex-col items-center justify-center px-2 sm:px-4 mt-8 md:mt-16">
         <motion.div
-          className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8 w-full max-w-xs xs:max-w-2xl md:max-w-4xl xl:max-w-6xl mt-10 sm:mt-16 md:mt-20"
+          className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 w-full max-w-xs xs:max-w-2xl md:max-w-4xl xl:max-w-6xl mt-10 sm:mt-16 md:mt-20"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -191,8 +191,8 @@ const HomePage = () => {
                 whileHover="hover"
                 className="relative h-full group"
               >
-                <div className={`absolute -inset-1 bg-gradient-to-r ${item.color} rounded-xl blur opacity-20 group-hover:opacity-60 transition duration-200`}></div>
-                <div className="relative flex flex-col items-center justify-center h-full p-4 md:p-6 min-w-[200px] max-w-[320px] w-full mx-auto rounded-xl shadow-lg transition-all duration-300 hover:border-blue-500 border-2 border-blue-800/80 backdrop-blur-[12px] focus:outline-none focus:ring-1 focus:ring-blue-300" style={{boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)'}} tabIndex={0}>
+                {/* <div className={`absolute -inset-0 bg-gradient-to-r ${item.color} rounded-xl blur-sm opacity-10 group-hover:opacity-40 transition duration-200`}></div> */}
+                <div className="relative flex flex-col items-center justify-center h-full p-4 md:p-6 min-w-[160px] max-w-[260px] w-full mx-auto rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:border-blue-500 border-2 border-blue-800/80 backdrop-blur-[12px] focus:outline-none focus:ring-1 focus:ring-blue-300" style={{boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)'}} tabIndex={0}>
                   <div className={`p-2 rounded-full ${item.bgColor} bg-opacity-60 mb-2 border-2 border-blue-200/60`}>
                     {React.cloneElement(item.icon, { className: `text-3xl ${item.icon.props.className}` })}
                   </div>

@@ -109,10 +109,10 @@ const AdminLogin = () => {
       </header>
 
       <div className="flex-1 flex items-center justify-center p-4 md:p-8">
-        <div className="w-full max-w-md md:max-w-lg lg:max-w-xl">
+        <div className="w-full max-w-md mx-auto">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
             {/* Card Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-6 text-center">
+            <div className="bg-gradient-to-r from-blue-700 to-blue-500 p-6 text-center">
               <div className="flex justify-center mb-4">
                 <div className="bg-white/20 p-3 rounded-full">
                   <svg
