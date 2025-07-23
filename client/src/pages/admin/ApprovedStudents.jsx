@@ -48,7 +48,7 @@ export default function ApprovedStudents() {
       Swal.fire({
         icon: 'error',
         title: 'Failed to load students',
-        text: 'Could not fetch approved students. Please try again later.',
+        text: 'Could not fetch approved students. Please try again later. Redirecting to login page...',
       });
     }
     setLoading(false);

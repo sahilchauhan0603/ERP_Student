@@ -69,7 +69,7 @@ export default function AdminAllStudents() {
       Swal.fire({
         icon: 'error',
         title: 'Failed to load students',
-        text: 'Could not fetch student list. Please try again later.',
+        text: 'Could not fetch student list. Please try again later. Redirecting to login page...',
       });
     }
     setLoading(false);

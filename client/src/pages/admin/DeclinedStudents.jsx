@@ -48,7 +48,7 @@ export default function DeclinedStudents() {
       Swal.fire({
         icon: 'error',
         title: 'Failed to load students',
-        text: 'Could not fetch declined students. Please try again later.',
+        text: 'Could not fetch declined students. Please try again later. Redirecting to login page...',
       });
     }
     setLoading(false);
