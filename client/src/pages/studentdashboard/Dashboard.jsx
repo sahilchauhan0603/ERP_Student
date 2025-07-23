@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Tab } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
-import { forceLogoutStudent } from '../../App';
-import Swal from 'sweetalert2';
+import { forceLogoutStudent } from "../../App";
+import Swal from "sweetalert2";
 
 const StudentDetailsDashboard = () => {
   const [details, setDetails] = useState(null);
@@ -16,7 +16,9 @@ const StudentDetailsDashboard = () => {
   const [declinedFields, setDeclinedFields] = useState([]);
   const [updatedFields, setUpdatedFields] = useState([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [saveStatus, setSaveStatus] = useState({ final: { loading: false, error: null, success: false } });
+  const [saveStatus, setSaveStatus] = useState({
+    final: { loading: false, error: null, success: false },
+  });
   const [updatedDocuments, setUpdatedDocuments] = useState({});
   const navigate = useNavigate();
 
@@ -35,7 +37,7 @@ const StudentDetailsDashboard = () => {
           if (response.data.data.declinedFields) {
             const fields = Array.isArray(response.data.data.declinedFields)
               ? response.data.data.declinedFields
-              : JSON.parse(response.data.data.declinedFields || '[]');
+              : JSON.parse(response.data.data.declinedFields || "[]");
             setDeclinedFields(fields);
           }
         } else {
@@ -63,8 +65,12 @@ const StudentDetailsDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/student/logout`, {}, { withCredentials: true });
-      localStorage.setItem('showBackToHomePopup', 'student');
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/student/logout`,
+        {},
+        { withCredentials: true }
+      );
+      localStorage.setItem("showBackToHomePopup", "student");
       forceLogoutStudent();
     } catch (err) {
       console.error("Logout failed:", err);
@@ -88,18 +94,18 @@ const StudentDetailsDashboard = () => {
   const handleInputChange = (section, field, value) => {
     const fieldPath = `${section}.${field}`;
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
 
     // Track updated fields
     if (declinedFields.includes(fieldPath)) {
       if (!updatedFields.includes(fieldPath)) {
-        setUpdatedFields(prev => [...prev, fieldPath]);
+        setUpdatedFields((prev) => [...prev, fieldPath]);
       }
     }
   };
@@ -117,16 +123,21 @@ const StudentDetailsDashboard = () => {
   };
 
   const allDeclinedFieldsUpdated = () => {
-    return declinedFields.length > 0 && 
-           declinedFields.every(field => updatedFields.includes(field));
+    return (
+      declinedFields.length > 0 &&
+      declinedFields.every((field) => updatedFields.includes(field))
+    );
   };
 
   const handleUpdateDeclinedFields = async () => {
     try {
-      setSaveStatus(prev => ({ ...prev, final: { loading: true, error: null } }));
+      setSaveStatus((prev) => ({
+        ...prev,
+        final: { loading: true, error: null },
+      }));
       const updateData = {};
-      declinedFields.forEach(fieldPath => {
-        const [section, field] = fieldPath.split('.');
+      declinedFields.forEach((fieldPath) => {
+        const [section, field] = fieldPath.split(".");
         if (!updateData[section]) updateData[section] = {};
         updateData[section][field] = formData[section]?.[field];
       });
@@ -134,7 +145,7 @@ const StudentDetailsDashboard = () => {
       let dataToSend = { data: updateData };
       if (Object.keys(updatedDocuments).length > 0) {
         const formDataObj = new FormData();
-        formDataObj.append('data', JSON.stringify(updateData));
+        formDataObj.append("data", JSON.stringify(updateData));
         Object.entries(updatedDocuments).forEach(([field, file]) => {
           formDataObj.append(field, file);
         });
@@ -142,7 +153,10 @@ const StudentDetailsDashboard = () => {
       }
       const config = {
         withCredentials: true,
-        headers: Object.keys(updatedDocuments).length > 0 ? { 'Content-Type': 'multipart/form-data' } : undefined
+        headers:
+          Object.keys(updatedDocuments).length > 0
+            ? { "Content-Type": "multipart/form-data" }
+            : undefined,
       };
       const response = await axios.patch(
         `${import.meta.env.VITE_API_URL}/student/students/me/update-declined`,
@@ -150,28 +164,31 @@ const StudentDetailsDashboard = () => {
         config
       );
       if (response.data.success) {
-        setDetails(prev => ({
+        setDetails((prev) => ({
           ...prev,
           ...formData,
-          status: 'pending',
-          declinedFields: response.data.declinedFields || []
+          status: "pending",
+          declinedFields: response.data.declinedFields || [],
         }));
         setDeclinedFields(response.data.declinedFields || []);
         setEditMode(false);
         setShowSuccessModal(true);
-        setSaveStatus(prev => ({ ...prev, final: { loading: false, success: true } }));
+        setSaveStatus((prev) => ({
+          ...prev,
+          final: { loading: false, success: true },
+        }));
         setUpdatedDocuments({});
       } else {
         throw new Error(response.data.message || "Failed to update profile");
       }
     } catch (err) {
       console.error("Failed to update declined fields:", err);
-      setSaveStatus(prev => ({
+      setSaveStatus((prev) => ({
         ...prev,
         final: {
           loading: false,
-          error: err.response?.data?.message || "Failed to update profile"
-        }
+          error: err.response?.data?.message || "Failed to update profile",
+        },
       }));
     }
   };
@@ -265,14 +282,18 @@ const StudentDetailsDashboard = () => {
   );
 
   const formatDate = (dateStr) => {
-    if (!dateStr) return '';
+    if (!dateStr) return "";
     const date = new Date(dateStr);
     if (isNaN(date)) return dateStr;
-    return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    return date.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   const DetailCard = ({ title, children, section }) => (
-    <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-6 overflow-hidden min-w-[340px] md:min-w-[400px]">
+    <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-6 overflow-hidden min-w-[380px] max-w-[440px] w-full">
       <div className="px-6 py-4 bg-blue-50 border-b border-blue-200 flex items-center">
         <h3 className="text-lg font-semibold text-blue-800">{title}</h3>
       </div>
@@ -284,11 +305,18 @@ const StudentDetailsDashboard = () => {
     </div>
   );
 
-  const DetailItem = ({ label, value, field, section, subSection, editable = true }) => {
+  const DetailItem = ({
+    label,
+    value,
+    field,
+    section,
+    subSection,
+    editable = true,
+  }) => {
     const isDeclined = isFieldDeclined(section, field, subSection);
     const isEditable = isFieldEditable(section, field, subSection);
     // Document fields
-    const isDocument = section === 'documents';
+    const isDocument = section === "documents";
     // Format date fields
     const isDateField = /date|dob/i.test(field);
     const displayValue = isDateField ? formatDate(value) : value;
@@ -303,25 +331,34 @@ const StudentDetailsDashboard = () => {
             <input
               type="file"
               accept="image/*,application/pdf"
-              onChange={e => {
+              onChange={(e) => {
                 const file = e.target.files[0];
                 if (file) {
-                  setUpdatedDocuments(prev => ({ ...prev, [field]: file }));
-                  setFormData(prev => ({
+                  setUpdatedDocuments((prev) => ({ ...prev, [field]: file }));
+                  setFormData((prev) => ({
                     ...prev,
                     documents: {
                       ...prev.documents,
-                      [field]: URL.createObjectURL(file)
-                    }
+                      [field]: URL.createObjectURL(file),
+                    },
                   }));
                   const fieldPath = `documents.${field}`;
-                  setUpdatedFields(prev => prev.includes(fieldPath) ? prev : [...prev, fieldPath]);
+                  setUpdatedFields((prev) =>
+                    prev.includes(fieldPath) ? prev : [...prev, fieldPath]
+                  );
                 }
               }}
               className="ml-2"
             />
             {formData.documents?.[field] && (
-              <a href={formData.documents[field]} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-600 underline text-xs">Preview</a>
+              <a
+                href={formData.documents[field]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-2 text-blue-600 underline text-xs"
+              >
+                Preview
+              </a>
             )}
           </td>
         </tr>
@@ -330,18 +367,35 @@ const StudentDetailsDashboard = () => {
 
     return (
       <tr className="border-b last:border-b-0">
-        <td className={`py-2 px-6 text-gray-600 font-medium w-1/3 text-left align-top border-r border-gray-200 ${isDeclined ? 'text-red-600' : ''}`}>{label}:</td>
-        <td className={`py-2 px-6 text-gray-900 font-semibold w-2/3 text-left align-top break-words ${isDeclined ? 'text-red-600' : ''}`}>{displayValue || <span className="text-gray-400 italic">N/A</span>}</td>
+        <td
+          className={`py-2 px-6 text-gray-600 font-medium w-1/3 text-left align-top border-r border-gray-200 ${
+            isDeclined ? "text-red-600" : ""
+          }`}
+        >
+          {label}:
+        </td>
+        <td
+          className={`py-2 px-6 text-gray-900 font-semibold w-2/3 text-left align-top break-words ${
+            isDeclined ? "text-red-600" : ""
+          }`}
+        >
+          {displayValue || <span className="text-gray-400 italic">N/A</span>}
+        </td>
       </tr>
     );
   };
 
   // Update DocumentCard to support edit mode and declined fields
-  const DocumentCard = ({ title, url, field, editMode, isDeclined, onFileChange }) => (
+  const DocumentCard = ({
+    title,
+    url,
+    field,
+    editMode,
+    isDeclined,
+    onFileChange,
+  }) => (
     <div className="border border-gray-200 rounded-xl p-4 flex flex-col bg-white hover:shadow-md transition-shadow">
-      <h4 className="font-medium text-gray-800 mb-3">
-        {title}
-      </h4>
+      <h4 className="font-medium text-gray-800 mb-3">{title}</h4>
       {url ? (
         <>
           <div className="flex-1 flex items-center justify-center mb-3 bg-gray-100 rounded-lg overflow-hidden min-h-[160px]">
@@ -349,9 +403,10 @@ const StudentDetailsDashboard = () => {
               src={url}
               alt={title}
               className="max-h-40 max-w-full object-contain"
-              onError={e => {
+              onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = "https://via.placeholder.com/150x150?text=Document+Error";
+                e.target.src =
+                  "https://via.placeholder.com/150x150?text=Document+Error";
               }}
             />
           </div>
@@ -379,9 +434,7 @@ const StudentDetailsDashboard = () => {
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <p className="text-gray-400 text-sm italic">
-            Not uploaded
-          </p>
+          <p className="text-gray-400 text-sm italic">Not uploaded</p>
         </div>
       )}
       {editMode && isDeclined && (
@@ -389,7 +442,7 @@ const StudentDetailsDashboard = () => {
           type="file"
           accept="image/*,application/pdf"
           className="mt-2"
-          onChange={e => onFileChange(field, e.target.files[0])}
+          onChange={(e) => onFileChange(field, e.target.files[0])}
         />
       )}
     </div>
@@ -398,10 +451,10 @@ const StudentDetailsDashboard = () => {
   // Helper to convert field name to label
   function fieldToLabel(field) {
     return field
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase())
-      .replace(/\b10th\b/, '10th')
-      .replace(/\b12th\b/, '12th');
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase())
+      .replace(/\b10th\b/, "10th")
+      .replace(/\b12th\b/, "12th");
   }
 
   if (loading) {
@@ -409,9 +462,7 @@ const StudentDetailsDashboard = () => {
       <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">
-            Loading student details...
-          </p>
+          <p className="text-gray-600">Loading student details...</p>
           <p className="text-gray-400 text-sm mt-1">
             Please wait while we fetch your information
           </p>
@@ -486,7 +537,10 @@ const StudentDetailsDashboard = () => {
               Student Dashboard
             </h1>
             <p className="text-gray-600 mt-2">
-              Welcome back, <span className="font-medium text-blue-600">{details.personal?.firstName}</span>
+              Welcome back,{" "}
+              <span className="font-medium text-blue-600">
+                {details.personal?.firstName}
+              </span>
             </p>
           </div>
           <div className="flex items-center gap-4 mt-4 md:mt-0">
@@ -525,13 +579,15 @@ const StudentDetailsDashboard = () => {
         </div>
 
         {/* Student Profile Summary */}
-        <div className={`rounded-xl shadow-lg overflow-hidden mb-8 ${
-  details.personal?.status === "declined"
-    ? "bg-gradient-to-r from-red-500 to-red-600"
-    : details.personal?.status === "approved"
-    ? "bg-gradient-to-r from-green-500 to-green-600"
-    : "bg-gradient-to-r from-orange-400 to-yellow-400"
-}`}>
+        <div
+          className={`rounded-xl shadow-lg overflow-hidden mb-8 ${
+            details.personal?.status === "declined"
+              ? "bg-gradient-to-r from-red-500 to-red-600"
+              : details.personal?.status === "approved"
+              ? "bg-gradient-to-r from-green-500 to-green-600"
+              : "bg-gradient-to-r from-orange-400 to-yellow-400"
+          }`}
+        >
           <div className="p-6 flex flex-col md:flex-row items-center">
             <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white/80 shadow-lg mb-4 md:mb-0 md:mr-6">
               <img
@@ -557,7 +613,11 @@ const StudentDetailsDashboard = () => {
             </div>
             <div className="flex-1 text-center md:text-left">
               <h2 className="text-2xl font-bold text-white">
-                {details.personal?.firstName} {details.personal?.middleName ? details.personal.middleName + " " : ""}{details.personal?.lastName}
+                {details.personal?.firstName}{" "}
+                {details.personal?.middleName
+                  ? details.personal.middleName + " "
+                  : ""}
+                {details.personal?.lastName}
               </h2>
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-2">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
@@ -584,13 +644,15 @@ const StudentDetailsDashboard = () => {
                   </svg>
                   {details.personal?.category}
                 </span>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-          details.personal?.status === "approved"
-            ? "bg-green-100 text-green-800"
-            : details.personal?.status === "declined"
-            ? "bg-red-100 text-red-800"
-            : "bg-orange-100 text-orange-800"
-        }`}>
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                    details.personal?.status === "approved"
+                      ? "bg-green-100 text-green-800"
+                      : details.personal?.status === "declined"
+                      ? "bg-red-100 text-red-800"
+                      : "bg-orange-100 text-orange-800"
+                  }`}
+                >
                   {details.personal?.status?.toUpperCase() || "PENDING"}
                 </span>
               </div>
@@ -665,9 +727,7 @@ const StudentDetailsDashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">
-                  Documents Uploaded
-                </p>
+                <p className="text-sm text-gray-500">Documents Uploaded</p>
                 <p className="text-2xl font-bold text-gray-800">
                   {
                     Object.values(details.documents || {}).filter((doc) => doc)
@@ -700,9 +760,7 @@ const StudentDetailsDashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">
-                  Academic Status
-                </p>
+                <p className="text-sm text-gray-500">Academic Status</p>
                 <p className="text-2xl font-bold text-gray-800">
                   {details.academic?.classXII?.aggregate || "N/A"}%
                 </p>
@@ -728,9 +786,7 @@ const StudentDetailsDashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">
-                  Family Income
-                </p>
+                <p className="text-sm text-gray-500">Family Income</p>
                 <p className="text-2xl font-bold text-gray-800">
                   {details.parent?.familyIncome
                     ? `₹${Number(details.parent.familyIncome).toLocaleString(
@@ -752,7 +808,11 @@ const StudentDetailsDashboard = () => {
                 className={({ selected }) =>
                   `w-full rounded-lg py-3 text-sm font-medium leading-5 transition-all duration-200
                   ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2
-                  ${selected ? "bg-white shadow text-blue-700" : "text-gray-600 hover:bg-white/50 hover:text-blue-600"}`
+                  ${
+                    selected
+                      ? "bg-white shadow text-blue-700"
+                      : "text-gray-600 hover:bg-white/50 hover:text-blue-600"
+                  }`
                 }
               >
                 {category}
@@ -762,8 +822,8 @@ const StudentDetailsDashboard = () => {
 
           <Tab.Panels className="mt-2">
             {/* Personal Information Tab */}
-            <Tab.Panel className="rounded-xl bg-white p-6 shadow">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Tab.Panel className="rounded-xl p-2 bg-white shadow" style={{ minHeight: 0, background: '#fff' }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
                 <DetailCard title="Basic Information" section="personal">
                   <DetailItem
                     label="First Name"
@@ -888,7 +948,7 @@ const StudentDetailsDashboard = () => {
             </Tab.Panel>
 
             {/* Parent Information Tab */}
-            <Tab.Panel className="rounded-xl bg-white p-6 shadow">
+            <Tab.Panel className="rounded-xl bg-white p-2 shadow">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <DetailCard title="Father's Details" section="parent">
                   <DetailItem
@@ -1232,16 +1292,21 @@ const StudentDetailsDashboard = () => {
                     isDeclined={declinedFields.includes(`documents.${field}`)}
                     onFileChange={(docField, file) => {
                       if (file) {
-                        setUpdatedDocuments(prev => ({ ...prev, [docField]: file }));
-                        setFormData(prev => ({
+                        setUpdatedDocuments((prev) => ({
+                          ...prev,
+                          [docField]: file,
+                        }));
+                        setFormData((prev) => ({
                           ...prev,
                           documents: {
                             ...prev.documents,
-                            [docField]: URL.createObjectURL(file)
-                          }
+                            [docField]: URL.createObjectURL(file),
+                          },
                         }));
                         const fieldPath = `documents.${docField}`;
-                        setUpdatedFields(prev => prev.includes(fieldPath) ? prev : [...prev, fieldPath]);
+                        setUpdatedFields((prev) =>
+                          prev.includes(fieldPath) ? prev : [...prev, fieldPath]
+                        );
                       }
                     }}
                   />
@@ -1255,11 +1320,14 @@ const StudentDetailsDashboard = () => {
         {editMode && details.personal?.status === "declined" && (
           <div className="mt-8 flex justify-end items-center">
             <div className="mr-4 text-sm text-gray-600">
-              {updatedFields.length} of {declinedFields.length} required fields updated
+              {updatedFields.length} of {declinedFields.length} required fields
+              updated
             </div>
             <button
               onClick={handleUpdateDeclinedFields}
-              disabled={!allDeclinedFieldsUpdated() || saveStatus.final?.loading}
+              disabled={
+                !allDeclinedFieldsUpdated() || saveStatus.final?.loading
+              }
               className={`px-6 py-3 text-white font-medium rounded-lg transition-all shadow-lg flex items-center gap-2 ${
                 allDeclinedFieldsUpdated()
                   ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
