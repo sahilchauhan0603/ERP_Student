@@ -96,11 +96,11 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="fixed h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Dashboard Overview
+            Your Central Hub for Student Insights & Activity
           </h1>
           <p className="text-gray-500 mt-2">
             Welcome back! Here's what's happening today.
