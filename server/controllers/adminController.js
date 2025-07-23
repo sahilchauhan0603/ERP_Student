@@ -93,9 +93,20 @@ exports.getStudentStats = (req, res) => {
 };
 
 exports.listAllStudents = (req, res) => {
-  db.query('SELECT * FROM students', (err, results) => {
+  let { page = 1, limit = 10 } = req.query;
+  page = parseInt(page);
+  limit = parseInt(limit);
+  const offset = (page - 1) * limit;
+  // Get total count
+  db.query('SELECT COUNT(*) as total FROM students', (err, countResult) => {
     if (err) return res.status(500).json({ message: 'DB error', error: err });
-    res.json({ students: results });
+    const total = countResult[0].total;
+    const totalPages = Math.ceil(total / limit);
+    // Get paginated students
+    db.query('SELECT * FROM students ORDER BY id DESC LIMIT ? OFFSET ?', [limit, offset], (err2, results) => {
+      if (err2) return res.status(500).json({ message: 'DB error', error: err2 });
+      res.json({ students: results, totalPages });
+    });
   });
 };
 
@@ -404,17 +415,27 @@ exports.updateStudentStatus = (req, res) => {
 // List students by status (pending, approved, declined)
 exports.listStudentsByStatus = (req, res) => {
   const { status } = req.params;
+  let { page = 1, limit = 10 } = req.query;
+  page = parseInt(page);
+  limit = parseInt(limit);
   if (!['pending', 'approved', 'declined'].includes(status)) {
     return res.status(400).json({ message: 'Invalid status' });
   }
-  db.query('SELECT * FROM students WHERE status = ?', [status], (err, results) => {
+  const offset = (page - 1) * limit;
+  // Get total count
+  db.query('SELECT COUNT(*) as total FROM students WHERE status = ?', [status], (err, countResult) => {
     if (err) return res.status(500).json({ message: 'DB error', error: err });
-    // Parse declinedFields for each student
-    const students = results.map(s => ({
-      ...s,
-      declinedFields: s.declinedFields ? JSON.parse(s.declinedFields) : [],
-    }));
-    res.json({ students });
+    const total = countResult[0].total;
+    const totalPages = Math.ceil(total / limit);
+    // Get paginated students
+    db.query('SELECT * FROM students WHERE status = ? ORDER BY id DESC LIMIT ? OFFSET ?', [status, limit, offset], (err2, results) => {
+      if (err2) return res.status(500).json({ message: 'DB error', error: err2 });
+      const students = results.map(s => ({
+        ...s,
+        declinedFields: s.declinedFields ? JSON.parse(s.declinedFields) : [],
+      }));
+      res.json({ students, totalPages });
+    });
   });
 };
 
@@ -572,4 +593,11 @@ exports.getStudentFullDetails = (req, res) => {
     }
     res.json({ personal, parent, documents, academic, declinedFields });
   });
+};
+
+exports.getAdminProfile = (req, res) => {
+  if (!req.user || !req.user.email) {
+    return res.status(401).json({ message: 'No admin email found in token' });
+  }
+  res.json({ email: req.user.email });
 };

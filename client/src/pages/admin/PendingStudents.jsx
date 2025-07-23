@@ -29,18 +29,22 @@ export default function PendingStudents() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedGender, setSelectedGender] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchPendingStudents();
-  }, []);
+  }, [currentPage]);
 
   const fetchPendingStudents = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/admin/list/pending`, { withCredentials: true });
+      const res = await axios.get(`${API_URL}/admin/list/pending?page=${currentPage}&limit=10`, { withCredentials: true });
       setStudents(res.data.students || []);
+      setTotalPages(res.data.totalPages || 1);
     } catch {
       setStudents([]);
+      setTotalPages(1);
       Swal.fire({
         icon: 'error',
         title: 'Failed to load students',
@@ -230,6 +234,31 @@ export default function PendingStudents() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-500">
+              Page <span className="font-medium">{currentPage}</span> of{' '}
+              <span className="font-medium">{totalPages}</span>
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>

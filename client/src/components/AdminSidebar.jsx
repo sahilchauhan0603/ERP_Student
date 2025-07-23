@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FiLogOut, FiX } from 'react-icons/fi';
 import axios from 'axios';
@@ -16,6 +16,23 @@ const navItems = [
 export default function AdminSidebar({ open, onClose }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [adminEmail, setAdminEmail] = useState('');
+
+  useEffect(() => {
+    async function fetchAdminEmail() {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/me`, { withCredentials: true });
+        if (res.data && res.data.email) {
+          setAdminEmail(res.data.email);
+        } else {
+          setAdminEmail('');
+        }
+      } catch {
+        setAdminEmail('');
+      }
+    }
+    fetchAdminEmail();
+  }, []);
 
   const handleLogout = async () => {
     const result = await Swal.fire({
@@ -98,10 +115,13 @@ export default function AdminSidebar({ open, onClose }) {
         <div className="px-4 py-5 border-t border-blue-700">
           <div className="flex items-center space-x-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center text-blue-300 font-bold">
-              A
+              {adminEmail ? adminEmail.charAt(0).toUpperCase() : 'A'}
             </div>
             <div>
               <p className="font-medium text-white">Admin User</p>
+              <p className="text-xs text-blue-200 break-all">
+                {adminEmail ? adminEmail : 'No email found'}
+              </p>
             </div>
           </div>
           <button

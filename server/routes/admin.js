@@ -26,4 +26,7 @@ router.get('/search', authenticate, authorizeRole('admin'), adminController.sear
 // Get full details of a student (all registration sections)
 router.get('/student-details/:studentId', authenticate, authorizeRole('admin'), adminController.getStudentFullDetails);
 
+// Admin profile endpoint
+router.get('/me', authenticate, authorizeRole('admin'), adminController.getAdminProfile);
+
 module.exports = router;
