@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from 'sweetalert2';
@@ -13,6 +13,28 @@ const StudentLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    if (localStorage.getItem('showBackToHomePopup') === 'student') {
+      localStorage.removeItem('showBackToHomePopup');
+      setTimeout(() => {
+        Swal.fire({
+          title: 'Back to Home?',
+          text: 'Do you want to go back to the homepage?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes',
+          cancelButtonText: 'No',
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = '/';
+          }
+        });
+      }, 300);
+    }
+  }, []);
 
   const handleSendOtp = async (e) => {
     e.preventDefault();

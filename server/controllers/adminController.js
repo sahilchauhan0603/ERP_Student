@@ -6,8 +6,8 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim
 const rateLimit = require('express-rate-limit');
 
 const otpLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
+  windowMs: 30 * 60 * 1000, // 10 minutes
+  max: 15, // limit each IP to 5 requests per windowMs
   message: { message: 'Too many OTP requests, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,

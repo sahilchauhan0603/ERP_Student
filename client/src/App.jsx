@@ -48,9 +48,11 @@ function AuthRoute({ children, role }) {
   return children;
 }
 
-export function forceLogout() {
-  // Clear any local state if needed, then force reload
+export function forceLogoutStudent() {
   window.location.href = '/login';
+}
+export function forceLogoutAdmin() {
+  window.location.href = '/admin';
 }
 
 function App() {

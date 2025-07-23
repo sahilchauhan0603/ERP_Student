@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Tab } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
-import { forceLogout } from '../../App';
+import { forceLogoutStudent } from '../../App';
+import Swal from 'sweetalert2';
 
 const StudentDetailsDashboard = () => {
   const [details, setDetails] = useState(null);
@@ -63,8 +64,10 @@ const StudentDetailsDashboard = () => {
   const handleLogout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_URL}/student/logout`, {}, { withCredentials: true });
-      forceLogout();
+      localStorage.setItem('showBackToHomePopup', 'student');
+      forceLogoutStudent();
     } catch (err) {
+      console.error("Logout failed:", err);
       // Optionally show error
     }
     setShowLogoutModal(false);

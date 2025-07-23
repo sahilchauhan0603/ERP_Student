@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import bpitLogo from "../../assets/icons/BPIT-logo-transparent.png";
 import campusBackground from "../../assets/images/BPIT.png";
+import Swal from 'sweetalert2';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -14,6 +15,28 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem('showBackToHomePopup') === 'admin') {
+      localStorage.removeItem('showBackToHomePopup');
+      setTimeout(() => {
+        Swal.fire({
+          title: 'Back to Home?',
+          text: 'Do you want to go back to the homepage?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes',
+          cancelButtonText: 'No',
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = '/';
+          }
+        });
+      }, 300);
+    }
+  }, []);
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
