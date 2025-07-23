@@ -13,6 +13,7 @@ const StudentLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showInfoButton, setShowInfoButton] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem('showBackToHomePopup') === 'student') {
@@ -30,11 +31,31 @@ const StudentLogin = () => {
         }).then((result) => {
           if (result.isConfirmed) {
             window.location.href = '/';
+          } else {
+            setShowInfoButton(true);
           }
         });
       }, 300);
     }
   }, []);
+
+  const handleInfoClick = () => {
+    Swal.fire({
+      title: 'Back to Home?',
+      text: 'Do you want to go back to the homepage?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = '/';
+      }
+      // If No, keep the button visible
+    });
+  };
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
@@ -178,7 +199,19 @@ const StudentLogin = () => {
       <div className="flex-1 flex flex-col justify-center items-center py-8 px-2 sm:px-4 mt-2 md:mt-6">
         <div className="w-full max-w-md mx-auto">
           <div className="bg-gradient-to-br from-white via-blue-50 to-red-50 p-1 rounded-2xl shadow-lg">
-            <div className="bg-white py-8 px-6 shadow-lg rounded-2xl border-2 border-blue-200/40">
+            <div className="bg-white py-8 px-6 shadow-lg rounded-2xl border-2 border-blue-200/40 relative">
+              {showInfoButton && (
+                <button
+                  onClick={handleInfoClick}
+                  style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, background: 'none', border: 'none', padding: 0, margin: 0, boxShadow: 'none' }}
+                  title="Back to Home?"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-blue-600">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 16h.01M12 8v4" />
+                  </svg>
+                </button>
+              )}
               <div className="flex flex-col items-center mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

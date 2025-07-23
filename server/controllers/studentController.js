@@ -1,6 +1,5 @@
 const sendOtpMail = require('../utils/studentOTPMailer');
-// const sendStatusEmail = require('../utils/sendStatusEmail');
-// const crypto = require('crypto');
+const sendStatusEmail = require('../utils/sendStatusEmail');
 const db = require('../config/db');
 const uploadToCloudinary = require('../utils/cloudinaryUpload');
 const otpStore = {}; // In-memory store for OTPs, consider using Redis or similar in production
@@ -735,6 +734,36 @@ exports.updateDeclinedFields = async (req, res) => {
         console.error('❌ Error updating declined fields:', err2);
         return res.status(500).json({ success: false, message: 'Failed to update declined fields' });
       }
+
+      // Send email to student notifying profile update and resubmission
+      db.query('SELECT email, firstName, lastName FROM students WHERE id = ?', [studentId], (err3, studentRows) => {
+        if (!err3 && studentRows && studentRows.length > 0) {
+          const { email, firstName, lastName } = studentRows[0];
+          const fullName = `${firstName} ${lastName}`;
+          const emailSubject = 'Profile Update Submitted for Review';
+          const emailHtml = `
+            <div style=\"max-width:600px;margin:0 auto;padding:20px;font-family:Arial,sans-serif;background:#f9f9f9;\">
+              <div style=\"text-align:center;padding:20px 0;background:#2563eb;color:white;\">
+                <h1>Profile Update Submitted</h1>
+              </div>
+              <div style=\"padding:20px;background:white;\">
+                <p>Dear ${fullName},</p>
+                <p>Your profile has been updated and resubmitted for review by the authorities.</p>
+                <p>Our team will review your changes and notify you once a decision has been made.</p>
+                <div style=\"background:#f0f8ff;padding:15px;margin:20px 0;border-left:4px solid #2563eb;\">
+                  <p style=\"margin:0;\">Thank you for keeping your information up to date.</p>
+                </div>
+                <p>Stay tuned for further updates.</p>
+                <p>Best regards,<br>The Admissions Team</p>
+              </div>
+              <div style=\"text-align:center;padding:20px;font-size:12px;color:#777;\">
+                <p>© ${new Date().getFullYear()} Bhagwan Parshuram Institute of Technology</p>
+              </div>
+            </div>
+          `;
+          sendStatusEmail(email, emailSubject, emailHtml).catch(() => {});
+        }
+      });
 
       return res.json({
         success: true,

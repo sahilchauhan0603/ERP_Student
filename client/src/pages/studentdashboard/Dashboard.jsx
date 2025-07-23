@@ -1107,7 +1107,7 @@ const StudentDetailsDashboard = () => {
             </Tab.Panel>
 
             {/* Academic Information Tab */}
-            <Tab.Panel className="rounded-xl bg-white p-6 shadow">
+            <Tab.Panel className="rounded-xl bg-white p-2 shadow">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <DetailCard title="Class X Details" section="academic">
                   <DetailItem

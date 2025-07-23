@@ -251,6 +251,13 @@ export default function AdminStudentDetailsModal({
       }, { withCredentials: true });
       refresh?.();
       onClose();
+      Swal.fire({
+        icon: 'success',
+        title: 'Profile Reviewed',
+        text: `You have successfully reviewed the profile and ${student.firstName} ${student.lastName} has been approved.`,
+        timer: 2500,
+        showConfirmButton: false
+      });
     } catch (e) {
       Swal.fire({
         icon: 'error',
@@ -272,6 +279,13 @@ export default function AdminStudentDetailsModal({
       }, { withCredentials: true });
       refresh?.();
       onClose();
+      Swal.fire({
+        icon: 'info',
+        title: 'Profile Reviewed',
+        text: `You have successfully reviewed the profile and ${student.firstName} ${student.lastName} has been declined.`,
+        timer: 2500,
+        showConfirmButton: false
+      });
     } catch (e) {
       Swal.fire({
         icon: 'error',
@@ -444,6 +458,13 @@ export default function AdminStudentDetailsModal({
     );
   };
 
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    if (isNaN(date)) return dateStr;
+    return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
   const renderPersonal = () => (
     <div>
       {tableType === "pending" && (
@@ -494,7 +515,7 @@ export default function AdminStudentDetailsModal({
         />
         <DetailField
           label="Date of Birth"
-          value={details?.personal?.dob}
+          value={formatDate(details?.personal?.dob)}
           section="personal"
           field="dob"
           showVerify={tableType === "pending"}
