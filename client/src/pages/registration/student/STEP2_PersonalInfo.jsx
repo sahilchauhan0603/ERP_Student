@@ -1,7 +1,7 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 
-const PersonalInfo = ({ formData, setFormData }) => {
+const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
   const courses = [
     "B.Tech Computer Science Engineering (CSE)",
     "B.Tech Information Technology Engineering (IT)",
@@ -17,6 +17,18 @@ const PersonalInfo = ({ formData, setFormData }) => {
     "MBA",
   ];
 
+  const countryCodes = [
+    { code: "+91", label: "India(+91)" },
+    { code: "+1", label: "USA (+1)" },
+    { code: "+44", label: "UK (+44)" },
+    { code: "+61", label: "Australia (+61)" },
+    { code: "+971", label: "UAE (+971)" },
+    // Add more as needed
+  ];
+
+  const [mobileCountry, setMobileCountry] = useState(formData.personal.mobileCountry || "+91");
+  const [emailUser, setEmailUser] = useState(formData.personal.email ? formData.personal.email.replace(/@gmail\.com$/, "") : "");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -24,6 +36,39 @@ const PersonalInfo = ({ formData, setFormData }) => {
       personal: {
         ...prev.personal,
         [name]: value,
+      },
+    }));
+  };
+
+  const handleMobileChange = (e) => {
+    const value = e.target.value.replace(/[^0-9]/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        mobile: value,
+        mobileCountry,
+      },
+    }));
+  };
+  const handleMobileCountryChange = (e) => {
+    setMobileCountry(e.target.value);
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        mobileCountry: e.target.value,
+      },
+    }));
+  };
+  const handleEmailUserChange = (e) => {
+    const value = e.target.value.replace(/@.*/, "");
+    setEmailUser(value);
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        email: value ? value + "@gmail.com" : "",
       },
     }));
   };
@@ -55,7 +100,7 @@ const PersonalInfo = ({ formData, setFormData }) => {
             name="course"
             value={formData.personal.course || ""}
             onChange={handleChange}
-            className="w-full px-5 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+            className={`w-full px-5 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('course') ? 'border-red-500' : 'border-gray-400'}`}
             required
           >
             <option value="" className="text-gray-300">
@@ -67,6 +112,9 @@ const PersonalInfo = ({ formData, setFormData }) => {
               </option>
             ))}
           </select>
+          {incompleteFields.includes('course') && (
+            <div className="text-xs text-red-500 mt-1">Course is required</div>
+          )}
         </div>
 
         {/* Personal Details Section */}
@@ -103,9 +151,12 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="First Name"
                 value={formData.personal.firstName || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('firstName') ? 'border-red-500' : 'border-gray-400'}`}
                 required
               />
+              {incompleteFields.includes('firstName') && (
+                <div className="text-xs text-red-500 mt-1">First name is required</div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -117,8 +168,11 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="Middle Name"
                 value={formData.personal.middleName || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('middleName') ? 'border-red-500' : 'border-gray-400'}`}
               />
+              {incompleteFields.includes('middleName') && (
+                <div className="text-xs text-red-500 mt-1">Middle name is required</div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -130,9 +184,12 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="Last Name"
                 value={formData.personal.lastName || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('lastName') ? 'border-red-500' : 'border-gray-400'}`}
                 required
               />
+              {incompleteFields.includes('lastName') && (
+                <div className="text-xs text-red-500 mt-1">Last name is required</div>
+              )}
             </div>
 
             {/* ABC ID */}
@@ -145,9 +202,12 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="ABC ID"
                 value={formData.personal.abcId || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('abcId') ? 'border-red-500' : 'border-gray-400'}`}
                 required
               />
+              {incompleteFields.includes('abcId') && (
+                <div className="text-xs text-red-500 mt-1">ABC ID is required</div>
+              )}
             </div>
 
             {/* Date of Birth */}
@@ -160,9 +220,12 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 name="dob"
                 value={formData.personal.dob || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('dob') ? 'border-red-500' : 'border-gray-400'}`}
                 required
               />
+              {incompleteFields.includes('dob') && (
+                <div className="text-xs text-red-500 mt-1">Date of birth is required</div>
+              )}
             </div>
 
             {/* Place of Birth */}
@@ -175,8 +238,11 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="City, Country"
                 value={formData.personal.placeOfBirth || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('placeOfBirth') ? 'border-red-500' : 'border-gray-400'}`}
               />
+              {incompleteFields.includes('placeOfBirth') && (
+                <div className="text-xs text-red-500 mt-1">Place of birth is required</div>
+              )}
             </div>
           </div>
         </div>
@@ -205,33 +271,56 @@ const PersonalInfo = ({ formData, setFormData }) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Mobile Number Field */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-800">
                 Mobile Number<span className="text-red-500">*</span>
               </label>
-              <input
-                name="mobile"
-                placeholder="+91 98765 43210"
-                value={formData.personal.mobile || ""}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
-                required
-              />
+              <div className="flex gap-2">
+                <select
+                  value={mobileCountry}
+                  onChange={handleMobileCountryChange}
+                  className={`px-2 py-3 border-2 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400 ${incompleteFields.includes('mobile') ? 'border-red-500' : 'border-gray-400'}`}
+                  style={{ minWidth: 140 }}
+                >
+                  {countryCodes.map((c) => (
+                    <option key={c.code} value={c.code}>{c.label}</option>
+                  ))}
+                </select>
+                <input
+                  name="mobile"
+                  placeholder="9876543210"
+                  value={formData.personal.mobile || ""}
+                  onChange={handleMobileChange}
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('mobile') ? 'border-red-500' : 'border-gray-400'}`}
+                  required
+                  maxLength={15}
+                  inputMode="numeric"
+                />
+              </div>
+              {incompleteFields.includes('mobile') && (
+                <div className="text-xs text-red-500 mt-1">Mobile number is required</div>
+              )}
             </div>
-
+            {/* Email Field */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-800">
                 Email Address<span className="text-red-500">*</span>
               </label>
-              <input
-                name="email"
-                type="email"
-                placeholder="your.email@example.com"
-                value={formData.personal.email || ""}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
-                required
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  name="emailUser"
+                  placeholder="your.email"
+                  value={emailUser}
+                  onChange={handleEmailUserChange}
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('email') ? 'border-red-500' : 'border-gray-400'}`}
+                  required
+                />
+                <span className="text-gray-700 font-semibold select-none">@gmail.com</span>
+              </div>
+              {incompleteFields.includes('email') && (
+                <div className="text-xs text-red-500 mt-1">Email is required</div>
+              )}
             </div>
           </div>
         </div>
@@ -269,9 +358,12 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="Roll Number"
                 value={formData.personal.examRoll || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('examRoll') ? 'border-red-500' : 'border-gray-400'}`}
                 required
               />
+              {incompleteFields.includes('examRoll') && (
+                <div className="text-xs text-red-500 mt-1">Exam roll number is required</div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -283,8 +375,11 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="Rank (if applicable)"
                 value={formData.personal.examRank || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('examRank') ? 'border-red-500' : 'border-gray-400'}`}
               />
+              {incompleteFields.includes('examRank') && (
+                <div className="text-xs text-red-500 mt-1">Exam rank is required</div>
+              )}
             </div>
           </div>
         </div>
@@ -345,6 +440,9 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 </label>
               ))}
             </div>
+            {incompleteFields.includes('gender') && (
+              <div className="text-xs text-red-500 mt-1">Gender is required</div>
+            )}
           </div>
 
           {/* Category Selection */}
@@ -380,6 +478,9 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 </label>
               ))}
             </div>
+            {incompleteFields.includes('category') && (
+              <div className="text-xs text-red-500 mt-1">Category is required</div>
+            )}
           </div>
 
           {/* Sub Category Selection */}
@@ -418,6 +519,9 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 )
               )}
             </div>
+            {incompleteFields.includes('subCategory') && (
+              <div className="text-xs text-red-500 mt-1">Sub category is required</div>
+            )}
           </div>
 
           {/* Region Selection */}
@@ -453,6 +557,9 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 </label>
               ))}
             </div>
+            {incompleteFields.includes('region') && (
+              <div className="text-xs text-red-500 mt-1">Region is required</div>
+            )}
           </div>
         </div>
 
@@ -495,10 +602,13 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="Your current residential address"
                 value={formData.personal.currentAddress || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('currentAddress') ? 'border-red-500' : 'border-gray-400'}`}
                 rows={4}
                 required
               />
+              {incompleteFields.includes('currentAddress') && (
+                <div className="text-xs text-red-500 mt-1">Current address is required</div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -510,10 +620,13 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 placeholder="Your permanent residential address"
                 value={formData.personal.permanentAddress || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('permanentAddress') ? 'border-red-500' : 'border-gray-400'}`}
                 rows={4}
                 required
               />
+              {incompleteFields.includes('permanentAddress') && (
+                <div className="text-xs text-red-500 mt-1">Permanent address is required</div>
+              )}
             </div>
           </div>
         </div>
@@ -598,6 +711,9 @@ const PersonalInfo = ({ formData, setFormData }) => {
                 </label>
               ))}
             </div>
+            {incompleteFields.includes('feeReimbursement') && (
+              <div className="text-xs text-red-500 mt-1">Fee reimbursement is required</div>
+            )}
           </div>
 
           {/* Anti-Ragging Reference */}
@@ -611,9 +727,12 @@ const PersonalInfo = ({ formData, setFormData }) => {
               placeholder="Enter your reference number"
               value={formData.personal.antiRaggingRef || ""}
               onChange={handleChange}
-              className="w-full px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+              className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('antiRaggingRef') ? 'border-red-500' : 'border-gray-400'}`}
               required
             />
+            {incompleteFields.includes('antiRaggingRef') && (
+              <div className="text-xs text-red-500 mt-1">Anti-ragging reference number is required</div>
+            )}
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-export default function DocumentsUpload({ formData, setFormData }) {
+export default function DocumentsUpload({ formData, setFormData, incompleteFields = [] }) {
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     setFormData(prev => ({
@@ -29,6 +29,25 @@ export default function DocumentsUpload({ formData, setFormData }) {
     { name: "academicFeeReceipt", label: "Academic Fee Receipt", icon: "💰" },
     { name: "collegeFeeReceipt", label: "College Fee Receipt", icon: "💵" },
     { name: "parentSignature", label: "Parent's Signature", icon: "✍️" }
+  ];
+
+  const requiredDocs = [
+    "photo",
+    "ipuRegistration",
+    "allotmentLetter",
+    "examAdmitCard",
+    "examScoreCard",
+    "marksheet10",
+    "passing10",
+    "marksheet12",
+    "passing12",
+    "aadhar",
+    "characterCertificate",
+    "medicalCertificate",
+    "migrationCertificate",
+    "academicFeeReceipt",
+    "collegeFeeReceipt",
+    "parentSignature",
   ];
 
   return (
@@ -81,6 +100,9 @@ export default function DocumentsUpload({ formData, setFormData }) {
               <label className="block text-sm font-semibold text-gray-800 flex items-center">
                 <span className="mr-2 text-lg">{icon}</span>
                 {label}
+                {requiredDocs.includes(name) && (
+                  <span className="text-red-500 ml-1">*</span>
+                )}
               </label>
               <div className="relative">
                 <input
@@ -88,12 +110,12 @@ export default function DocumentsUpload({ formData, setFormData }) {
                   name={name}
                   onChange={handleFileChange}
                   accept=".pdf,.jpg,.jpeg,.png"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  className={`absolute inset-0 w-full h-full opacity-0 cursor-pointer ${incompleteFields.includes(name) ? 'border-red-500' : ''}`}
                   id={`file-upload-${name}`}
                 />
                 <label
                   htmlFor={`file-upload-${name}`}
-                  className="block w-full px-4 py-3 border-2 border-dashed border-gray-400 rounded-xl hover:border-gray-500 transition-colors duration-300 cursor-pointer bg-white text-gray-900 font-semibold"
+                  className={`block w-full px-4 py-3 border-2 border-dashed rounded-xl transition-colors duration-300 cursor-pointer bg-white text-gray-900 font-semibold ${incompleteFields.includes(name) ? 'border-red-500 hover:border-red-500' : 'border-gray-400 hover:border-gray-500'}`}
                 >
                   <div className="flex flex-col items-center justify-center text-center">
                     <svg
@@ -119,6 +141,9 @@ export default function DocumentsUpload({ formData, setFormData }) {
                     <span className="text-xs text-gray-500 mt-1">PDF, JPG, or PNG</span>
                   </div>
                 </label>
+                {incompleteFields.includes(name) && (
+                  <div className="text-xs text-red-500 mt-1">This document is required</div>
+                )}
               </div>
             </div>
           ))}

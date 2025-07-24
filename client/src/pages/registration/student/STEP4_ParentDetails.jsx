@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 
-const ParentDetails = ({ formData, setFormData }) => {
+const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     const path = name.split('.');
@@ -31,6 +31,103 @@ const ParentDetails = ({ formData, setFormData }) => {
       }
       return prev;
     });
+  };
+
+  const countryCodes = [
+    { code: "+91", label: "India (+91)" },
+    { code: "+1", label: "USA (+1)" },
+    { code: "+44", label: "UK (+44)" },
+    { code: "+61", label: "Australia (+61)" },
+    { code: "+971", label: "UAE (+971)" },
+    // Add more as needed
+  ];
+
+  const [fatherMobileCountry, setFatherMobileCountry] = useState(formData.parents.father.mobileCountry || "+91");
+  const [fatherEmailUser, setFatherEmailUser] = useState(formData.parents.father.email ? formData.parents.father.email.replace(/@gmail\.com$/, "") : "");
+  const [motherMobileCountry, setMotherMobileCountry] = useState(formData.parents.mother.mobileCountry || "+91");
+  const [motherEmailUser, setMotherEmailUser] = useState(formData.parents.mother.email ? formData.parents.mother.email.replace(/@gmail\.com$/, "") : "");
+
+  const handleFatherMobileChange = (e) => {
+    const value = e.target.value.replace(/[^0-9]/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      parents: {
+        ...prev.parents,
+        father: {
+          ...prev.parents.father,
+          mobile: value,
+          mobileCountry: fatherMobileCountry,
+        },
+      },
+    }));
+  };
+  const handleFatherMobileCountryChange = (e) => {
+    setFatherMobileCountry(e.target.value);
+    setFormData((prev) => ({
+      ...prev,
+      parents: {
+        ...prev.parents,
+        father: {
+          ...prev.parents.father,
+          mobileCountry: e.target.value,
+        },
+      },
+    }));
+  };
+  const handleFatherEmailUserChange = (e) => {
+    const value = e.target.value.replace(/@.*/, "");
+    setFatherEmailUser(value);
+    setFormData((prev) => ({
+      ...prev,
+      parents: {
+        ...prev.parents,
+        father: {
+          ...prev.parents.father,
+          email: value ? value + "@gmail.com" : "",
+        },
+      },
+    }));
+  };
+  const handleMotherMobileChange = (e) => {
+    const value = e.target.value.replace(/[^0-9]/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      parents: {
+        ...prev.parents,
+        mother: {
+          ...prev.parents.mother,
+          mobile: value,
+          mobileCountry: motherMobileCountry,
+        },
+      },
+    }));
+  };
+  const handleMotherMobileCountryChange = (e) => {
+    setMotherMobileCountry(e.target.value);
+    setFormData((prev) => ({
+      ...prev,
+      parents: {
+        ...prev.parents,
+        mother: {
+          ...prev.parents.mother,
+          mobileCountry: e.target.value,
+        },
+      },
+    }));
+  };
+  const handleMotherEmailUserChange = (e) => {
+    const value = e.target.value.replace(/@.*/, "");
+    setMotherEmailUser(value);
+    setFormData((prev) => ({
+      ...prev,
+      parents: {
+        ...prev.parents,
+        mother: {
+          ...prev.parents.mother,
+          email: value ? value + "@gmail.com" : "",
+        },
+      },
+    }));
   };
 
   return (
@@ -82,8 +179,11 @@ const ParentDetails = ({ formData, setFormData }) => {
                 value={formData.parents.father.name || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('father.name') ? 'border-red-500' : 'border-gray-400'}`}
               />
+              {incompleteFields.includes('father.name') && (
+                <div className="text-xs text-red-500 mt-1">Father's name is required</div>
+              )}
             </div>
             <div className="space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
@@ -115,28 +215,45 @@ const ParentDetails = ({ formData, setFormData }) => {
               <label className="block text-sm font-semibold text-gray-800">
                 Email Address<span className="text-red-500">*</span>
               </label>
-              <input
-                name="parents.father.email"
-                placeholder="Enter Father's Email"
-                type="email"
-                value={formData.parents.father.email || ""}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  name="parents.father.emailUser"
+                  placeholder="father.email"
+                  value={fatherEmailUser}
+                  onChange={handleFatherEmailUserChange}
+                  required
+                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                />
+                <span className="text-gray-700 font-semibold select-none">@gmail.com</span>
+              </div>
             </div>
+            {/* Father Mobile and Email */}
             <div className="space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
                 Mobile Number<span className="text-red-500">*</span>
               </label>
-              <input
-                name="parents.father.mobile"
-                placeholder="Enter Father's Mobile Number"
-                value={formData.parents.father.mobile || ""}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
-              />
+              <div className="flex gap-2">
+                <select
+                  value={fatherMobileCountry}
+                  onChange={handleFatherMobileCountryChange}
+                  className="px-2 py-2 border-2 border-gray-400 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400"
+                  style={{ minWidth: 140 }}
+                >
+                  {countryCodes.map((c) => (
+                    <option key={c.code} value={c.code}>{c.label}</option>
+                  ))}
+                </select>
+                <input
+                  name="parents.father.mobile"
+                  placeholder="9876543210"
+                  value={formData.parents.father.mobile || ""}
+                  onChange={handleFatherMobileChange}
+                  required
+                  maxLength={15}
+                  inputMode="numeric"
+                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
@@ -157,7 +274,7 @@ const ParentDetails = ({ formData, setFormData }) => {
                 </label>
                 <input
                   name="parents.father.telephone"
-                  placeholder="Telephone Number"            
+                  placeholder="Telephone No."            
                   value={formData.parents.father.telephone || ""}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
@@ -245,27 +362,44 @@ const ParentDetails = ({ formData, setFormData }) => {
               <label className="block text-sm font-semibold text-gray-800">
                 Email Address
               </label>
-              <input
-                name="parents.mother.email"
-                placeholder="Enter Mother's Email"
-                type="email"
-                value={formData.parents.mother.email || ""}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  name="parents.mother.emailUser"
+                  placeholder="mother.email"
+                  value={motherEmailUser}
+                  onChange={handleMotherEmailUserChange}
+                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                />
+                <span className="text-gray-700 font-semibold select-none">@gmail.com</span>
+              </div>
             </div>
+            {/* Mother Mobile and Email */}
             <div className="space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
                 Mobile Number<span className="text-red-500">*</span>
               </label>
-              <input
-                name="parents.mother.mobile"
-                placeholder="Enter Mother's Mobile Number"
-                value={formData.parents.mother.mobile || ""}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
-              />
+              <div className="flex gap-2">
+                <select
+                  value={motherMobileCountry}
+                  onChange={handleMotherMobileCountryChange}
+                  className="px-2 py-2 border-2 border-gray-400 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400"
+                  style={{ minWidth: 140 }}
+                >
+                  {countryCodes.map((c) => (
+                    <option key={c.code} value={c.code}>{c.label}</option>
+                  ))}
+                </select>
+                <input
+                  name="parents.mother.mobile"
+                  placeholder="9876543210"
+                  value={formData.parents.mother.mobile || ""}
+                  onChange={handleMotherMobileChange}
+                  required
+                  maxLength={15}
+                  inputMode="numeric"
+                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
@@ -286,7 +420,7 @@ const ParentDetails = ({ formData, setFormData }) => {
                 </label>
                 <input
                   name="parents.mother.telephone"
-                  placeholder="Telephone Number"            
+                  placeholder="Telephone No."            
                   value={formData.parents.mother.telephone || ""}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"

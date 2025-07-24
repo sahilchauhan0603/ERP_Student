@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function AcademicInfo({ formData, setFormData }) {
+export default function AcademicInfo({ formData, setFormData, incompleteFields = [] }) {
   const handleChange = (e, section, field, index = null) => {
     const { name, value } = e.target;
 
@@ -62,9 +62,12 @@ export default function AcademicInfo({ formData, setFormData }) {
         name={name}
         value={formData.academic[section][name] || ''}
         onChange={(e) => handleChange(e, section)}
-        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300 bg-white/50 text-gray-900 placeholder-gray-300 shadow-inner"
+        className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300 bg-white/50 text-gray-900 placeholder-gray-300 shadow-inner ${required && incompleteFields.includes(`${section}.${name}`) ? 'border-red-500' : 'border-gray-200'}`}
         required={required}
       />
+      {required && incompleteFields.includes(`${section}.${name}`) && (
+        <div className="text-xs text-red-500 mt-1">{label} is required</div>
+      )}
     </div>
   );
 
@@ -126,7 +129,7 @@ export default function AcademicInfo({ formData, setFormData }) {
           {renderInput('Institute', 'institute', 'classXII', 'text', true)}
           {renderInput('Year', 'year', 'classXII', 'text', true)}
           {renderInput('Board', 'board', 'classXII', 'text', true)}
-          {renderInput('PCM %', 'pcm', 'classXII', true)}
+          {renderInput('PCM %', 'pcm', 'classXII', 'text', true)}
           {renderInput('Aggregate %', 'aggregate', 'classXII', 'text', true)}
         </div>
       </div>

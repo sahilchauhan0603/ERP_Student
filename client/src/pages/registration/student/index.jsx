@@ -20,6 +20,7 @@ const StudentRegistration = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [incompleteFields, setIncompleteFields] = useState([]);
 
   // Modal state
   const [modal, setModal] = useState({
@@ -135,9 +136,9 @@ const StudentRegistration = () => {
   });
 
   const nextStep = () => {
-    if (validateCurrentStep()) {
+    const missing = getIncompleteFields(currentStep);
+    if (missing.length === 0) {
       if (currentStep < steps.length - 1) {
-        // Show confirmation modal for current step
         let stepName = steps[currentStep]?.label || "Current form";
         showModal({
           title: "Step Completed!",
@@ -146,10 +147,12 @@ const StudentRegistration = () => {
           onClose: () => {
             setModal((m) => ({ ...m, isOpen: false }));
             setCurrentStep(currentStep + 1);
+            setIncompleteFields([]);
           },
         });
       }
     } else {
+      setIncompleteFields(missing);
       showModal({
         title: "Incomplete Fields",
         message: "Please fill all required fields before proceeding.",
@@ -211,7 +214,6 @@ const StudentRegistration = () => {
       academic.classX.board &&
       academic.classX.year &&
       academic.classX.aggregate &&
-      academic.classX.pcm &&
       academic.classX.isDiplomaOrPolytechnic !== undefined &&
       academic.classX.isDiplomaOrPolytechnic !== null;
 
@@ -401,27 +403,113 @@ const StudentRegistration = () => {
     }
   };
 
+  function getIncompleteFields(step) {
+    const missing = [];
+    if (step === 1) {
+      const { personal } = formData;
+      if (!personal.course) missing.push("course");
+      if (!personal.firstName) missing.push("firstName");
+      if (!personal.lastName) missing.push("lastName");
+      if (!personal.abcId) missing.push("abcId");
+      if (!personal.email) missing.push("email");
+      if (!personal.mobile) missing.push("mobile");
+      if (!personal.dob) missing.push("dob");
+      if (!personal.examRoll) missing.push("examRoll");
+      if (!personal.examRank) missing.push("examRank");
+      if (!personal.gender) missing.push("gender");
+      if (!personal.category) missing.push("category");
+      if (!personal.region) missing.push("region");
+      if (!personal.currentAddress) missing.push("currentAddress");
+      if (!personal.permanentAddress) missing.push("permanentAddress");
+      if (!personal.feeReimbursement) missing.push("feeReimbursement");
+      if (!personal.antiRaggingRef) missing.push("antiRaggingRef");
+    } else if (step === 2) {
+      const { academic } = formData;
+      // Class X
+      if (!academic.classX.institute) missing.push("classX.institute");
+      if (!academic.classX.board) missing.push("classX.board");
+      if (!academic.classX.year) missing.push("classX.year");
+      if (!academic.classX.aggregate) missing.push("classX.aggregate");
+      if (academic.classX.isDiplomaOrPolytechnic === undefined || academic.classX.isDiplomaOrPolytechnic === null || academic.classX.isDiplomaOrPolytechnic === "") missing.push("classX.isDiplomaOrPolytechnic");
+      // Class XII
+      if (!academic.classXII.institute) missing.push("classXII.institute");
+      if (!academic.classXII.board) missing.push("classXII.board");
+      if (!academic.classXII.year) missing.push("classXII.year");
+      if (!academic.classXII.aggregate) missing.push("classXII.aggregate");
+      if (!academic.classXII.pcm) missing.push("classXII.pcm");
+      // Other Qualification (optional, but if any field is filled, all must be filled)
+      const oq = academic.otherQualification;
+      const oqAny = oq.institute || oq.board || oq.year || oq.aggregate || oq.pcm;
+      if (oqAny) {
+        if (!oq.institute) missing.push("otherQualification.institute");
+        if (!oq.board) missing.push("otherQualification.board");
+        if (!oq.year) missing.push("otherQualification.year");
+        if (!oq.aggregate) missing.push("otherQualification.aggregate");
+        if (!oq.pcm) missing.push("otherQualification.pcm");
+      }
+    } else if (step === 3) {
+      const { parents } = formData;
+      // Father
+      if (!parents.father.name) missing.push("father.name");
+      if (!parents.father.qualification) missing.push("father.qualification");
+      if (!parents.father.occupation) missing.push("father.occupation");
+      if (!parents.father.email) missing.push("father.email");
+      if (!parents.father.mobile) missing.push("father.mobile");
+      // Mother
+      if (!parents.mother.name) missing.push("mother.name");
+      if (!parents.mother.qualification) missing.push("mother.qualification");
+      if (!parents.mother.occupation) missing.push("mother.occupation");
+      if (!parents.mother.mobile) missing.push("mother.mobile");
+      // Family Income
+      if (!parents.familyIncome) missing.push("familyIncome");
+    } else if (step === 4) {
+      const { documents } = formData;
+      const requiredDocs = [
+        "photo",
+        "ipuRegistration",
+        "allotmentLetter",
+        "examAdmitCard",
+        "examScoreCard",
+        "marksheet10",
+        "passing10",
+        "marksheet12",
+        "passing12",
+        "aadhar",
+        "characterCertificate",
+        "medicalCertificate",
+        "migrationCertificate",
+        "academicFeeReceipt",
+        "collegeFeeReceipt",
+        "parentSignature",
+      ];
+      requiredDocs.forEach((doc) => {
+        if (!documents[doc]) missing.push(doc);
+      });
+    }
+    return missing;
+  }
+
   const steps = [
     { label: "Instructions", component: <Instructions nextStep={nextStep} /> },
     {
       label: "Personal Info",
-      component: <PersonalInfo formData={formData} setFormData={setFormData} />,
+      component: <PersonalInfo formData={formData} setFormData={setFormData} incompleteFields={incompleteFields} />,
     },
     {
       label: "Academic Info",
-      component: <AcademicInfo formData={formData} setFormData={setFormData} />,
+      component: <AcademicInfo formData={formData} setFormData={setFormData} incompleteFields={incompleteFields} />,
     },
     {
       label: "Parents Info",
-      component: <ParentsInfo formData={formData} setFormData={setFormData} />,
+      component: <ParentsInfo formData={formData} setFormData={setFormData} incompleteFields={incompleteFields} />,
     },
     {
       label: "Documents",
       component: (
-        <DocumentsUpload formData={formData} setFormData={setFormData} />
+        <DocumentsUpload formData={formData} setFormData={setFormData} incompleteFields={incompleteFields} />
       ),
     },
-    { label: "Review", component: <ReviewSubmit formData={formData} /> },
+    { label: "Review", component: <ReviewSubmit formData={formData} incompleteFields={incompleteFields} /> },
   ];
 
   return (
