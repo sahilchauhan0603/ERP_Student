@@ -953,6 +953,20 @@ export default function AdminStudentDetailsModal({
               </span>
             </h2>
             <p className="text-gray-600 mt-1">{student?.email}</p>
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              {student?.course && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                  <FiBook className="mr-1" />
+                  {student.course}
+                </span>
+              )}
+              {student?.batch && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
+                  <FiCalendar className="mr-1" />
+                  Batch: {student.batch}
+                </span>
+              )}
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -1008,24 +1022,26 @@ export default function AdminStudentDetailsModal({
 
         {/* Tabs */}
         <div className="border-b border-gray-200 px-6">
-          <div className="flex space-x-4">
-            {sectionDefs.map((section, index) => (
-              <button
-                key={section.key}
-                onClick={() => tableType !== "pending" && setActiveTab(index)}
-                className={`py-4 px-1 font-medium text-sm border-b-2 transition-colors flex items-center ${
-                  activeTab === index
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                {section.icon}
-                {section.label}
-                {tableType === "pending" && sectionCompleted[index] && (
-                  <FiCheckCircle className="ml-2 text-green-500" size={16} />
-                )}
-              </button>
-            ))}
+          <div className="overflow-x-auto -mx-4 px-4">
+            <div className="flex space-x-4 whitespace-nowrap">
+              {sectionDefs.map((section, index) => (
+                <button
+                  key={section.key}
+                  onClick={() => tableType !== "pending" && setActiveTab(index)}
+                  className={`py-4 px-1 font-medium text-sm border-b-2 transition-colors flex items-center ${
+                    activeTab === index
+                      ? "border-blue-500 text-blue-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
+                >
+                  {section.icon}
+                  {section.label}
+                  {tableType === "pending" && sectionCompleted[index] && (
+                    <FiCheckCircle className="ml-2 text-green-500" size={16} />
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
