@@ -377,16 +377,18 @@ const StudentDetailsDashboard = () => {
     if (isEditable && !isDocument) {
       return (
         <tr className="border-b last:border-b-0">
-          <td className="py-2 px-6 text-red-600 font-semibold w-1/3 text-left align-top">{label}:</td>
+          <td className="py-2 px-6 text-red-600 font-semibold w-1/3 text-left align-top">
+            {label}:
+          </td>
           <td className="py-2 px-6">
             <input
               type="text"
               value={localValue}
-              onChange={e => setLocalValue(e.target.value)}
-              onBlur={e => {
+              onChange={(e) => setLocalValue(e.target.value)}
+              onBlur={(e) => {
                 const newValue = e.target.value;
                 if (subSection) {
-                  setFormData(prev => ({
+                  setFormData((prev) => ({
                     ...prev,
                     [section]: {
                       ...prev[section],
@@ -397,7 +399,7 @@ const StudentDetailsDashboard = () => {
                     },
                   }));
                 } else {
-                  setFormData(prev => ({
+                  setFormData((prev) => ({
                     ...prev,
                     [section]: {
                       ...prev[section],
@@ -406,10 +408,12 @@ const StudentDetailsDashboard = () => {
                   }));
                 }
                 // Track updated fields
-                const fieldPath = subSection ? `${section}.${subSection}.${field}` : `${section}.${field}`;
+                const fieldPath = subSection
+                  ? `${section}.${subSection}.${field}`
+                  : `${section}.${field}`;
                 if (declinedFields.includes(fieldPath)) {
                   if (!updatedFields.includes(fieldPath)) {
-                    setUpdatedFields(prev => [...prev, fieldPath]);
+                    setUpdatedFields((prev) => [...prev, fieldPath]);
                   }
                 }
               }}
@@ -584,7 +588,8 @@ const StudentDetailsDashboard = () => {
   const twelfth = parseFloat(details.academic?.classXII?.aggregate);
   const hasTenth = !isNaN(tenth);
   const hasTwelfth = !isNaN(twelfth);
-  const academicAvg = hasTenth && hasTwelfth ? ((tenth + twelfth) / 2).toFixed(2) : null;
+  const academicAvg =
+    hasTenth && hasTwelfth ? ((tenth + twelfth) / 2).toFixed(2) : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50">
@@ -822,12 +827,15 @@ const StudentDetailsDashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Academic Status - 10th + 12th</p>
+                <p className="text-sm text-gray-500">
+                  Academic Status - 10th + 12th
+                </p>
                 <p className="text-2xl font-bold text-gray-800">
-                  {hasTenth && hasTwelfth ? `${academicAvg}%` : 'N/A'}
+                  {hasTenth && hasTwelfth ? `${academicAvg}%` : "N/A"}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {hasTenth ? `10th: ${tenth}%` : '10th: N/A'} | {hasTwelfth ? `12th: ${twelfth}%` : '12th: N/A'}
+                  {hasTenth ? `10th: ${tenth}%` : "10th: N/A"} |{" "}
+                  {hasTwelfth ? `12th: ${twelfth}%` : "12th: N/A"}
                 </p>
               </div>
             </div>
@@ -887,7 +895,10 @@ const StudentDetailsDashboard = () => {
 
           <Tab.Panels className="mt-2">
             {/* Personal Information Tab */}
-            <Tab.Panel className="rounded-xl p-2 bg-white shadow" style={{ minHeight: 0, background: '#fff' }}>
+            <Tab.Panel
+              className="rounded-xl p-2 bg-white shadow"
+              style={{ minHeight: 0, background: "#fff" }}
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
                 <DetailCard title="Basic Information" section="personal">
                   <DetailItem
@@ -1300,16 +1311,26 @@ const StudentDetailsDashboard = () => {
                 {details.academic?.academicAchievements?.length > 0 && (
                   <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-6 overflow-hidden min-w-[380px] max-w-[440px] w-full">
                     <div className="px-6 py-4 bg-blue-50 border-b border-blue-200 flex items-center">
-                      <h3 className="text-lg font-semibold text-blue-800">Academic Achievements</h3>
+                      <h3 className="text-lg font-semibold text-blue-800">
+                        Academic Achievements
+                      </h3>
                     </div>
                     <div className="px-6 py-4">
                       <div className="space-y-2">
-                        {details.academic.academicAchievements.map((achievement, index) => (
-                          <div key={index} className="text-sm text-gray-600 p-2 bg-gray-50 rounded">
-                            <strong>{achievement.event}</strong> ({achievement.date})<br />
-                            <span className="text-xs text-gray-500">{achievement.outcome}</span>
-                          </div>
-                        ))}
+                        {details.academic.academicAchievements.map(
+                          (achievement, index) => (
+                            <div
+                              key={index}
+                              className="text-sm text-gray-600 p-2 bg-gray-50 rounded"
+                            >
+                              <strong>{achievement.event}</strong> (
+                              {achievement.date})<br />
+                              <span className="text-xs text-gray-500">
+                                {achievement.outcome}
+                              </span>
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1318,16 +1339,26 @@ const StudentDetailsDashboard = () => {
                 {details.academic?.coCurricularAchievements?.length > 0 && (
                   <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-6 overflow-hidden min-w-[380px] max-w-[440px] w-full">
                     <div className="px-6 py-4 bg-blue-50 border-b border-blue-200 flex items-center">
-                      <h3 className="text-lg font-semibold text-blue-800">Co-Curricular Achievements</h3>
+                      <h3 className="text-lg font-semibold text-blue-800">
+                        Co-Curricular Achievements
+                      </h3>
                     </div>
                     <div className="px-6 py-4">
                       <div className="space-y-2">
-                        {details.academic.coCurricularAchievements.map((achievement, index) => (
-                          <div key={index} className="text-sm text-gray-600 p-2 bg-gray-50 rounded">
-                            <strong>{achievement.event}</strong> ({achievement.date})<br />
-                            <span className="text-xs text-gray-500">{achievement.outcome}</span>
-                          </div>
-                        ))}
+                        {details.academic.coCurricularAchievements.map(
+                          (achievement, index) => (
+                            <div
+                              key={index}
+                              className="text-sm text-gray-600 p-2 bg-gray-50 rounded"
+                            >
+                              <strong>{achievement.event}</strong> (
+                              {achievement.date})<br />
+                              <span className="text-xs text-gray-500">
+                                {achievement.outcome}
+                              </span>
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
                   </div>

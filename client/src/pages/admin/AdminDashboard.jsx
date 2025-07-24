@@ -10,7 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 ChartJS.register(
   CategoryScale,
@@ -39,14 +39,16 @@ export default function AdminDashboard() {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/admin/stats`, { withCredentials: true });
+      const res = await axios.get(`${API_URL}/admin/stats`, {
+        withCredentials: true,
+      });
       setStats(res.data);
     } catch {
       setStats({ total: 0, pending: 0, approved: 0, declined: 0 });
       Swal.fire({
-        icon: 'error',
-        title: 'Failed to load stats',
-        text: 'Could not fetch dashboard statistics. Please try again later. Redirecting to login page...',
+        icon: "error",
+        title: "Failed to load stats",
+        text: "Could not fetch dashboard statistics. Please try again later. Redirecting to login page...",
       });
     }
     setLoading(false);

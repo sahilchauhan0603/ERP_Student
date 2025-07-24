@@ -346,8 +346,7 @@ const StudentRegistration = () => {
           payload[`academic.${section}`] = data;
         } else {
           for (const [field, value] of Object.entries(data)) {
-            if (value)
-              payload[`academic.${section}.${field}`] = value;
+            if (value) payload[`academic.${section}.${field}`] = value;
           }
         }
       }
@@ -374,9 +373,13 @@ const StudentRegistration = () => {
 
       // Achievements arrays as JSON strings (for backend compatibility)
       if (formData.academic.academicAchievements)
-        payload["academic.academicAchievements"] = JSON.stringify(formData.academic.academicAchievements);
+        payload["academic.academicAchievements"] = JSON.stringify(
+          formData.academic.academicAchievements
+        );
       if (formData.academic.coCurricularAchievements)
-        payload["academic.coCurricularAchievements"] = JSON.stringify(formData.academic.coCurricularAchievements);
+        payload["academic.coCurricularAchievements"] = JSON.stringify(
+          formData.academic.coCurricularAchievements
+        );
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/student/register`,
@@ -430,7 +433,12 @@ const StudentRegistration = () => {
       if (!academic.classX.board) missing.push("classX.board");
       if (!academic.classX.year) missing.push("classX.year");
       if (!academic.classX.aggregate) missing.push("classX.aggregate");
-      if (academic.classX.isDiplomaOrPolytechnic === undefined || academic.classX.isDiplomaOrPolytechnic === null || academic.classX.isDiplomaOrPolytechnic === "") missing.push("classX.isDiplomaOrPolytechnic");
+      if (
+        academic.classX.isDiplomaOrPolytechnic === undefined ||
+        academic.classX.isDiplomaOrPolytechnic === null ||
+        academic.classX.isDiplomaOrPolytechnic === ""
+      )
+        missing.push("classX.isDiplomaOrPolytechnic");
       // Class XII
       if (!academic.classXII.institute) missing.push("classXII.institute");
       if (!academic.classXII.board) missing.push("classXII.board");
@@ -439,7 +447,8 @@ const StudentRegistration = () => {
       if (!academic.classXII.pcm) missing.push("classXII.pcm");
       // Other Qualification (optional, but if any field is filled, all must be filled)
       const oq = academic.otherQualification;
-      const oqAny = oq.institute || oq.board || oq.year || oq.aggregate || oq.pcm;
+      const oqAny =
+        oq.institute || oq.board || oq.year || oq.aggregate || oq.pcm;
       if (oqAny) {
         if (!oq.institute) missing.push("otherQualification.institute");
         if (!oq.board) missing.push("otherQualification.board");
@@ -493,23 +502,50 @@ const StudentRegistration = () => {
     { label: "Instructions", component: <Instructions nextStep={nextStep} /> },
     {
       label: "Personal Info",
-      component: <PersonalInfo formData={formData} setFormData={setFormData} incompleteFields={incompleteFields} />,
+      component: (
+        <PersonalInfo
+          formData={formData}
+          setFormData={setFormData}
+          incompleteFields={incompleteFields}
+        />
+      ),
     },
     {
       label: "Academic Info",
-      component: <AcademicInfo formData={formData} setFormData={setFormData} incompleteFields={incompleteFields} />,
+      component: (
+        <AcademicInfo
+          formData={formData}
+          setFormData={setFormData}
+          incompleteFields={incompleteFields}
+        />
+      ),
     },
     {
       label: "Parents Info",
-      component: <ParentsInfo formData={formData} setFormData={setFormData} incompleteFields={incompleteFields} />,
+      component: (
+        <ParentsInfo
+          formData={formData}
+          setFormData={setFormData}
+          incompleteFields={incompleteFields}
+        />
+      ),
     },
     {
       label: "Documents",
       component: (
-        <DocumentsUpload formData={formData} setFormData={setFormData} incompleteFields={incompleteFields} />
+        <DocumentsUpload
+          formData={formData}
+          setFormData={setFormData}
+          incompleteFields={incompleteFields}
+        />
       ),
     },
-    { label: "Review", component: <ReviewSubmit formData={formData} incompleteFields={incompleteFields} /> },
+    {
+      label: "Review",
+      component: (
+        <ReviewSubmit formData={formData} incompleteFields={incompleteFields} />
+      ),
+    },
   ];
 
   return (
@@ -560,9 +596,7 @@ const StudentRegistration = () => {
                 onClick={handleSubmit}
                 disabled={isSubmitting}
                 className={`px-4 py-2 rounded-md ${
-                  isSubmitting
-                    ? "bg-gray-500"
-                    : "bg-gray-900 hover:bg-gray-800"
+                  isSubmitting ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-800"
                 } text-white flex items-center justify-center min-w-32`}
               >
                 {isSubmitting ? (

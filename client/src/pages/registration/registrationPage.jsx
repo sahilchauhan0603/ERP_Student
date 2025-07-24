@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { FaUserGraduate, FaChalkboardTeacher } from 'react-icons/fa';
-import { BsPersonBadge } from 'react-icons/bs';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import campusBackground from '../../assets/images/BPIT.png'; // Make sure this path is correct
+import React, { useState, useEffect } from "react";
+import { FaUserGraduate, FaChalkboardTeacher } from "react-icons/fa";
+import { BsPersonBadge } from "react-icons/bs";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import campusBackground from "../../assets/images/BPIT.png"; // Make sure this path is correct
 
 const RegistrationPage = () => {
   const [loaded, setLoaded] = useState(false);
@@ -20,14 +20,15 @@ const RegistrationPage = () => {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut"
-      }
+        ease: "easeOut",
+      },
     },
     hover: {
       y: -10,
       scale: 1.03,
-      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
-    }
+      boxShadow:
+        "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+    },
   };
 
   const containerVariants = {
@@ -36,20 +37,20 @@ const RegistrationPage = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.3
-      }
-    }
+        delayChildren: 0.3,
+      },
+    },
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen flex flex-col relative"
       style={{
         background: `
           linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
           url(${campusBackground}) center/cover fixed no-repeat
         `,
-        minHeight: '100vh'
+        minHeight: "100vh",
       }}
     >
       {/* Main Content */}
@@ -86,7 +87,7 @@ const RegistrationPage = () => {
             <Link
               to="/registration/student"
               className="relative flex flex-col items-center justify-center p-4 md:p-5 min-w-[220px] max-w-[260px] mx-auto rounded-xl shadow-lg h-full text-center text-gray-700 transition-all duration-300 hover:border-blue-500 border-2 border-black backdrop-blur-[10px]"
-              style={{boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)'}}
+              style={{ boxShadow: "0 4px 24px 0 rgba(0,0,0,0.10)" }}
             >
               <div className="p-2 rounded-full bg-blue-50 bg-opacity-60 mb-2">
                 <FaUserGraduate className="text-3xl text-blue-600" />
@@ -97,7 +98,7 @@ const RegistrationPage = () => {
               <p className="mt-1 text-gray-900 font-bold text-sm">
                 Join as a student to access all campus resources
               </p>
-              <motion.span 
+              <motion.span
                 className="mt-2 text-blue-800 font-semibold inline-flex items-center text-sm"
                 whileHover={{ x: 5 }}
               >
@@ -116,7 +117,7 @@ const RegistrationPage = () => {
             <Link
               to="/registration/faculty"
               className="relative flex flex-col items-center justify-center p-4 md:p-5 min-w-[220px] max-w-[260px] mx-auto rounded-xl shadow-lg h-full text-center text-gray-700 transition-all duration-300 hover:border-green-500 border-2 border-black backdrop-blur-[10px]"
-              style={{boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)'}}
+              style={{ boxShadow: "0 4px 24px 0 rgba(0,0,0,0.10)" }}
             >
               <div className="p-2 rounded-full bg-green-50 bg-opacity-60 mb-2">
                 <FaChalkboardTeacher className="text-3xl text-green-600" />
@@ -127,7 +128,7 @@ const RegistrationPage = () => {
               <p className="mt-1 text-gray-900 font-bold text-sm">
                 Join as faculty to manage courses and students
               </p>
-              <motion.span 
+              <motion.span
                 className="mt-2 text-green-800 font-semibold inline-flex items-center text-sm"
                 whileHover={{ x: 5 }}
               >
@@ -146,7 +147,7 @@ const RegistrationPage = () => {
             <Link
               to="/registration/non-teaching-staff"
               className="relative flex flex-col items-center justify-center p-4 md:p-5 min-w-[220px] max-w-[260px] mx-auto rounded-xl shadow-lg h-full text-center text-gray-700 transition-all duration-300 hover:border-purple-500 border-2 border-black backdrop-blur-[10px]"
-              style={{boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)'}}
+              style={{ boxShadow: "0 4px 24px 0 rgba(0,0,0,0.10)" }}
             >
               <div className="p-2 rounded-full bg-purple-50 bg-opacity-60 mb-2">
                 <BsPersonBadge className="text-3xl text-purple-600" />
@@ -157,7 +158,7 @@ const RegistrationPage = () => {
               <p className="mt-1 text-gray-900 font-bold text-sm">
                 Join as non-teaching staff to access admin features
               </p>
-              <motion.span 
+              <motion.span
                 className="mt-2 text-purple-800 font-semibold inline-flex items-center text-sm"
                 whileHover={{ x: 5 }}
               >

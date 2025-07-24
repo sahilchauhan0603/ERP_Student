@@ -11,7 +11,7 @@ import {
   FiCheck,
   FiX,
 } from "react-icons/fi";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -67,9 +67,9 @@ export default function AdminAllStudents() {
     } catch {
       setStudents([]);
       Swal.fire({
-        icon: 'error',
-        title: 'Failed to load students',
-        text: 'Could not fetch student list. Please try again later. Redirecting to login page...',
+        icon: "error",
+        title: "Failed to load students",
+        text: "Could not fetch student list. Please try again later. Redirecting to login page...",
       });
     }
     setLoading(false);
@@ -94,9 +94,9 @@ export default function AdminAllStudents() {
     } catch {
       setStudents([]);
       Swal.fire({
-        icon: 'error',
-        title: 'Search failed',
-        text: 'Could not search students. Please try again later.',
+        icon: "error",
+        title: "Search failed",
+        text: "Could not search students. Please try again later.",
       });
     }
     setLoading(false);

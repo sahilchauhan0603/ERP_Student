@@ -1,12 +1,16 @@
-export default function DocumentsUpload({ formData, setFormData, incompleteFields = [] }) {
+export default function DocumentsUpload({
+  formData,
+  setFormData,
+  incompleteFields = [],
+}) {
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       documents: {
         ...prev.documents,
-        [name]: files[0]
-      }
+        [name]: files[0],
+      },
     }));
   };
 
@@ -21,14 +25,30 @@ export default function DocumentsUpload({ formData, setFormData, incompleteField
     { name: "marksheet12", label: "XIIth Marksheet", icon: "📈" },
     { name: "passing12", label: "XIIth Passing Certificate", icon: "🎓" },
     { name: "aadhar", label: "Aadhar Card", icon: "🆔" },
-    { name: "characterCertificate", label: "Character Certificate", icon: "🧾" },
+    {
+      name: "characterCertificate",
+      label: "Character Certificate",
+      icon: "🧾",
+    },
     { name: "medicalCertificate", label: "Medical Certificate", icon: "🏥" },
-    { name: "migrationCertificate", label: "Migration Certificate", icon: "✈️" },
-    { name: "categoryCertificate", label: "Category Certificate (if applicable)", icon: "🏷️" },
-    { name: "specialCategoryCertificate", label: "Special Category Certificate (if applicable)", icon: "🏷️" },
+    {
+      name: "migrationCertificate",
+      label: "Migration Certificate",
+      icon: "✈️",
+    },
+    {
+      name: "categoryCertificate",
+      label: "Category Certificate (if applicable)",
+      icon: "🏷️",
+    },
+    {
+      name: "specialCategoryCertificate",
+      label: "Special Category Certificate (if applicable)",
+      icon: "🏷️",
+    },
     { name: "academicFeeReceipt", label: "Academic Fee Receipt", icon: "💰" },
     { name: "collegeFeeReceipt", label: "College Fee Receipt", icon: "💵" },
-    { name: "parentSignature", label: "Parent's Signature", icon: "✍️" }
+    { name: "parentSignature", label: "Parent's Signature", icon: "✍️" },
   ];
 
   const requiredDocs = [
@@ -87,7 +107,9 @@ export default function DocumentsUpload({ formData, setFormData, incompleteField
               </p>
               <ul className="list-disc pl-5 text-sm text-gray-600 mt-1 space-y-1">
                 <li>Maximum file size: 2MB per document</li>
-                <li>Name files clearly (e.g., "10th_Marksheet_YourName.pdf")</li>
+                <li>
+                  Name files clearly (e.g., "10th_Marksheet_YourName.pdf")
+                </li>
                 <li>Ensure documents are clear and legible</li>
               </ul>
             </div>
@@ -110,12 +132,18 @@ export default function DocumentsUpload({ formData, setFormData, incompleteField
                   name={name}
                   onChange={handleFileChange}
                   accept=".pdf,.jpg,.jpeg,.png"
-                  className={`absolute inset-0 w-full h-full opacity-0 cursor-pointer ${incompleteFields.includes(name) ? 'border-red-500' : ''}`}
+                  className={`absolute inset-0 w-full h-full opacity-0 cursor-pointer ${
+                    incompleteFields.includes(name) ? "border-red-500" : ""
+                  }`}
                   id={`file-upload-${name}`}
                 />
                 <label
                   htmlFor={`file-upload-${name}`}
-                  className={`block w-full px-4 py-3 border-2 border-dashed rounded-xl transition-colors duration-300 cursor-pointer bg-white text-gray-900 font-semibold ${incompleteFields.includes(name) ? 'border-red-500 hover:border-red-500' : 'border-gray-400 hover:border-gray-500'}`}
+                  className={`block w-full px-4 py-3 border-2 border-dashed rounded-xl transition-colors duration-300 cursor-pointer bg-white text-gray-900 font-semibold ${
+                    incompleteFields.includes(name)
+                      ? "border-red-500 hover:border-red-500"
+                      : "border-gray-400 hover:border-gray-500"
+                  }`}
                 >
                   <div className="flex flex-col items-center justify-center text-center">
                     <svg
@@ -133,16 +161,22 @@ export default function DocumentsUpload({ formData, setFormData, incompleteField
                     </svg>
                     <span className="text-sm text-gray-600 font-medium">
                       {formData.documents[name] ? (
-                        <span className="text-green-600">{formData.documents[name].name}</span>
+                        <span className="text-green-600">
+                          {formData.documents[name].name}
+                        </span>
                       ) : (
                         "Click to upload"
                       )}
                     </span>
-                    <span className="text-xs text-gray-500 mt-1">PDF, JPG, or PNG</span>
+                    <span className="text-xs text-gray-500 mt-1">
+                      PDF, JPG, or PNG
+                    </span>
                   </div>
                 </label>
                 {incompleteFields.includes(name) && (
-                  <div className="text-xs text-red-500 mt-1">This document is required</div>
+                  <div className="text-xs text-red-500 mt-1">
+                    This document is required
+                  </div>
                 )}
               </div>
             </div>

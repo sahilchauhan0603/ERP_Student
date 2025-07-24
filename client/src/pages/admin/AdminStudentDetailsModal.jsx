@@ -18,7 +18,7 @@ import {
   FiUsers,
   FiCalendar,
 } from "react-icons/fi";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 const sectionDefs = [
   { label: "Personal", key: "personal", icon: <FiUser className="mr-2" /> },
@@ -244,25 +244,29 @@ export default function AdminStudentDetailsModal({
   const handleApprove = async () => {
     setActionLoading(true);
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/admin/verify-student`, {
-        studentId: student.id,
-        verifications,
-        status: "approved",
-      }, { withCredentials: true });
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/admin/verify-student`,
+        {
+          studentId: student.id,
+          verifications,
+          status: "approved",
+        },
+        { withCredentials: true }
+      );
       refresh?.();
       onClose();
       Swal.fire({
-        icon: 'success',
-        title: 'Profile Reviewed',
+        icon: "success",
+        title: "Profile Reviewed",
         text: `You have successfully reviewed the profile and ${student.firstName} ${student.lastName} has been approved.`,
         timer: 2500,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
     } catch (e) {
       Swal.fire({
-        icon: 'error',
-        title: 'Failed to approve',
-        text: e.message || 'Failed to approve student.',
+        icon: "error",
+        title: "Failed to approve",
+        text: e.message || "Failed to approve student.",
       });
     }
     setActionLoading(false);
@@ -271,26 +275,30 @@ export default function AdminStudentDetailsModal({
   const handleDecline = async () => {
     setActionLoading(true);
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/admin/verify-student`, {
-        studentId: student.id,
-        verifications,
-        status: "declined",
-        declineReason: "Details not correct",
-      }, { withCredentials: true });
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/admin/verify-student`,
+        {
+          studentId: student.id,
+          verifications,
+          status: "declined",
+          declineReason: "Details not correct",
+        },
+        { withCredentials: true }
+      );
       refresh?.();
       onClose();
       Swal.fire({
-        icon: 'info',
-        title: 'Profile Reviewed',
+        icon: "info",
+        title: "Profile Reviewed",
         text: `You have successfully reviewed the profile and ${student.firstName} ${student.lastName} has been declined.`,
         timer: 2500,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
     } catch (e) {
       Swal.fire({
-        icon: 'error',
-        title: 'Failed to decline',
-        text: e.message || 'Failed to decline student.',
+        icon: "error",
+        title: "Failed to decline",
+        text: e.message || "Failed to decline student.",
       });
     }
     setActionLoading(false);
@@ -313,19 +321,23 @@ export default function AdminStudentDetailsModal({
     const declinedFields = getDeclinedFields();
     const status = declinedFields.length > 0 ? "declined" : "approved";
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/admin/verify-student`, {
-        studentId: student.id,
-        verifications,
-        status,
-        declinedFields,
-      }, { withCredentials: true });
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/admin/verify-student`,
+        {
+          studentId: student.id,
+          verifications,
+          status,
+          declinedFields,
+        },
+        { withCredentials: true }
+      );
       refresh?.();
       onClose();
     } catch (e) {
       Swal.fire({
-        icon: 'error',
-        title: 'Failed to update',
-        text: e.message || 'Failed to update student.',
+        icon: "error",
+        title: "Failed to update",
+        text: e.message || "Failed to update student.",
       });
     }
     setActionLoading(false);
@@ -459,10 +471,14 @@ export default function AdminStudentDetailsModal({
   };
 
   function formatDate(dateStr) {
-    if (!dateStr) return '';
+    if (!dateStr) return "";
     const date = new Date(dateStr);
     if (isNaN(date)) return dateStr;
-    return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    return date.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   }
 
   const renderPersonal = () => (

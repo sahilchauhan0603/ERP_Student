@@ -3,9 +3,9 @@ import React, { useState } from "react";
 const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const path = name.split('.');
-    
-    setFormData(prev => {
+    const path = name.split(".");
+
+    setFormData((prev) => {
       // Handle nested objects (parents.father.name, etc.)
       if (path.length === 3) {
         return {
@@ -14,9 +14,9 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
             ...prev[path[0]],
             [path[1]]: {
               ...prev[path[0]][path[1]],
-              [path[2]]: value
-            }
-          }
+              [path[2]]: value,
+            },
+          },
         };
       }
       // Handle top-level fields (parents.familyIncome)
@@ -25,8 +25,8 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
           ...prev,
           [path[0]]: {
             ...prev[path[0]],
-            [path[1]]: value
-          }
+            [path[1]]: value,
+          },
         };
       }
       return prev;
@@ -42,10 +42,22 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
     // Add more as needed
   ];
 
-  const [fatherMobileCountry, setFatherMobileCountry] = useState(formData.parents.father.mobileCountry || "+91");
-  const [fatherEmailUser, setFatherEmailUser] = useState(formData.parents.father.email ? formData.parents.father.email.replace(/@gmail\.com$/, "") : "");
-  const [motherMobileCountry, setMotherMobileCountry] = useState(formData.parents.mother.mobileCountry || "+91");
-  const [motherEmailUser, setMotherEmailUser] = useState(formData.parents.mother.email ? formData.parents.mother.email.replace(/@gmail\.com$/, "") : "");
+  const [fatherMobileCountry, setFatherMobileCountry] = useState(
+    formData.parents.father.mobileCountry || "+91"
+  );
+  const [fatherEmailUser, setFatherEmailUser] = useState(
+    formData.parents.father.email
+      ? formData.parents.father.email.replace(/@gmail\.com$/, "")
+      : ""
+  );
+  const [motherMobileCountry, setMotherMobileCountry] = useState(
+    formData.parents.mother.mobileCountry || "+91"
+  );
+  const [motherEmailUser, setMotherEmailUser] = useState(
+    formData.parents.mother.email
+      ? formData.parents.mother.email.replace(/@gmail\.com$/, "")
+      : ""
+  );
 
   const handleFatherMobileChange = (e) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
@@ -135,9 +147,7 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
       <div className="text-center mb-10">
         <div className="flex justify-center items-center gap-4 mb-2">
           <span className="inline-block w-2 h-10 bg-gray-800 rounded-full"></span>
-          <h2 className="text-3xl font-extrabold text-black">
-            Parent Details
-          </h2>
+          <h2 className="text-3xl font-extrabold text-black">Parent Details</h2>
           <span className="inline-block w-2 h-10 bg-gray-800 rounded-full"></span>
         </div>
         <p className="text-gray-700 text-lg font-medium tracking-wide">
@@ -179,10 +189,16 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 value={formData.parents.father.name || ""}
                 onChange={handleChange}
                 required
-                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${incompleteFields.includes('father.name') ? 'border-red-500' : 'border-gray-400'}`}
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  incompleteFields.includes("father.name")
+                    ? "border-red-500"
+                    : "border-gray-400"
+                }`}
               />
-              {incompleteFields.includes('father.name') && (
-                <div className="text-xs text-red-500 mt-1">Father's name is required</div>
+              {incompleteFields.includes("father.name") && (
+                <div className="text-xs text-red-500 mt-1">
+                  Father's name is required
+                </div>
               )}
             </div>
             <div className="space-y-1">
@@ -224,7 +240,9 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                   required
                   className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
                 />
-                <span className="text-gray-700 font-semibold select-none">@gmail.com</span>
+                <span className="text-gray-700 font-semibold select-none">
+                  @gmail.com
+                </span>
               </div>
             </div>
             {/* Father Mobile and Email */}
@@ -240,7 +258,9 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                   style={{ minWidth: 140 }}
                 >
                   {countryCodes.map((c) => (
-                    <option key={c.code} value={c.code}>{c.label}</option>
+                    <option key={c.code} value={c.code}>
+                      {c.label}
+                    </option>
                   ))}
                 </select>
                 <input
@@ -274,7 +294,7 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 </label>
                 <input
                   name="parents.father.telephone"
-                  placeholder="Telephone No."            
+                  placeholder="Telephone No."
                   value={formData.parents.father.telephone || ""}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
@@ -370,7 +390,9 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                   onChange={handleMotherEmailUserChange}
                   className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
                 />
-                <span className="text-gray-700 font-semibold select-none">@gmail.com</span>
+                <span className="text-gray-700 font-semibold select-none">
+                  @gmail.com
+                </span>
               </div>
             </div>
             {/* Mother Mobile and Email */}
@@ -386,7 +408,9 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                   style={{ minWidth: 140 }}
                 >
                   {countryCodes.map((c) => (
-                    <option key={c.code} value={c.code}>{c.label}</option>
+                    <option key={c.code} value={c.code}>
+                      {c.label}
+                    </option>
                   ))}
                 </select>
                 <input
@@ -420,7 +444,7 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 </label>
                 <input
                   name="parents.mother.telephone"
-                  placeholder="Telephone No."            
+                  placeholder="Telephone No."
                   value={formData.parents.mother.telephone || ""}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
@@ -465,7 +489,7 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {['<5', '5-7', '7-10', '>10'].map((range, idx) => (
+            {["<5", "5-7", "7-10", ">10"].map((range, idx) => (
               <label
                 key={idx}
                 className="inline-flex items-center cursor-pointer"
@@ -483,16 +507,18 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                   <div className="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-gray-500 flex items-center justify-center transition-all duration-300">
                     <div
                       className={`w-3 h-3 rounded-full bg-gray-500 scale-0 peer-checked:scale-100 transition-all duration-300 ${
-                        formData.parents.familyIncome === range ? 'scale-100' : ''
+                        formData.parents.familyIncome === range
+                          ? "scale-100"
+                          : ""
                       }`}
                     ></div>
                   </div>
                 </div>
                 <span className="ml-3 text-gray-800/90">
-                  {range === '<5' && 'Less than 5 lacs'}
-                  {range === '5-7' && '5 lacs to 7 lacs'}
-                  {range === '7-10' && '7 lacs to 10 lacs'}
-                  {range === '>10' && 'More than 10 lacs'}
+                  {range === "<5" && "Less than 5 lacs"}
+                  {range === "5-7" && "5 lacs to 7 lacs"}
+                  {range === "7-10" && "7 lacs to 10 lacs"}
+                  {range === ">10" && "More than 10 lacs"}
                 </span>
               </label>
             ))}

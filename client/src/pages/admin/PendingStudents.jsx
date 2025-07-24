@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { FiUser, FiClock, FiEye, FiRefreshCw, FiSearch } from 'react-icons/fi';
-import AdminStudentDetailsModal from './AdminStudentDetailsModal';
-import Swal from 'sweetalert2';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { FiUser, FiClock, FiEye, FiRefreshCw, FiSearch } from "react-icons/fi";
+import AdminStudentDetailsModal from "./AdminStudentDetailsModal";
+import Swal from "sweetalert2";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -26,9 +26,9 @@ export default function PendingStudents() {
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCourse, setSelectedCourse] = useState('');
-  const [selectedGender, setSelectedGender] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedGender, setSelectedGender] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -39,16 +39,19 @@ export default function PendingStudents() {
   const fetchPendingStudents = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/admin/list/pending?page=${currentPage}&limit=10`, { withCredentials: true });
+      const res = await axios.get(
+        `${API_URL}/admin/list/pending?page=${currentPage}&limit=10`,
+        { withCredentials: true }
+      );
       setStudents(res.data.students || []);
       setTotalPages(res.data.totalPages || 1);
     } catch {
       setStudents([]);
       setTotalPages(1);
       Swal.fire({
-        icon: 'error',
-        title: 'Failed to load students',
-        text: 'Could not fetch pending students. Please try again later. Redirecting to login page...',
+        icon: "error",
+        title: "Failed to load students",
+        text: "Could not fetch pending students. Please try again later. Redirecting to login page...",
       });
     }
     setLoading(false);
@@ -65,9 +68,14 @@ export default function PendingStudents() {
       student.firstName.toLowerCase().includes(searchLower) ||
       student.lastName.toLowerCase().includes(searchLower) ||
       student.email.toLowerCase().includes(searchLower) ||
-      (student.studentId && student.studentId.toLowerCase().includes(searchLower));
-    const matchesCourse = selectedCourse ? student.course === selectedCourse : true;
-    const matchesGender = selectedGender ? student.gender === selectedGender : true;
+      (student.studentId &&
+        student.studentId.toLowerCase().includes(searchLower));
+    const matchesCourse = selectedCourse
+      ? student.course === selectedCourse
+      : true;
+    const matchesGender = selectedGender
+      ? student.gender === selectedGender
+      : true;
 
     return matchesSearch && matchesCourse && matchesGender;
   });
@@ -85,7 +93,8 @@ export default function PendingStudents() {
                 Pending Applications
               </h1>
               <p className="text-gray-600 mt-1">
-                {students.length} student{students.length !== 1 ? 's' : ''} awaiting review
+                {students.length} student{students.length !== 1 ? "s" : ""}{" "}
+                awaiting review
               </p>
             </div>
 
@@ -135,7 +144,7 @@ export default function PendingStudents() {
                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg shadow-sm transition-all duration-150"
                 title="Refresh"
               >
-                <FiRefreshCw className={`${loading ? 'animate-spin' : ''}`} />
+                <FiRefreshCw className={`${loading ? "animate-spin" : ""}`} />
               </button>
             </div>
           </div>
@@ -153,20 +162,20 @@ export default function PendingStudents() {
             </div>
             <h3 className="text-lg font-semibold text-gray-800">
               {searchTerm || selectedCourse || selectedGender
-                ? 'No matching students found'
-                : 'No pending applications'}
+                ? "No matching students found"
+                : "No pending applications"}
             </h3>
             <p className="mt-2 text-gray-500">
               {searchTerm || selectedCourse || selectedGender
-                ? 'Try different filters or keywords'
-                : 'All applications have been processed.'}
+                ? "Try different filters or keywords"
+                : "All applications have been processed."}
             </p>
             {(searchTerm || selectedCourse || selectedGender) && (
               <button
                 onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCourse('');
-                  setSelectedGender('');
+                  setSearchTerm("");
+                  setSelectedCourse("");
+                  setSelectedGender("");
                 }}
                 className="mt-4 text-sm text-yellow-600 hover:text-yellow-800"
               >
@@ -203,7 +212,7 @@ export default function PendingStudents() {
                       </div>
                       <div className="ml-4">
                         <div className="font-medium text-gray-900">
-                          {student.firstName} {student.middleName}{' '}
+                          {student.firstName} {student.middleName}{" "}
                           {student.lastName}
                         </div>
                         <div className="text-gray-500 text-xs">
@@ -240,7 +249,7 @@ export default function PendingStudents() {
         {totalPages > 1 && (
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
             <div className="text-sm text-gray-500">
-              Page <span className="font-medium">{currentPage}</span> of{' '}
+              Page <span className="font-medium">{currentPage}</span> of{" "}
               <span className="font-medium">{totalPages}</span>
             </div>
             <div className="flex space-x-2">
@@ -252,7 +261,9 @@ export default function PendingStudents() {
                 Previous
               </button>
               <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
                 disabled={currentPage === totalPages}
                 className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >

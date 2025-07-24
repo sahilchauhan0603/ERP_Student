@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FiUser, FiXCircle, FiEye, FiRefreshCw, FiSearch } from "react-icons/fi";
+import {
+  FiUser,
+  FiXCircle,
+  FiEye,
+  FiRefreshCw,
+  FiSearch,
+} from "react-icons/fi";
 import AdminStudentDetailsModal from "./AdminStudentDetailsModal";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -39,16 +45,19 @@ export default function DeclinedStudents() {
   const fetchDeclinedStudents = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/admin/list/declined?page=${currentPage}&limit=10`, { withCredentials: true });
+      const res = await axios.get(
+        `${API_URL}/admin/list/declined?page=${currentPage}&limit=10`,
+        { withCredentials: true }
+      );
       setStudents(res.data.students || []);
       setTotalPages(res.data.totalPages || 1);
     } catch {
       setStudents([]);
       setTotalPages(1);
       Swal.fire({
-        icon: 'error',
-        title: 'Failed to load students',
-        text: 'Could not fetch declined students. Please try again later. Redirecting to login page...',
+        icon: "error",
+        title: "Failed to load students",
+        text: "Could not fetch declined students. Please try again later. Redirecting to login page...",
       });
     }
     setLoading(false);
@@ -246,7 +255,7 @@ export default function DeclinedStudents() {
         {totalPages > 1 && (
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
             <div className="text-sm text-gray-500">
-              Page <span className="font-medium">{currentPage}</span> of{' '}
+              Page <span className="font-medium">{currentPage}</span> of{" "}
               <span className="font-medium">{totalPages}</span>
             </div>
             <div className="flex space-x-2">
@@ -258,7 +267,9 @@ export default function DeclinedStudents() {
                 Previous
               </button>
               <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
                 disabled={currentPage === totalPages}
                 className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
