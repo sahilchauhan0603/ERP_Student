@@ -1,3 +1,5 @@
+const transporter = require('../config/mailer');
+
 async function sendStatusEmail(to, subject, html) {
   const mailOptions = {
     from: `"BPIT Admissions" <${process.env.EMAIL_USER}>`,
