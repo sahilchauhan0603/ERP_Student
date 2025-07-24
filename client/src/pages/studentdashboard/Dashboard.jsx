@@ -321,6 +321,16 @@ const StudentDetailsDashboard = () => {
     const isDateField = /date|dob/i.test(field);
     const displayValue = isDateField ? formatDate(value) : value;
 
+    // Fix: Use formData for value in edit mode to prevent cursor jump
+    let inputValue = value;
+    if (isEditable && !isDocument) {
+      if (subSection) {
+        inputValue = formData[section]?.[subSection]?.[field] ?? "";
+      } else {
+        inputValue = formData[section]?.[field] ?? "";
+      }
+    }
+
     if (isEditable && isDocument) {
       return (
         <tr className="border-b last:border-b-0">
@@ -360,6 +370,50 @@ const StudentDetailsDashboard = () => {
                 Preview
               </a>
             )}
+          </td>
+        </tr>
+      );
+    }
+
+    if (isEditable && !isDocument) {
+      return (
+        <tr className="border-b last:border-b-0">
+          <td className="py-2 px-6 text-red-600 font-semibold w-1/3 text-left align-top">{label}:</td>
+          <td className="py-2 px-6">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={e => {
+                if (subSection) {
+                  setFormData(prev => ({
+                    ...prev,
+                    [section]: {
+                      ...prev[section],
+                      [subSection]: {
+                        ...prev[section]?.[subSection],
+                        [field]: e.target.value,
+                      },
+                    },
+                  }));
+                } else {
+                  setFormData(prev => ({
+                    ...prev,
+                    [section]: {
+                      ...prev[section],
+                      [field]: e.target.value,
+                    },
+                  }));
+                }
+                // Track updated fields
+                const fieldPath = subSection ? `${section}.${subSection}.${field}` : `${section}.${field}`;
+                if (declinedFields.includes(fieldPath)) {
+                  if (!updatedFields.includes(fieldPath)) {
+                    setUpdatedFields(prev => [...prev, fieldPath]);
+                  }
+                }
+              }}
+              className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
+            />
           </td>
         </tr>
       );
@@ -523,6 +577,13 @@ const StudentDetailsDashboard = () => {
       </div>
     );
   }
+
+  // Calculate average of 10th and 12th aggregate
+  const tenth = parseFloat(details.academic?.classX?.aggregate);
+  const twelfth = parseFloat(details.academic?.classXII?.aggregate);
+  const hasTenth = !isNaN(tenth);
+  const hasTwelfth = !isNaN(twelfth);
+  const academicAvg = hasTenth && hasTwelfth ? ((tenth + twelfth) / 2).toFixed(2) : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50">
@@ -760,9 +821,12 @@ const StudentDetailsDashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Academic Status</p>
+                <p className="text-sm text-gray-500">Academic Status - 10th + 12th</p>
                 <p className="text-2xl font-bold text-gray-800">
-                  {details.academic?.classXII?.aggregate || "N/A"}%
+                  {hasTenth && hasTwelfth ? `${academicAvg}%` : 'N/A'}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {hasTenth ? `10th: ${tenth}%` : '10th: N/A'} | {hasTwelfth ? `12th: ${twelfth}%` : '12th: N/A'}
                 </p>
               </div>
             </div>
