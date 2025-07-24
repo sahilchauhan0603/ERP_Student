@@ -321,15 +321,11 @@ const StudentDetailsDashboard = () => {
     const isDateField = /date|dob/i.test(field);
     const displayValue = isDateField ? formatDate(value) : value;
 
-    // Fix: Use formData for value in edit mode to prevent cursor jump
-    let inputValue = value;
-    if (isEditable && !isDocument) {
-      if (subSection) {
-        inputValue = formData[section]?.[subSection]?.[field] ?? "";
-      } else {
-        inputValue = formData[section]?.[field] ?? "";
-      }
-    }
+    // Use local state for editing to prevent cursor jump
+    const [localValue, setLocalValue] = React.useState(value ?? "");
+    React.useEffect(() => {
+      if (!isEditable) setLocalValue(value ?? "");
+    }, [value, isEditable]);
 
     if (isEditable && isDocument) {
       return (
@@ -382,8 +378,10 @@ const StudentDetailsDashboard = () => {
           <td className="py-2 px-6">
             <input
               type="text"
-              value={inputValue}
-              onChange={e => {
+              value={localValue}
+              onChange={e => setLocalValue(e.target.value)}
+              onBlur={e => {
+                const newValue = e.target.value;
                 if (subSection) {
                   setFormData(prev => ({
                     ...prev,
@@ -391,7 +389,7 @@ const StudentDetailsDashboard = () => {
                       ...prev[section],
                       [subSection]: {
                         ...prev[section]?.[subSection],
-                        [field]: e.target.value,
+                        [field]: newValue,
                       },
                     },
                   }));
@@ -400,7 +398,7 @@ const StudentDetailsDashboard = () => {
                     ...prev,
                     [section]: {
                       ...prev[section],
-                      [field]: e.target.value,
+                      [field]: newValue,
                     },
                   }));
                 }
@@ -891,45 +889,45 @@ const StudentDetailsDashboard = () => {
                 <DetailCard title="Basic Information" section="personal">
                   <DetailItem
                     label="First Name"
-                    value={`${details.personal?.firstName || ""}`.trim()}
+                    value={`${formData.personal?.firstName || ""}`.trim()}
                     field="firstName"
                     section="personal"
                   />
                   <DetailItem
                     label="Middle Name"
-                    value={`${details.personal?.middleName || ""}`.trim()}
+                    value={`${formData.personal?.middleName || ""}`.trim()}
                     field="middleName"
                     section="personal"
                   />
                   <DetailItem
                     label="Last Name"
-                    value={`${details.personal?.lastName || ""}`.trim()}
+                    value={`${formData.personal?.lastName || ""}`.trim()}
                     field="lastName"
                     section="personal"
                   />
                   <DetailItem
                     label="Date of Birth"
-                    value={details.personal?.dob}
+                    value={formData.personal?.dob}
                     field="dob"
                     section="personal"
                   />
                   <DetailItem
                     label="Place of Birth"
-                    value={details.personal?.placeOfBirth}
+                    value={formData.personal?.placeOfBirth}
                     field="placeOfBirth"
                     section="personal"
                   />
                   <DetailItem
                     label="Gender"
-                    value={details.personal?.gender}
+                    value={formData.personal?.gender}
                     field="gender"
                     section="personal"
                   />
                   <DetailItem
                     label="Category"
-                    value={`${details.personal?.category || ""}${
-                      details.personal?.subCategory
-                        ? ` (${details.personal.subCategory})`
+                    value={`${formData.personal?.category || ""}${
+                      formData.personal?.subCategory
+                        ? ` (${formData.personal.subCategory})`
                         : ""
                     }`}
                     field="category"
@@ -937,7 +935,7 @@ const StudentDetailsDashboard = () => {
                   />
                   <DetailItem
                     label="Region"
-                    value={details.personal?.region}
+                    value={formData.personal?.region}
                     field="region"
                     section="personal"
                   />
@@ -946,25 +944,25 @@ const StudentDetailsDashboard = () => {
                 <DetailCard title="Contact Information" section="personal">
                   <DetailItem
                     label="Email"
-                    value={details.personal?.email}
+                    value={formData.personal?.email}
                     field="email"
                     section="personal"
                   />
                   <DetailItem
                     label="Mobile"
-                    value={details.personal?.mobile}
+                    value={formData.personal?.mobile}
                     field="mobile"
                     section="personal"
                   />
                   <DetailItem
                     label="Current Address"
-                    value={details.personal?.currentAddress}
+                    value={formData.personal?.currentAddress}
                     field="currentAddress"
                     section="personal"
                   />
                   <DetailItem
                     label="Permanent Address"
-                    value={details.personal?.permanentAddress}
+                    value={formData.personal?.permanentAddress}
                     field="permanentAddress"
                     section="personal"
                   />
@@ -973,37 +971,37 @@ const StudentDetailsDashboard = () => {
                 <DetailCard title="Academic Information" section="personal">
                   <DetailItem
                     label="Course"
-                    value={details.personal?.course}
+                    value={formData.personal?.course}
                     field="course"
                     section="personal"
                   />
                   <DetailItem
                     label="Exam Roll No"
-                    value={details.personal?.examRoll}
+                    value={formData.personal?.examRoll}
                     field="examRoll"
                     section="personal"
                   />
                   <DetailItem
                     label="Exam Rank"
-                    value={details.personal?.examRank}
+                    value={formData.personal?.examRank}
                     field="examRank"
                     section="personal"
                   />
                   <DetailItem
                     label="ABC ID"
-                    value={details.personal?.abcId}
+                    value={formData.personal?.abcId}
                     field="abcId"
                     section="personal"
                   />
                   <DetailItem
                     label="Fee Reimbursement"
-                    value={details.personal?.feeReimbursement}
+                    value={formData.personal?.feeReimbursement}
                     field="feeReimbursement"
                     section="personal"
                   />
                   <DetailItem
                     label="Anti-Ragging Ref"
-                    value={details.personal?.antiRaggingRef}
+                    value={formData.personal?.antiRaggingRef}
                     field="antiRaggingRef"
                     section="personal"
                   />
@@ -1017,56 +1015,56 @@ const StudentDetailsDashboard = () => {
                 <DetailCard title="Father's Details" section="parent">
                   <DetailItem
                     label="Name"
-                    value={details.parent?.father?.name}
+                    value={formData.parent?.father?.name}
                     field="name"
                     section="parent"
                     subSection="father"
                   />
                   <DetailItem
                     label="Qualification"
-                    value={details.parent?.father?.qualification}
+                    value={formData.parent?.father?.qualification}
                     field="qualification"
                     section="parent"
                     subSection="father"
                   />
                   <DetailItem
                     label="Occupation"
-                    value={details.parent?.father?.occupation}
+                    value={formData.parent?.father?.occupation}
                     field="occupation"
                     section="parent"
                     subSection="father"
                   />
                   <DetailItem
                     label="Email"
-                    value={details.parent?.father?.email}
+                    value={formData.parent?.father?.email}
                     field="email"
                     section="parent"
                     subSection="father"
                   />
                   <DetailItem
                     label="Mobile"
-                    value={details.parent?.father?.mobile}
+                    value={formData.parent?.father?.mobile}
                     field="mobile"
                     section="parent"
                     subSection="father"
                   />
                   <DetailItem
                     label="Telephone (STD)"
-                    value={details.parent?.father?.telephoneSTD}
+                    value={formData.parent?.father?.telephoneSTD}
                     field="telephoneSTD"
                     section="parent"
                     subSection="father"
                   />
                   <DetailItem
                     label="Telephone"
-                    value={details.parent?.father?.telephone}
+                    value={formData.parent?.father?.telephone}
                     field="telephone"
                     section="parent"
                     subSection="father"
                   />
                   <DetailItem
                     label="Office Address"
-                    value={details.parent?.father?.officeAddress}
+                    value={formData.parent?.father?.officeAddress}
                     field="officeAddress"
                     section="parent"
                     subSection="father"
@@ -1076,56 +1074,56 @@ const StudentDetailsDashboard = () => {
                 <DetailCard title="Mother's Details" section="parent">
                   <DetailItem
                     label="Name"
-                    value={details.parent?.mother?.name}
+                    value={formData.parent?.mother?.name}
                     field="name"
                     section="parent"
                     subSection="mother"
                   />
                   <DetailItem
                     label="Qualification"
-                    value={details.parent?.mother?.qualification}
+                    value={formData.parent?.mother?.qualification}
                     field="qualification"
                     section="parent"
                     subSection="mother"
                   />
                   <DetailItem
                     label="Occupation"
-                    value={details.parent?.mother?.occupation}
+                    value={formData.parent?.mother?.occupation}
                     field="occupation"
                     section="parent"
                     subSection="mother"
                   />
                   <DetailItem
                     label="Email"
-                    value={details.parent?.mother?.email}
+                    value={formData.parent?.mother?.email}
                     field="email"
                     section="parent"
                     subSection="mother"
                   />
                   <DetailItem
                     label="Mobile"
-                    value={details.parent?.mother?.mobile}
+                    value={formData.parent?.mother?.mobile}
                     field="mobile"
                     section="parent"
                     subSection="mother"
                   />
                   <DetailItem
                     label="Telephone (STD)"
-                    value={details.parent?.mother?.telephoneSTD}
+                    value={formData.parent?.mother?.telephoneSTD}
                     field="telephoneSTD"
                     section="parent"
                     subSection="mother"
                   />
                   <DetailItem
                     label="Telephone"
-                    value={details.parent?.mother?.telephone}
+                    value={formData.parent?.mother?.telephone}
                     field="telephone"
                     section="parent"
                     subSection="mother"
                   />
                   <DetailItem
                     label="Office Address"
-                    value={details.parent?.mother?.officeAddress}
+                    value={formData.parent?.mother?.officeAddress}
                     field="officeAddress"
                     section="parent"
                     subSection="mother"
@@ -1176,42 +1174,42 @@ const StudentDetailsDashboard = () => {
                 <DetailCard title="Class X Details" section="academic">
                   <DetailItem
                     label="Institute"
-                    value={details.academic?.classX?.institute}
+                    value={formData.academic?.classX?.institute}
                     field="institute"
                     section="academic"
                     subSection="classX"
                   />
                   <DetailItem
                     label="Board"
-                    value={details.academic?.classX?.board}
+                    value={formData.academic?.classX?.board}
                     field="board"
                     section="academic"
                     subSection="classX"
                   />
                   <DetailItem
                     label="Year"
-                    value={details.academic?.classX?.year}
+                    value={formData.academic?.classX?.year}
                     field="year"
                     section="academic"
                     subSection="classX"
                   />
                   <DetailItem
                     label="Aggregate %"
-                    value={details.academic?.classX?.aggregate}
+                    value={formData.academic?.classX?.aggregate}
                     field="aggregate"
                     section="academic"
                     subSection="classX"
                   />
                   <DetailItem
                     label="PCM %"
-                    value={details.academic?.classX?.pcm}
+                    value={formData.academic?.classX?.pcm}
                     field="pcm"
                     section="academic"
                     subSection="classX"
                   />
                   <DetailItem
                     label="Diploma/Polytechnic"
-                    value={details.academic?.classX?.isDiplomaOrPolytechnic}
+                    value={formData.academic?.classX?.isDiplomaOrPolytechnic}
                     field="isDiplomaOrPolytechnic"
                     section="academic"
                     subSection="classX"
@@ -1221,35 +1219,35 @@ const StudentDetailsDashboard = () => {
                 <DetailCard title="Class XII Details" section="academic">
                   <DetailItem
                     label="Institute"
-                    value={details.academic?.classXII?.institute}
+                    value={formData.academic?.classXII?.institute}
                     field="institute"
                     section="academic"
                     subSection="classXII"
                   />
                   <DetailItem
                     label="Board"
-                    value={details.academic?.classXII?.board}
+                    value={formData.academic?.classXII?.board}
                     field="board"
                     section="academic"
                     subSection="classXII"
                   />
                   <DetailItem
                     label="Year"
-                    value={details.academic?.classXII?.year}
+                    value={formData.academic?.classXII?.year}
                     field="year"
                     section="academic"
                     subSection="classXII"
                   />
                   <DetailItem
                     label="Aggregate %"
-                    value={details.academic?.classXII?.aggregate}
+                    value={formData.academic?.classXII?.aggregate}
                     field="aggregate"
                     section="academic"
                     subSection="classXII"
                   />
                   <DetailItem
                     label="PCM %"
-                    value={details.academic?.classXII?.pcm}
+                    value={formData.academic?.classXII?.pcm}
                     field="pcm"
                     section="academic"
                     subSection="classXII"
@@ -1260,35 +1258,35 @@ const StudentDetailsDashboard = () => {
                   <DetailCard title="Other Qualification" section="academic">
                     <DetailItem
                       label="Institute"
-                      value={details.academic.otherQualification.institute}
+                      value={formData.academic.otherQualification.institute}
                       field="institute"
                       section="academic"
                       subSection="otherQualification"
                     />
                     <DetailItem
                       label="Board"
-                      value={details.academic.otherQualification.board}
+                      value={formData.academic.otherQualification.board}
                       field="board"
                       section="academic"
                       subSection="otherQualification"
                     />
                     <DetailItem
                       label="Year"
-                      value={details.academic.otherQualification.year}
+                      value={formData.academic.otherQualification.year}
                       field="year"
                       section="academic"
                       subSection="otherQualification"
                     />
                     <DetailItem
                       label="Aggregate %"
-                      value={details.academic.otherQualification.aggregate}
+                      value={formData.academic.otherQualification.aggregate}
                       field="aggregate"
                       section="academic"
                       subSection="otherQualification"
                     />
                     <DetailItem
                       label="PCM %"
-                      value={details.academic.otherQualification.pcm}
+                      value={formData.academic.otherQualification.pcm}
                       field="pcm"
                       section="academic"
                       subSection="otherQualification"
@@ -1297,48 +1295,39 @@ const StudentDetailsDashboard = () => {
                 )}
 
                 {details.academic?.academicAchievements?.length > 0 && (
-                  <DetailCard title="Academic Achievements" section="academic">
-                    <div className="space-y-2">
-                      {details.academic.academicAchievements.map(
-                        (achievement, index) => (
-                          <div
-                            key={index}
-                            className="text-sm text-gray-600 p-2 bg-gray-50 rounded"
-                          >
-                            <strong>{achievement.event}</strong> (
-                            {achievement.date})<br />
-                            <span className="text-xs text-gray-500">
-                              {achievement.outcome}
-                            </span>
-                          </div>
-                        )
-                      )}
+                  <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-6 overflow-hidden min-w-[380px] max-w-[440px] w-full">
+                    <div className="px-6 py-4 bg-blue-50 border-b border-blue-200 flex items-center">
+                      <h3 className="text-lg font-semibold text-blue-800">Academic Achievements</h3>
                     </div>
-                  </DetailCard>
+                    <div className="px-6 py-4">
+                      <div className="space-y-2">
+                        {details.academic.academicAchievements.map((achievement, index) => (
+                          <div key={index} className="text-sm text-gray-600 p-2 bg-gray-50 rounded">
+                            <strong>{achievement.event}</strong> ({achievement.date})<br />
+                            <span className="text-xs text-gray-500">{achievement.outcome}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 )}
 
                 {details.academic?.coCurricularAchievements?.length > 0 && (
-                  <DetailCard
-                    title="Co-Curricular Achievements"
-                    section="academic"
-                  >
-                    <div className="space-y-2">
-                      {details.academic.coCurricularAchievements.map(
-                        (achievement, index) => (
-                          <div
-                            key={index}
-                            className="text-sm text-gray-600 p-2 bg-gray-50 rounded"
-                          >
-                            <strong>{achievement.event}</strong> (
-                            {achievement.date})<br />
-                            <span className="text-xs text-gray-500">
-                              {achievement.outcome}
-                            </span>
-                          </div>
-                        )
-                      )}
+                  <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-6 overflow-hidden min-w-[380px] max-w-[440px] w-full">
+                    <div className="px-6 py-4 bg-blue-50 border-b border-blue-200 flex items-center">
+                      <h3 className="text-lg font-semibold text-blue-800">Co-Curricular Achievements</h3>
                     </div>
-                  </DetailCard>
+                    <div className="px-6 py-4">
+                      <div className="space-y-2">
+                        {details.academic.coCurricularAchievements.map((achievement, index) => (
+                          <div key={index} className="text-sm text-gray-600 p-2 bg-gray-50 rounded">
+                            <strong>{achievement.event}</strong> ({achievement.date})<br />
+                            <span className="text-xs text-gray-500">{achievement.outcome}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             </Tab.Panel>
