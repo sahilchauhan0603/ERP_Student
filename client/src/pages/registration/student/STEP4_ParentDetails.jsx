@@ -34,27 +34,27 @@ const ParentDetails = ({ formData, setFormData }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-gradient-to-br from-white via-blue-50 to-red-50 p-6 sm:p-10 rounded-3xl shadow-2xl border-2 border-blue-200/40 animate-fade-in">
+    <div className="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-3xl shadow-2xl border border-gray-200 animate-fade-in">
       <div className="text-center mb-10">
         <div className="flex justify-center items-center gap-4 mb-2">
-          <span className="inline-block w-2 h-10 bg-blue-500 rounded-full"></span>
-          <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-red-500 to-blue-700 drop-shadow-lg">
+          <span className="inline-block w-2 h-10 bg-gray-800 rounded-full"></span>
+          <h2 className="text-3xl font-extrabold text-black">
             Parent Details
           </h2>
-          <span className="inline-block w-2 h-10 bg-red-500 rounded-full"></span>
+          <span className="inline-block w-2 h-10 bg-gray-800 rounded-full"></span>
         </div>
-        <p className="text-blue-700/90 text-lg font-medium tracking-wide">
+        <p className="text-gray-700 text-lg font-medium tracking-wide">
           Please provide your parents' information
         </p>
       </div>
 
       <div className="space-y-12">
         {/* Father Section */}
-        <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
-          <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
-            <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
+        <div className="bg-gray-50 p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center mb-6 pb-3 border-b border-gray-200">
+            <div className="bg-gray-100/50 p-2 rounded-lg mr-3">
               <svg
-                className="w-6 h-6 text-blue-600"
+                className="w-6 h-6 text-gray-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -67,13 +67,13 @@ const ParentDetails = ({ formData, setFormData }) => {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-blue-800/90">
+            <h2 className="text-xl font-semibold text-gray-800/90">
               Father's Details
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-1">
-              <label className="block text-sm font-semibold text-blue-800">
+              <label className="block text-sm font-semibold text-gray-800">
                 Father's Name<span className="text-red-500">*</span>
               </label>
               <input
@@ -82,11 +82,11 @@ const ParentDetails = ({ formData, setFormData }) => {
                 value={formData.parents.father.name || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-semibold text-blue-800">
+              <label className="block text-sm font-semibold text-gray-800">
                 Highest Qualification<span className="text-red-500">*</span>
               </label>
               <input
@@ -95,11 +95,11 @@ const ParentDetails = ({ formData, setFormData }) => {
                 value={formData.parents.father.qualification || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-semibold text-blue-800">
+              <label className="block text-sm font-semibold text-gray-800">
                 Occupation<span className="text-red-500">*</span>
               </label>
               <input
@@ -108,11 +108,11 @@ const ParentDetails = ({ formData, setFormData }) => {
                 value={formData.parents.father.occupation || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-semibold text-blue-800">
+              <label className="block text-sm font-semibold text-gray-800">
                 Email Address<span className="text-red-500">*</span>
               </label>
               <input
@@ -122,11 +122,11 @@ const ParentDetails = ({ formData, setFormData }) => {
                 value={formData.parents.father.email || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-semibold text-blue-800">
+              <label className="block text-sm font-semibold text-gray-800">
                 Mobile Number<span className="text-red-500">*</span>
               </label>
               <input
@@ -135,37 +135,37 @@ const ParentDetails = ({ formData, setFormData }) => {
                 value={formData.parents.father.mobile || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="block text-sm font-semibold text-blue-800">
+                <label className="block text-sm font-semibold text-gray-800">
                   Telephone STD
                 </label>
                 <input
                   name="parents.father.telephoneSTD"
-                  placeholder="Enter Father's Telephone STD"
+                  placeholder="Telephone STD"
                   value={formData.parents.father.telephoneSTD || ""}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
                 />
               </div>
               <div className="space-y-1">
-                <label className="block text-sm font-semibold text-blue-800">
+                <label className="block text-sm font-semibold text-gray-800">
                   Telephone Number
                 </label>
                 <input
                   name="parents.father.telephone"
-                  placeholder="Enter Father's Telephone Number"            
+                  placeholder="Telephone Number"            
                   value={formData.parents.father.telephone || ""}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
                 />
               </div>
             </div>
             <div className="md:col-span-2 space-y-1">
-              <label className="block text-sm font-semibold text-blue-800">
+              <label className="block text-sm font-semibold text-gray-800">
                 Office Address
               </label>
               <textarea
@@ -173,18 +173,18 @@ const ParentDetails = ({ formData, setFormData }) => {
                 value={formData.parents.father.officeAddress || ""}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
               />
             </div>
           </div>
         </div>
 
         {/* Mother Section */}
-        <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
-          <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
-            <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
+        <div className="bg-gray-50 p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center mb-6 pb-3 border-b border-gray-200">
+            <div className="bg-gray-100/50 p-2 rounded-lg mr-3">
               <svg
-                className="w-6 h-6 text-blue-600"
+                className="w-6 h-6 text-gray-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -197,13 +197,13 @@ const ParentDetails = ({ formData, setFormData }) => {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-blue-800/90">
+            <h2 className="text-xl font-semibold text-gray-800/90">
               Mother's Details
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-1">
-              <label className="block text-sm font-semibold text-blue-800">
+              <label className="block text-sm font-semibold text-gray-800">
                 Mother's Name<span className="text-red-500">*</span>
               </label>
               <input
@@ -212,11 +212,11 @@ const ParentDetails = ({ formData, setFormData }) => {
                 value={formData.parents.mother.name || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-semibold text-blue-800">
+              <label className="block text-sm font-semibold text-gray-800">
                 Highest Qualification<span className="text-red-500">*</span>
               </label>
               <input
@@ -225,11 +225,11 @@ const ParentDetails = ({ formData, setFormData }) => {
                 value={formData.parents.mother.qualification || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-semibold text-blue-800">
+              <label className="block text-sm font-semibold text-gray-800">
                 Occupation<span className="text-red-500">*</span>
               </label>
               <input
@@ -238,11 +238,11 @@ const ParentDetails = ({ formData, setFormData }) => {
                 value={formData.parents.mother.occupation || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-semibold text-blue-800">
+              <label className="block text-sm font-semibold text-gray-800">
                 Email Address
               </label>
               <input
@@ -251,11 +251,11 @@ const ParentDetails = ({ formData, setFormData }) => {
                 type="email"
                 value={formData.parents.mother.email || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <label className="block text-sm font-semibold text-blue-800">
+              <label className="block text-sm font-semibold text-gray-800">
                 Mobile Number<span className="text-red-500">*</span>
               </label>
               <input
@@ -264,37 +264,37 @@ const ParentDetails = ({ formData, setFormData }) => {
                 value={formData.parents.mother.mobile || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="block text-sm font-semibold text-blue-800">
+                <label className="block text-sm font-semibold text-gray-800">
                   Telephone STD
                 </label>
                 <input
                   name="parents.mother.telephoneSTD"
-                  placeholder="Enter Mother's Telephone STD"
+                  placeholder="Telephone STD"
                   value={formData.parents.mother.telephoneSTD || ""}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
                 />
               </div>
               <div className="space-y-1">
-                <label className="block text-sm font-semibold text-blue-800">
+                <label className="block text-sm font-semibold text-gray-800">
                   Telephone Number
                 </label>
                 <input
                   name="parents.mother.telephone"
-                  placeholder="Enter Mother's Telephone Number"            
+                  placeholder="Telephone Number"            
                   value={formData.parents.mother.telephone || ""}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
                 />
               </div>
             </div>
             <div className="md:col-span-2 space-y-1">
-              <label className="block text-sm font-semibold text-blue-800">
+              <label className="block text-sm font-semibold text-gray-800">
                 Office Address
               </label>
               <textarea
@@ -302,18 +302,18 @@ const ParentDetails = ({ formData, setFormData }) => {
                 value={formData.parents.mother.officeAddress || ""}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-4 py-2 border-2 border-blue-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-blue-900 placeholder-blue-300 shadow-inner font-semibold"
+                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
               />
             </div>
           </div>
         </div>
 
         {/* Family Income */}
-        <div className="bg-gradient-to-r from-blue-50 via-white to-red-50 p-6 rounded-2xl shadow-lg border-2 border-blue-200/40 transition-all duration-300 hover:shadow-xl">
-          <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-200/40">
-            <div className="bg-blue-100/50 p-2 rounded-lg mr-3">
+        <div className="bg-gray-50 p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl">
+          <div className="flex items-center mb-6 pb-3 border-b border-gray-200">
+            <div className="bg-gray-100/50 p-2 rounded-lg mr-3">
               <svg
-                className="w-6 h-6 text-blue-600"
+                className="w-6 h-6 text-gray-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -326,7 +326,7 @@ const ParentDetails = ({ formData, setFormData }) => {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-blue-800/90">
+            <h2 className="text-xl font-semibold text-gray-800/90">
               Family Income<span className="text-red-500">*</span>
             </h2>
           </div>
@@ -346,15 +346,15 @@ const ParentDetails = ({ formData, setFormData }) => {
                     className="sr-only peer"
                     required
                   />
-                  <div className="w-5 h-5 border-2 border-blue-300 rounded-full peer-checked:border-blue-500 flex items-center justify-center transition-all duration-300">
+                  <div className="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-gray-500 flex items-center justify-center transition-all duration-300">
                     <div
-                      className={`w-3 h-3 rounded-full bg-blue-500 scale-0 peer-checked:scale-100 transition-all duration-300 ${
+                      className={`w-3 h-3 rounded-full bg-gray-500 scale-0 peer-checked:scale-100 transition-all duration-300 ${
                         formData.parents.familyIncome === range ? 'scale-100' : ''
                       }`}
                     ></div>
                   </div>
                 </div>
-                <span className="ml-3 text-blue-800/90">
+                <span className="ml-3 text-gray-800/90">
                   {range === '<5' && 'Less than 5 lacs'}
                   {range === '5-7' && '5 lacs to 7 lacs'}
                   {range === '7-10' && '7 lacs to 10 lacs'}

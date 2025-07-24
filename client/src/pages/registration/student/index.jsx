@@ -184,13 +184,21 @@ const StudentRegistration = () => {
   const validatePersonalInfo = () => {
     const { personal } = formData;
     return (
+      personal.course &&
       personal.firstName &&
       personal.lastName &&
+      personal.abcId &&
       personal.email &&
       personal.mobile &&
       personal.dob &&
+      personal.examRoll &&
+      personal.examRank &&
       personal.gender &&
       personal.category &&
+      personal.region &&
+      personal.currentAddress &&
+      personal.permanentAddress &&
+      personal.feeReimbursement &&
       personal.antiRaggingRef
     );
   };
@@ -298,7 +306,7 @@ const StudentRegistration = () => {
     return fatherValid && motherValid && incomeValid;
   };
 
-  console.log("Valid Parent Info:", validateParentInfo());
+  // console.log("Valid Parent Info:", validateParentInfo());
 
   // Helper: convert File to base64
   const fileToBase64 = (file) => {
@@ -417,7 +425,7 @@ const StudentRegistration = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
       <CustomModal
         isOpen={modal.isOpen}
         title={modal.title}
@@ -427,7 +435,7 @@ const StudentRegistration = () => {
       />
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-black">
             Student Registration
           </h1>
           <p className="mt-2 text-sm text-gray-600">
@@ -437,7 +445,7 @@ const StudentRegistration = () => {
 
         <ProgressBar steps={steps} currentStep={currentStep} />
 
-        <div className="bg-white shadow rounded-lg p-6">
+        <div className="bg-gray-50 shadow rounded-lg p-6">
           {steps[currentStep].component}
 
           <div className="flex justify-between mt-8">
@@ -454,7 +462,7 @@ const StudentRegistration = () => {
                 <button
                   onClick={nextStep}
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
@@ -466,7 +474,7 @@ const StudentRegistration = () => {
                 className={`px-4 py-2 rounded-md ${
                   isSubmitting
                     ? "bg-gray-500"
-                    : "bg-green-600 hover:bg-green-700"
+                    : "bg-gray-900 hover:bg-gray-800"
                 } text-white flex items-center justify-center min-w-32`}
               >
                 {isSubmitting ? (

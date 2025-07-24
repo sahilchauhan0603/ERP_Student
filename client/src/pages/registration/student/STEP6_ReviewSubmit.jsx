@@ -136,16 +136,16 @@ export default function ReviewSubmit({ formData, registrationSuccess }) {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-6 sm:py-10 bg-gradient-to-br from-white via-blue-50 to-red-50 rounded-3xl shadow-2xl border-2 border-blue-200/40 animate-fade-in">
+    <div className="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-6 sm:py-10 bg-white rounded-3xl shadow-2xl border border-gray-200 animate-fade-in">
       <div className="text-center mb-12">
         <div className="flex justify-center items-center gap-4 mb-2">
-          <span className="inline-block w-2 h-10 bg-blue-500 rounded-full"></span>
-          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-red-500 to-blue-700 drop-shadow-lg">
+          <span className="inline-block w-2 h-10 bg-gray-800 rounded-full"></span>
+          <h1 className="text-4xl font-extrabold text-black">
             Application Review
           </h1>
-          <span className="inline-block w-2 h-10 bg-red-500 rounded-full"></span>
+          <span className="inline-block w-2 h-10 bg-gray-800 rounded-full"></span>
         </div>
-        <p className="text-lg text-blue-700/90 max-w-2xl mx-auto font-medium tracking-wide">
+        <p className="text-lg text-gray-700 max-w-2xl mx-auto font-medium tracking-wide">
           Please verify all information before submission. Contact support if any corrections are needed.
         </p>
       </div>
