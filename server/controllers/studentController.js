@@ -703,6 +703,7 @@ exports.getStudentDetailsMe = (req, res) => {
         antiRaggingRef: student.antiRaggingRef,
         status: student.status,
         created_at: student.created_at,
+        batch: student.batch,
       };
       // Parent Information
       const parent = {
