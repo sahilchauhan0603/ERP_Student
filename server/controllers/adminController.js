@@ -160,9 +160,8 @@ exports.updateStudentStatus = (req, res) => {
                   <div style="background:#f0f8ff;padding:15px;margin:20px 0;border-left:4px solid #4CAF50;">
                     <p style="margin:0;">Next Steps:</p>
                     <ul style="margin:10px 0 0 20px;">
-                      <li>Complete your enrollment process</li>
-                      <li>Check your student portal for further instructions</li>
-                      <li>Contact admissions if you have any questions</li>
+                      <li>Check your profile by logging in at <a href="https://erp-student-sm4v.onrender.com/login target="_blank" rel="noopener noreferrer">Student Portal</a></li>
+                      <li>Contact admissions if you have any questions <a href="mailto:https://admissions-enquiry.bpitindia.ac.in/">https://admissions-enquiry.bpitindia.ac.in/</a></li>
                     </ul>
                   </div>
                   <p>Welcome to BPIT! We look forward to having you as part of our academic community.</p>
@@ -203,8 +202,8 @@ exports.updateStudentStatus = (req, res) => {
                   <div style="background:#fff8f8;padding:15px;margin:20px 0;border-left:4px solid #f44336;">
                     <p>For more information about this decision, please contact our admissions office:</p>
                     <p style="margin:10px 0 0 0;">
-                      Email: <a href="mailto:admissions@bpitindia.ac.in">admissions@bpitindia.ac.in</a><br>
-                      Phone: +91-11-XXXX-XXXX
+                      Email: <a href="mailto:https://admissions-enquiry.bpitindia.ac.in/">https://admissions-enquiry.bpitindia.ac.in/</a><br>
+                      Phone: 011-2757 2900, 011-2757 1080
                     </p>
                   </div>
                   <p>We appreciate your interest in BPIT and encourage you to explore other educational opportunities.</p>
