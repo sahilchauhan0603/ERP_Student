@@ -296,12 +296,12 @@ const StudentDetailsDashboard = () => {
   };
 
   const DetailCard = ({ title, children, section }) => (
-    <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-6 overflow-hidden min-w-[380px] max-w-[440px] w-full">
-      <div className="px-6 py-4 bg-blue-50 border-b border-blue-200 flex items-center">
+    <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-4 w-full overflow-x-auto">
+      <div className="px-4 py-3 bg-blue-50 border-b border-blue-200 flex items-center">
         <h3 className="text-lg font-semibold text-blue-800">{title}</h3>
       </div>
       <div className="px-0 py-0">
-        <table className="w-full">
+        <table className="w-full table-fixed">
           <tbody>{children}</tbody>
         </table>
       </div>
@@ -427,16 +427,17 @@ const StudentDetailsDashboard = () => {
     return (
       <tr className="border-b last:border-b-0">
         <td
-          className={`py-2 px-6 text-gray-600 font-medium w-1/3 text-left align-top border-r border-gray-200 ${
+          className={`py-2 px-4 text-gray-600 font-medium align-top border-r border-gray-200 break-words max-w-[120px] ${
             isDeclined ? "text-red-600" : ""
           }`}
         >
           {label}:
         </td>
         <td
-          className={`py-2 px-6 text-gray-900 font-semibold w-2/3 text-left align-top break-words ${
+          className={`py-2 px-4 text-gray-900 font-semibold align-top break-words max-w-[220px] ${
             isDeclined ? "text-red-600" : ""
           }`}
+          style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
         >
           {displayValue || <span className="text-gray-400 italic">N/A</span>}
         </td>
@@ -1317,22 +1318,22 @@ const StudentDetailsDashboard = () => {
                 )}
 
                 {details.academic?.academicAchievements?.length > 0 && (
-                  <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-6 overflow-hidden min-w-[380px] max-w-[440px] w-full">
-                    <div className="px-6 py-4 bg-blue-50 border-b border-blue-200 flex items-center">
+                  <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-4 w-full overflow-x-auto">
+                    <div className="px-4 py-3 bg-blue-50 border-b border-blue-200 flex items-center">
                       <h3 className="text-lg font-semibold text-blue-800">
                         Academic Achievements
                       </h3>
                     </div>
-                    <div className="px-6 py-4">
+                    <div className="px-4 py-4">
                       <div className="space-y-2">
                         {details.academic.academicAchievements.map(
                           (achievement, index) => (
                             <div
                               key={index}
-                              className="text-sm text-gray-600 p-2 bg-gray-50 rounded"
+                              className="text-sm text-gray-600 p-2 bg-gray-50 rounded break-words w-full"
+                              style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
                             >
-                              <strong>{achievement.event}</strong> (
-                              {achievement.date})<br />
+                              <strong>{achievement.event}</strong> ({achievement.date})<br />
                               <span className="text-xs text-gray-500">
                                 {achievement.outcome}
                               </span>
@@ -1345,22 +1346,22 @@ const StudentDetailsDashboard = () => {
                 )}
 
                 {details.academic?.coCurricularAchievements?.length > 0 && (
-                  <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-6 overflow-hidden min-w-[380px] max-w-[440px] w-full">
-                    <div className="px-6 py-4 bg-blue-50 border-b border-blue-200 flex items-center">
+                  <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-4 w-full overflow-x-auto">
+                    <div className="px-4 py-3 bg-blue-50 border-b border-blue-200 flex items-center">
                       <h3 className="text-lg font-semibold text-blue-800">
                         Co-Curricular Achievements
                       </h3>
                     </div>
-                    <div className="px-6 py-4">
+                    <div className="px-4 py-4">
                       <div className="space-y-2">
                         {details.academic.coCurricularAchievements.map(
                           (achievement, index) => (
                             <div
                               key={index}
-                              className="text-sm text-gray-600 p-2 bg-gray-50 rounded"
+                              className="text-sm text-gray-600 p-2 bg-gray-50 rounded break-words w-full"
+                              style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
                             >
-                              <strong>{achievement.event}</strong> (
-                              {achievement.date})<br />
+                              <strong>{achievement.event}</strong> ({achievement.date})<br />
                               <span className="text-xs text-gray-500">
                                 {achievement.outcome}
                               </span>
