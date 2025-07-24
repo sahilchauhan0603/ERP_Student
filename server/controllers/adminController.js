@@ -113,25 +113,30 @@ exports.getStudentStats = (req, res) => {
 };
 
 exports.listAllStudents = (req, res) => {
-  let { page = 1, limit = 10 } = req.query;
+  let { page = 1, limit = 10, batch = "" } = req.query;
   page = parseInt(page);
   limit = parseInt(limit);
   const offset = (page - 1) * limit;
   // Get total count
-  db.query("SELECT COUNT(*) as total FROM students", (err, countResult) => {
+  let countQuery = "SELECT COUNT(*) as total FROM students";
+  let dataQuery = "SELECT * FROM students";
+  const params = [];
+  if (batch) {
+    countQuery += " WHERE batch = ?";
+    dataQuery += " WHERE batch = ?";
+    params.push(batch);
+  }
+  dataQuery += " ORDER BY id DESC LIMIT ? OFFSET ?";
+  params.push(limit, offset);
+  db.query(countQuery, batch ? [batch] : [], (err, countResult) => {
     if (err) return res.status(500).json({ message: "DB error", error: err });
     const total = countResult[0].total;
     const totalPages = Math.ceil(total / limit);
-    // Get paginated students
-    db.query(
-      "SELECT * FROM students ORDER BY id DESC LIMIT ? OFFSET ?",
-      [limit, offset],
-      (err2, results) => {
-        if (err2)
-          return res.status(500).json({ message: "DB error", error: err2 });
-        res.json({ students: results, totalPages });
-      }
-    );
+    db.query(dataQuery, params, (err2, results) => {
+      if (err2)
+        return res.status(500).json({ message: "DB error", error: err2 });
+      res.json({ students: results, totalPages });
+    });
   });
 };
 
@@ -308,43 +313,41 @@ exports.updateStudentStatus = (req, res) => {
 // List students by status (pending, approved, declined)
 exports.listStudentsByStatus = (req, res) => {
   const { status } = req.params;
-  let { page = 1, limit = 10 } = req.query;
+  let { page = 1, limit = 10, batch = "" } = req.query;
   page = parseInt(page);
   limit = parseInt(limit);
   if (!["pending", "approved", "declined"].includes(status)) {
     return res.status(400).json({ message: "Invalid status" });
   }
   const offset = (page - 1) * limit;
-  // Get total count
-  db.query(
-    "SELECT COUNT(*) as total FROM students WHERE status = ?",
-    [status],
-    (err, countResult) => {
-      if (err) return res.status(500).json({ message: "DB error", error: err });
-      const total = countResult[0].total;
-      const totalPages = Math.ceil(total / limit);
-      // Get paginated students
-      db.query(
-        "SELECT * FROM students WHERE status = ? ORDER BY id DESC LIMIT ? OFFSET ?",
-        [status, limit, offset],
-        (err2, results) => {
-          if (err2)
-            return res.status(500).json({ message: "DB error", error: err2 });
-          const students = results.map((s) => ({
-            ...s,
-            declinedFields: s.declinedFields
-              ? JSON.parse(s.declinedFields)
-              : [],
-          }));
-          res.json({ students, totalPages });
-        }
-      );
-    }
-  );
+  let countQuery = "SELECT COUNT(*) as total FROM students WHERE status = ?";
+  let dataQuery = "SELECT * FROM students WHERE status = ?";
+  const params = [status];
+  if (batch) {
+    countQuery += " AND batch = ?";
+    dataQuery += " AND batch = ?";
+    params.push(batch);
+  }
+  dataQuery += " ORDER BY id DESC LIMIT ? OFFSET ?";
+  params.push(limit, offset);
+  db.query(countQuery, batch ? [status, batch] : [status], (err, countResult) => {
+    if (err) return res.status(500).json({ message: "DB error", error: err });
+    const total = countResult[0].total;
+    const totalPages = Math.ceil(total / limit);
+    db.query(dataQuery, params, (err2, results) => {
+      if (err2)
+        return res.status(500).json({ message: "DB error", error: err2 });
+      const students = results.map((s) => ({
+        ...s,
+        declinedFields: s.declinedFields ? JSON.parse(s.declinedFields) : [],
+      }));
+      res.json({ students, totalPages });
+    });
+  });
 };
 
 exports.searchStudents = (req, res) => {
-  const { q = "", gender = "", course = "", page = 1 } = req.query;
+  const { q = "", gender = "", course = "", batch = "", page = 1 } = req.query;
   const pageSize = 10;
   const offset = (parseInt(page) - 1) * pageSize;
 
@@ -378,24 +381,28 @@ exports.searchStudents = (req, res) => {
     countParams.push(course);
   }
 
+  // Apply batch filter
+  if (batch) {
+    baseQuery += ` AND batch = ?`;
+    countQuery += ` AND batch = ?`;
+    params.push(batch);
+    countParams.push(batch);
+  }
+
   // Pagination and ordering
   baseQuery += ` ORDER BY id DESC LIMIT ? OFFSET ?`;
   params.push(pageSize, offset);
 
-  // First get students
   db.query(baseQuery, params, (err, students) => {
     if (err) {
       console.error("Student query error:", err);
       return res.status(500).json({ message: "Database error", error: err });
     }
-
-    // Then get total count
     db.query(countQuery, countParams, (err2, countResult) => {
       if (err2) {
         console.error("Count query error:", err2);
         return res.status(500).json({ message: "Database error", error: err2 });
       }
-
       const totalPages = Math.ceil(countResult[0].total / pageSize);
       res.json({ students, totalPages });
     });

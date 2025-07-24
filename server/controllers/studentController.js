@@ -285,6 +285,28 @@ exports.registerStudent = async (req, res) => {
       familyIncome: req.body["parents.familyIncome"],
     };
 
+    // Calculate batch based on created_at and course
+    function calculateBatch(createdAt, course) {
+      const year = new Date(createdAt).getFullYear();
+      let endYear;
+      if (
+        course.startsWith("B.Tech") ||
+        course.startsWith("LE-B.Tech")
+      ) {
+        endYear = year + 4;
+      } else if (course === "BBA" || course === "MBA") {
+        endYear = year + 3;
+      } else {
+        endYear = year + 3;
+      }
+      return `${year}-${endYear}`;
+    }
+
+    // Use current date for created_at (will match DB default)
+    const createdAt = new Date();
+    student.batch = calculateBatch(createdAt, student.course);
+    student.created_at = createdAt;
+
     // Insert into DB
     const sql = "INSERT INTO students SET ?";
     db.query(sql, student, (err, result) => {

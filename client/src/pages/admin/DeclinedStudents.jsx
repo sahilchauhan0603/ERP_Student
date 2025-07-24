@@ -28,6 +28,14 @@ export default function DeclinedStudents() {
     "MBA",
   ];
 
+  const BATCH_OPTIONS = [
+    '',
+    '2024-2027', '2024-2028', '2024-2029',
+    '2025-2028', '2025-2029',
+    '2026-2029', '2026-2030',
+    // Add more as needed
+  ];
+
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -35,20 +43,20 @@ export default function DeclinedStudents() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedGender, setSelectedGender] = useState("");
+  const [selectedBatch, setSelectedBatch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchDeclinedStudents();
-  }, [currentPage]);
+  }, [currentPage, selectedBatch]);
 
   const fetchDeclinedStudents = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        `${API_URL}/admin/list/declined?page=${currentPage}&limit=10`,
-        { withCredentials: true }
-      );
+      let url = `${API_URL}/admin/list/declined?page=${currentPage}&limit=10`;
+      if (selectedBatch) url += `&batch=${selectedBatch}`;
+      const res = await axios.get(url, { withCredentials: true });
       setStudents(res.data.students || []);
       setTotalPages(res.data.totalPages || 1);
     } catch {
@@ -144,6 +152,20 @@ export default function DeclinedStudents() {
                 <option value="Other">Other</option>
               </select>
 
+              {/* Batch Filter */}
+              <select
+                value={selectedBatch}
+                onChange={(e) => setSelectedBatch(e.target.value)}
+                className="px-3 py-2 w-full border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="">All Batches</option>
+                {BATCH_OPTIONS.map((batch) => (
+                  <option key={batch} value={batch}>
+                    {batch}
+                  </option>
+                ))}
+              </select>
+
               {/* Refresh */}
               <button
                 onClick={fetchDeclinedStudents}
@@ -192,25 +214,22 @@ export default function DeclinedStudents() {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 text-sm">
+              {/* Add divide-x to thead and tbody rows for vertical lines */}
               <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">
-                    Student
-                  </th>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">
-                    Contact
-                  </th>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-right font-semibold text-gray-500 uppercase">
-                    Actions
-                  </th>
+                <tr className="divide-x divide-gray-200">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-500 uppercase">S.NO.</th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Student</th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Contact</th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Course</th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Batch</th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-right font-semibold text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
-                {filteredStudents.map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-50">
+                {filteredStudents.map((student, idx) => (
+                  <tr key={student.id} className="hover:bg-gray-50 divide-x divide-gray-200">
+                    <td className="px-4 py-4 text-sm text-gray-900">{(currentPage - 1) * 10 + idx + 1}</td>
                     <td className="px-6 py-4 whitespace-nowrap flex items-center">
                       <div className="h-10 w-10 rounded-full bg-red-100 text-red-700 flex items-center justify-center font-bold">
                         {student.firstName.charAt(0)}
@@ -228,9 +247,11 @@ export default function DeclinedStudents() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-gray-800">{student.email}</div>
-                      <div className="text-gray-500 text-xs">
-                        {student.mobile}
-                      </div>
+                      <div className="text-gray-500 text-xs">{student.mobile}</div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{student.course}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {student.batch}
                     </td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">

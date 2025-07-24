@@ -39,12 +39,21 @@ const COURSE_OPTIONS = [
   "MBA",
 ]; // Modify based on your actual course list
 
+const BATCH_OPTIONS = [
+  '',
+  '2024-2027', '2024-2028', '2024-2029',
+  '2025-2028', '2025-2029',
+  '2026-2029', '2026-2030',
+  // Add more as needed
+];
+
 export default function AdminAllStudents() {
   const [students, setStudents] = useState([]);
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
   const [genderFilter, setGenderFilter] = useState("");
   const [courseFilter, setCourseFilter] = useState("");
+  const [batchFilter, setBatchFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -61,6 +70,7 @@ export default function AdminAllStudents() {
       let url = `${API_URL}/admin/list`;
       if (status) url = `${API_URL}/admin/list/${status}`;
       url += `?page=${currentPage}`;
+      if (batchFilter) url += `&batch=${batchFilter}`;
       const res = await axios.get(url, { withCredentials: true });
       setStudents(res.data.students);
       setTotalPages(res.data.totalPages || 1);
@@ -83,6 +93,7 @@ export default function AdminAllStudents() {
       if (search) params.append("q", search);
       if (genderFilter) params.append("gender", genderFilter);
       if (courseFilter) params.append("course", courseFilter);
+      if (batchFilter) params.append("batch", batchFilter);
       params.append("page", currentPage);
 
       const res = await axios.get(
@@ -106,6 +117,7 @@ export default function AdminAllStudents() {
     setSearch("");
     setGenderFilter("");
     setCourseFilter("");
+    setBatchFilter("");
     fetchStudents();
   };
 
@@ -204,6 +216,19 @@ export default function AdminAllStudents() {
             ))}
           </select>
 
+          {/* Batch Filter */}
+          <select
+            value={batchFilter}
+            onChange={(e) => setBatchFilter(e.target.value)}
+            className="md:w-[180px] w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 shadow-sm"
+          >
+            {BATCH_OPTIONS.map((b) => (
+              <option key={b} value={b}>
+                {b || "All Batches"}
+              </option>
+            ))}
+          </select>
+
           {/* Search Button */}
           <button
             type="submit"
@@ -239,8 +264,10 @@ export default function AdminAllStudents() {
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
+          {/* Add divide-x to thead and tbody rows for vertical lines */}
           <thead className="bg-gray-50">
-            <tr>
+            <tr className="divide-x divide-gray-200">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">S.NO.</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Student
               </th>
@@ -249,6 +276,9 @@ export default function AdminAllStudents() {
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Course
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Batch
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Status
@@ -260,8 +290,8 @@ export default function AdminAllStudents() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {loading ? (
-              <tr>
-                <td colSpan={5} className="px-6 py-8 text-center">
+              <tr className="divide-x divide-gray-200">
+                <td colSpan={7} className="px-6 py-8 text-center">
                   <FiRefreshCw className="animate-spin text-gray-400 text-2xl mx-auto" />
                   <p className="mt-2 text-sm text-gray-500">
                     Loading student data...
@@ -269,11 +299,11 @@ export default function AdminAllStudents() {
                 </td>
               </tr>
             ) : students.length > 0 ? (
-              students.map((student) => (
-                <tr
+              students.map((student, idx) => (
+                <tr className="hover:bg-gray-50 transition-colors divide-x divide-gray-200"
                   key={student.id}
-                  className="hover:bg-gray-50 transition-colors"
                 >
+                  <td className="px-4 py-4 text-sm text-gray-900">{(currentPage - 1) * 10 + idx + 1}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
@@ -296,6 +326,9 @@ export default function AdminAllStudents() {
                   <td className="px-6 py-4 text-sm text-gray-900 flex items-center">
                     <FiBook className="mr-1 text-gray-400" /> {student.course}
                   </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {student.batch}
+                  </td>
                   <td className="px-6 py-4">
                     <StatusBadge status={student.status} />
                   </td>
@@ -313,8 +346,8 @@ export default function AdminAllStudents() {
                 </tr>
               ))
             ) : (
-              <tr>
-                <td colSpan={5} className="px-6 py-8 text-center">
+              <tr className="divide-x divide-gray-200">
+                <td colSpan={7} className="px-6 py-8 text-center">
                   <FiUser className="text-gray-400 text-2xl mx-auto" />
                   <p className="mt-2 text-sm text-gray-500">
                     No students found matching your filters.
@@ -324,6 +357,7 @@ export default function AdminAllStudents() {
                       setSearch("");
                       setGenderFilter("");
                       setCourseFilter("");
+                      setBatchFilter("");
                       setStatus("");
                       setCurrentPage(1);
                     }}

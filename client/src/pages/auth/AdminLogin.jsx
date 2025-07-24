@@ -112,7 +112,7 @@ const AdminLogin = () => {
         <button
           onClick={handleInfoClick}
           style={{ position: "fixed", top: 24, right: 24, zIndex: 50 }}
-          className="text-black rounded-full"
+          className="text-black border-2 rounded-full"
           title="Back to Home?"
         >
           <svg
