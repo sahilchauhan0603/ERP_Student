@@ -43,13 +43,26 @@ export default function AdminDashboard() {
         withCredentials: true,
       });
       setStats(res.data);
-    } catch {
+    } catch (err) {
       setStats({ total: 0, pending: 0, approved: 0, declined: 0 });
-      Swal.fire({
-        icon: "error",
-        title: "Failed to load stats",
-        text: "Could not fetch dashboard statistics. Please try again later. Redirecting to login page...",
-      });
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        Swal.fire({
+          icon: "error",
+          title: "Unauthorized Access",
+          text: "This page can only be accessed by authorized admins. Please log in as an admin.",
+          timer: 7000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        }).then(() => {
+          window.location.href = "/admin";
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Failed to load stats",
+          text: "Could not fetch dashboard statistics. Please try again later.",
+        });
+      }
     }
     setLoading(false);
   };
