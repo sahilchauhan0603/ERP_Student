@@ -7,7 +7,6 @@ import FacultyRegistration from './pages/registration/faculty/FacultyRegistratio
 import NonTeachingStaffRegistration from './pages/registration/nonTeachingStaff/NonTeachingStaffRegistration';
 import StudentLogin from './pages/auth/StudentLogin';
 import AdminLogin from './pages/auth/AdminLogin';
-// import StudentDashboard from './pages/studentdashboard/Dashboard';
 import StudentDetailsDashboardPage  from './pages/studentdashboard/StudentDetailsDashboardPage';
 import RegistrationPage from './pages/registration/registrationPage';
 import AdminLayout from './components/AdminLayout';
@@ -16,7 +15,7 @@ import AdminAllStudents from './pages/admin/AdminAllStudents';
 import PendingStudents from './pages/admin/PendingStudents';
 import ApprovedStudents from './pages/admin/ApprovedStudents';
 import DeclinedStudents from './pages/admin/DeclinedStudents';
-import CustomModal from './components/CustomModal';
+// import CustomModal from './components/CustomModal';
 import axios from 'axios';
 
 function AuthRoute({ children, role }) {
@@ -41,9 +40,9 @@ function AuthRoute({ children, role }) {
       });
   }, [role, navigate]);
 
-  if (unauthorized) {
-    return <CustomModal isOpen title="Unauthorized" message="You must be logged in to access this page." type="error" duration={1800} />;
-  }
+  // if (unauthorized) {
+  //   return <CustomModal isOpen title="Unauthorized" message="You must be logged in to access this page." type="error" duration={1800} />;
+  // }
   if (redirecting) return null;
   return children;
 }
