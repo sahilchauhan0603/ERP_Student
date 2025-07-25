@@ -46,7 +46,18 @@ const StudentDetailsDashboard = () => {
         }
       } catch (err) {
         console.error("Failed to fetch student details:", err);
-        if (err.response?.status === 404) {
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          Swal.fire({
+            icon: "error",
+            title: "Unauthorized Access",
+            text: "This page can only be accessed by authorized students.",
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          }).then(() => {
+            window.location.href = "/login";
+          });
+        } else if (err.response?.status === 404) {
           setError("Student not found");
         } else if (err.response?.status === 400) {
           setError("Invalid student ID");

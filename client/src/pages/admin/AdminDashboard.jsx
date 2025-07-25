@@ -50,7 +50,7 @@ export default function AdminDashboard() {
           icon: "error",
           title: "Unauthorized Access",
           text: "This page can only be accessed by authorized admins. Please log in as an admin.",
-          timer: 7000,
+          timer: 3000,
           timerProgressBar: true,
           showConfirmButton: false,
         }).then(() => {
