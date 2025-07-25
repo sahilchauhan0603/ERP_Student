@@ -543,6 +543,10 @@ const StudentDetailsDashboard = () => {
   }
 
   if (error || !details) {
+    // If unauthorized, SweetAlert will handle it, so don't render the background alert
+    if (error === "Unauthorized" || error === "Unauthorized Access") {
+      return null;
+    }
     return (
       <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-gray-50">
         <div className="text-center max-w-md">
