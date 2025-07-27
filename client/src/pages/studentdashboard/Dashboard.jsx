@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Tab } from "@headlessui/react";
+import { formatFamilyIncome } from "../../utils/formatters";
 import { useNavigate } from "react-router-dom";
 import { forceLogoutStudent } from "../../App";
 import Swal from "sweetalert2";
@@ -885,11 +886,7 @@ const StudentDetailsDashboard = () => {
               <div>
                 <p className="text-sm text-gray-500">Family Income</p>
                 <p className="text-2xl font-bold text-gray-800">
-                  {details.parent?.familyIncome
-                    ? `₹${Number(details.parent.familyIncome).toLocaleString(
-                        "en-IN"
-                      )}`
-                    : "N/A"}
+                  {formatFamilyIncome(details.parent?.familyIncome)}
                 </p>
               </div>
             </div>
@@ -1171,13 +1168,7 @@ const StudentDetailsDashboard = () => {
                 <DetailCard title="Family Information" section="parent">
                   <DetailItem
                     label="Annual Income"
-                    value={
-                      details.parent?.familyIncome
-                        ? `₹${Number(
-                            details.parent.familyIncome
-                          ).toLocaleString("en-IN")}`
-                        : "N/A"
-                    }
+                    value={formatFamilyIncome(details.parent?.familyIncome)}
                     field="familyIncome"
                     section="parent"
                   />

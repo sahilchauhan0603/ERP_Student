@@ -1,4 +1,4 @@
-const transporter = require('../config/mailer');
+const { transporter } = require('../config/mailer');
 
 async function sendStatusEmail(to, subject, html) {
   const mailOptions = {
