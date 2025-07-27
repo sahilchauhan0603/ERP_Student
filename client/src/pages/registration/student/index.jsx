@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CustomModal from "../../../components/CustomModal";
 import axios from "axios";
+import Swal from "sweetalert2";
 import ProgressBar from "../../../components/ProgressBar";
 import Instructions from "./STEP1_Instructions";
 import PersonalInfo from "./STEP2_PersonalInfo";
@@ -371,11 +372,41 @@ const StudentRegistration = () => {
 
       if (response.data.success) {
         setSubmitSuccess(true);
-        showModal({
-          title: "Registration Successful",
-          message:
-            "Your registration has been submitted successfully. You will receive a confirmation email shortly.",
-          type: "success",
+        
+        // Show success alert with SweetAlert2
+        Swal.fire({
+          title: "Registration Successful! 🎉",
+          html: `
+            <div class="text-center">
+              <div class="mb-4">
+                <svg class="mx-auto h-16 w-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-2">Welcome to BPIT!</h3>
+              <p class="text-gray-600 mb-4">
+                Your registration has been submitted successfully. You will receive a confirmation email shortly.
+              </p>
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+                <p class="font-medium">What's Next?</p>
+                <ul class="mt-1 space-y-1">
+                  <li>• Your profile is under review</li>
+                  <li>• You'll be notified once approved</li>
+                  <li>• Check your email for updates</li>
+                </ul>
+              </div>
+            </div>
+          `,
+          icon: "success",
+          confirmButtonText: "Go to Homepage",
+          confirmButtonColor: "#3B82F6",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Redirect to homepage
+            window.location.href = '/';
+          }
         });
       }
     } catch (error) {

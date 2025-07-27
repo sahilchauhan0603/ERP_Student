@@ -2,6 +2,8 @@ const sendOtpMail = require("../utils/studentOTPMailer");
 const sendStatusEmail = require("../utils/sendStatusEmail");
 const db = require("../config/db");
 const uploadToCloudinary = require("../utils/cloudinaryUpload");
+const { sendRegistrationEmail } = require("../utils/registrationEmail");
+const { sendEmail } = require("../config/mailer");
 const otpStore = {}; // In-memory store for OTPs, consider using Redis or similar in production
 const { signToken } = require("../utils/jwt");
 const rateLimit = require("express-rate-limit");
@@ -338,12 +340,30 @@ exports.registerStudent = async (req, res) => {
       });
       
       const sql = "INSERT INTO students SET ?";
-      db.query(sql, student, (err, result) => {
+      db.query(sql, student, async (err, result) => {
         if (err) {
           console.error("DB Insert Error:", err);
           return res.status(500).json({ message: "Database error", error: err });
         }
         console.log("Student successfully inserted with ID:", result.insertId);
+        
+        // Send confirmation email to the student
+        try {
+          const studentName = `${student.firstName} ${student.lastName}`;
+          const emailHtml = sendRegistrationEmail(student.email, studentName, result.insertId);
+          
+          await sendEmail({
+            to: student.email,
+            subject: "Registration Confirmation - Welcome to BPIT! 🎓",
+            html: emailHtml
+          });
+          
+          console.log("Confirmation email sent successfully to:", student.email);
+        } catch (emailError) {
+          console.error("Failed to send confirmation email:", emailError);
+          // Don't fail the registration if email fails
+        }
+        
         res
           .status(201)
           .json({
