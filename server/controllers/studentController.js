@@ -167,6 +167,13 @@ const docFields = [
 
 exports.registerStudent = async (req, res) => {
   try {
+    console.log("Registration request received:", {
+      bodyKeys: Object.keys(req.body),
+      hasPersonal: !!req.body["personal.firstName"],
+      hasAcademic: !!req.body["academic.classX.institute"],
+      hasParents: !!req.body["parents.father.name"],
+      hasDocuments: !!req.body.photo
+    });
     // Parse JSON fields for achievements
     let academicAchievements =
       req.body["academicAchievements"] ||
@@ -323,15 +330,24 @@ exports.registerStudent = async (req, res) => {
       student.created_at = createdAt;
 
       // Insert into DB
+      console.log("Attempting to insert student:", {
+        studentKeys: Object.keys(student),
+        email: student.email,
+        firstName: student.firstName,
+        course: student.course
+      });
+      
       const sql = "INSERT INTO students SET ?";
       db.query(sql, student, (err, result) => {
         if (err) {
           console.error("DB Insert Error:", err);
           return res.status(500).json({ message: "Database error", error: err });
         }
+        console.log("Student successfully inserted with ID:", result.insertId);
         res
           .status(201)
           .json({
+            success: true,
             message: "Student registered successfully",
             studentId: result.insertId,
           });

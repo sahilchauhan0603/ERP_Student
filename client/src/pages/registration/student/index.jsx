@@ -297,9 +297,70 @@ const StudentRegistration = () => {
         }
       }
 
+      // Flatten the nested object structure to match backend expectations
       const submissionData = {
-        ...formData,
-        documents: documentsWithBase64,
+        // Personal fields
+        "personal.course": formData.personal.course,
+        "personal.firstName": formData.personal.firstName,
+        "personal.middleName": formData.personal.middleName,
+        "personal.lastName": formData.personal.lastName,
+        "personal.abcId": formData.personal.abcId,
+        "personal.dob": formData.personal.dob,
+        "personal.placeOfBirth": formData.personal.placeOfBirth,
+        "personal.mobile": formData.personal.mobile,
+        "personal.email": formData.personal.email,
+        "personal.examRoll": formData.personal.examRoll,
+        "personal.examRank": formData.personal.examRank,
+        "personal.gender": formData.personal.gender,
+        "personal.category": formData.personal.category,
+        "personal.subCategory": formData.personal.subCategory,
+        "personal.region": formData.personal.region,
+        "personal.currentAddress": formData.personal.currentAddress,
+        "personal.permanentAddress": formData.personal.permanentAddress,
+        "personal.feeReimbursement": formData.personal.feeReimbursement,
+        "personal.antiRaggingRef": formData.personal.antiRaggingRef,
+        
+        // Academic fields
+        "academic.classX.institute": formData.academic.classX.institute,
+        "academic.classX.board": formData.academic.classX.board,
+        "academic.classX.year": formData.academic.classX.year,
+        "academic.classX.aggregate": formData.academic.classX.aggregate,
+        "academic.classX.pcm": formData.academic.classX.pcm,
+        "academic.classX.isDiplomaOrPolytechnic": formData.academic.classX.isDiplomaOrPolytechnic,
+        "academic.classXII.institute": formData.academic.classXII.institute,
+        "academic.classXII.board": formData.academic.classXII.board,
+        "academic.classXII.year": formData.academic.classXII.year,
+        "academic.classXII.aggregate": formData.academic.classXII.aggregate,
+        "academic.classXII.pcm": formData.academic.classXII.pcm,
+        "academic.otherQualification.institute": formData.academic.otherQualification.institute,
+        "academic.otherQualification.board": formData.academic.otherQualification.board,
+        "academic.otherQualification.year": formData.academic.otherQualification.year,
+        "academic.otherQualification.aggregate": formData.academic.otherQualification.aggregate,
+        "academic.otherQualification.pcm": formData.academic.otherQualification.pcm,
+        "academic.academicAchievements": JSON.stringify(formData.academic.academicAchievements),
+        "academic.coCurricularAchievements": JSON.stringify(formData.academic.coCurricularAchievements),
+        
+        // Parents fields
+        "parents.father.name": formData.parents.father.name,
+        "parents.father.qualification": formData.parents.father.qualification,
+        "parents.father.occupation": formData.parents.father.occupation,
+        "parents.father.email": formData.parents.father.email,
+        "parents.father.mobile": formData.parents.father.mobile,
+        "parents.father.telephoneSTD": formData.parents.father.telephoneSTD,
+        "parents.father.telephone": formData.parents.father.telephone,
+        "parents.father.officeAddress": formData.parents.father.officeAddress,
+        "parents.mother.name": formData.parents.mother.name,
+        "parents.mother.qualification": formData.parents.mother.qualification,
+        "parents.mother.occupation": formData.parents.mother.occupation,
+        "parents.mother.email": formData.parents.mother.email,
+        "parents.mother.mobile": formData.parents.mother.mobile,
+        "parents.mother.telephoneSTD": formData.parents.mother.telephoneSTD,
+        "parents.mother.telephone": formData.parents.mother.telephone,
+        "parents.mother.officeAddress": formData.parents.mother.officeAddress,
+        "parents.familyIncome": formData.parents.familyIncome,
+        
+        // Documents
+        ...documentsWithBase64
       };
 
       const response = await axios.post(
