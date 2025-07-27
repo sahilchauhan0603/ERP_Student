@@ -285,41 +285,53 @@ exports.registerStudent = async (req, res) => {
       familyIncome: req.body["parents.familyIncome"],
     };
 
-    // Calculate batch based on created_at and course
-    function calculateBatch(createdAt, course) {
-      const year = new Date(createdAt).getFullYear();
-      let endYear;
-      if (
-        course.startsWith("B.Tech") ||
-        course.startsWith("LE-B.Tech")
-      ) {
-        endYear = year + 4;
-      } else if (course === "BBA" || course === "MBA") {
-        endYear = year + 3;
-      } else {
-        endYear = year + 3;
+    // Check for duplicate email or abcId
+    const duplicateCheckSql = "SELECT id FROM students WHERE email = ? OR abcId = ? LIMIT 1";
+    db.query(duplicateCheckSql, [student.email, student.abcId], (dupErr, dupResults) => {
+      if (dupErr) {
+        console.error("DB Duplicate Check Error:", dupErr);
+        return res.status(500).json({ message: "Database error", error: dupErr });
       }
-      return `${year}-${endYear}`;
-    }
-
-    // Use current date for created_at (will match DB default)
-    const createdAt = new Date();
-    student.batch = calculateBatch(createdAt, student.course);
-    student.created_at = createdAt;
-
-    // Insert into DB
-    const sql = "INSERT INTO students SET ?";
-    db.query(sql, student, (err, result) => {
-      if (err) {
-        console.error("DB Insert Error:", err);
-        return res.status(500).json({ message: "Database error", error: err });
+      if (dupResults && dupResults.length > 0) {
+        return res.status(400).json({ message: "A user with this email or ABC ID already exists. Please enter a valid email and ABC ID." });
       }
-      res
-        .status(201)
-        .json({
-          message: "Student registered successfully",
-          studentId: result.insertId,
-        });
+
+      // Calculate batch based on created_at and course
+      function calculateBatch(createdAt, course) {
+        const year = new Date(createdAt).getFullYear();
+        let endYear;
+        if (
+          course.startsWith("B.Tech") ||
+          course.startsWith("LE-B.Tech")
+        ) {
+          endYear = year + 4;
+        } else if (course === "BBA" || course === "MBA") {
+          endYear = year + 3;
+        } else {
+          endYear = year + 3;
+        }
+        return `${year}-${endYear}`;
+      }
+
+      // Use current date for created_at (will match DB default)
+      const createdAt = new Date();
+      student.batch = calculateBatch(createdAt, student.course);
+      student.created_at = createdAt;
+
+      // Insert into DB
+      const sql = "INSERT INTO students SET ?";
+      db.query(sql, student, (err, result) => {
+        if (err) {
+          console.error("DB Insert Error:", err);
+          return res.status(500).json({ message: "Database error", error: err });
+        }
+        res
+          .status(201)
+          .json({
+            message: "Student registered successfully",
+            studentId: result.insertId,
+          });
+      });
     });
   } catch (error) {
     console.error("Register Student Error:", error);
@@ -969,4 +981,23 @@ exports.logout = (req, res) => {
     sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
   });
   res.json({ message: "Logged out successfully" });
+};
+
+// Real-time uniqueness check endpoints
+exports.checkEmailExists = (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.status(400).json({ exists: false, message: "Email is required" });
+  db.query("SELECT id FROM students WHERE email = ?", [email], (err, results) => {
+    if (err) return res.status(500).json({ exists: false, message: "DB error" });
+    res.json({ exists: results.length > 0 });
+  });
+};
+
+exports.checkAbcIdExists = (req, res) => {
+  const { abcId } = req.query;
+  if (!abcId) return res.status(400).json({ exists: false, message: "ABC ID is required" });
+  db.query("SELECT id FROM students WHERE abcId = ?", [abcId], (err, results) => {
+    if (err) return res.status(500).json({ exists: false, message: "DB error" });
+    res.json({ exists: results.length > 0 });
+  });
 };

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import axios from "axios";
 
 const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
   const courses = [
@@ -34,6 +35,8 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
       ? formData.personal.email.replace(/@gmail\.com$/, "")
       : ""
   );
+  const [emailError, setEmailError] = useState("");
+  const [abcIdError, setAbcIdError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -77,6 +80,36 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
         email: value ? value + "@gmail.com" : "",
       },
     }));
+  };
+
+  const checkEmailUnique = async (email) => {
+    if (!email) return;
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/student/check-email?email=${encodeURIComponent(email)}`);
+      if (res.data.exists) {
+        setEmailError("A user with this email already exists. Please enter a valid email.");
+      } else {
+        setEmailError("");
+      }
+    } catch (error) {
+      console.error("Email check error:", error);
+      setEmailError("Could not verify email uniqueness.");
+    }
+  };
+
+  const checkAbcIdUnique = async (abcId) => {
+    if (!abcId) return;
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/student/check-abcid?abcId=${encodeURIComponent(abcId)}`);
+      if (res.data.exists) {
+        setAbcIdError("A user with this ABC ID already exists. Please enter a valid ABC ID.");
+      } else {
+        setAbcIdError("");
+      }
+    } catch (error) {
+      console.error("ABC ID check error:", error);
+      setAbcIdError("Could not verify ABC ID uniqueness.");
+    }
   };
 
   return (
@@ -230,16 +263,17 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 placeholder="ABC ID"
                 value={formData.personal.abcId || ""}
                 onChange={handleChange}
+                onBlur={e => checkAbcIdUnique(e.target.value)}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("abcId")
+                  incompleteFields.includes("abcId") || abcIdError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
                 required
               />
-              {incompleteFields.includes("abcId") && (
+              {(incompleteFields.includes("abcId") || abcIdError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  ABC ID is required
+                  {abcIdError || "ABC ID is required"}
                 </div>
               )}
             </div>
@@ -371,8 +405,9 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                   placeholder="your.email"
                   value={emailUser}
                   onChange={handleEmailUserChange}
+                  onBlur={e => checkEmailUnique(e.target.value + "@gmail.com")}
                   className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                    incompleteFields.includes("email")
+                    incompleteFields.includes("email") || emailError
                       ? "border-red-500"
                       : "border-gray-400"
                   }`}
@@ -382,9 +417,9 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                   @gmail.com
                 </span>
               </div>
-              {incompleteFields.includes("email") && (
+              {(incompleteFields.includes("email") || emailError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Email is required
+                  {emailError || "Email is required"}
                 </div>
               )}
             </div>

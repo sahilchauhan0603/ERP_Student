@@ -8,11 +8,11 @@ CREATE TABLE IF NOT EXISTS students (
   firstName VARCHAR(100),
   middleName VARCHAR(100),
   lastName VARCHAR(100),
-  abcId VARCHAR(100),
+  abcId VARCHAR(100) UNIQUE,
   dob DATE,
   placeOfBirth VARCHAR(100),
   mobile VARCHAR(20),
-  email VARCHAR(100),
+  email VARCHAR(100) UNIQUE,
   examRoll VARCHAR(100),
   examRank VARCHAR(100),
   gender VARCHAR(20),
@@ -85,7 +85,9 @@ CREATE TABLE IF NOT EXISTS students (
 
   familyIncome VARCHAR(100),
   status ENUM('pending','approved','declined') DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  declinedFields TEXT,
+  batch VARCHAR(20)
 );
 `;
 

@@ -31,4 +31,8 @@ router.patch('/students/me/update-declined', authenticate, authorizeRole('studen
 
 router.post('/logout', studentController.logout);
 
+// Real-time uniqueness check endpoints
+router.get('/check-email', studentController.checkEmailExists);
+router.get('/check-abcid', studentController.checkAbcIdExists);
+
 module.exports = router;

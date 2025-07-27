@@ -319,10 +319,13 @@ const StudentRegistration = () => {
       }
     } catch (error) {
       console.error("Registration error:", error);
-      setSubmitError(
-        error.response?.data?.message ||
-          "An error occurred during registration. Please try again."
-      );
+      showModal({
+        title: "Registration Failed",
+        message:
+          error.response?.data?.message ||
+          "An error occurred during registration. Please try again.",
+        type: "error",
+      });
     } finally {
       setIsSubmitting(false);
     }
