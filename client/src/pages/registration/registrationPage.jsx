@@ -4,6 +4,7 @@ import { BsPersonBadge } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import campusBackground from "../../assets/images/BPIT.png"; // Make sure this path is correct
+import bpitLogo from "../../assets/icons/BPIT-logo-transparent.png";
 
 const RegistrationPage = () => {
   const [loaded, setLoaded] = useState(false);
@@ -53,22 +54,61 @@ const RegistrationPage = () => {
         minHeight: "100vh",
       }}
     >
+      {/* Header */}
+      <header
+        className="w-full bg-white border-t-4 border-b-4 border-red-500 shadow-lg flex flex-col md:flex-row items-center justify-between px-2 md:px-10 py-3 relative z-20"
+        style={{ minHeight: 100, borderRadius: "0 0 1.5rem 1.5rem" }}
+      >
+        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full md:w-auto">
+          <div className="flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-1 md:p-2 shadow-sm border border-blue-200">
+            <img
+              src={bpitLogo}
+              alt="BPIT Logo"
+              className="h-14 sm:h-16 w-auto object-contain drop-shadow-md"
+              style={{ minWidth: 56 }}
+            />
+          </div>
+          <div className="flex flex-col justify-center items-center sm:items-start text-center sm:text-left w-full">
+            <h1
+              className="text-lg xs:text-xl md:text-3xl font-extrabold text-blue-900 leading-tight tracking-tight drop-shadow-sm"
+              style={{ fontFamily: "serif", letterSpacing: 0.5 }}
+            >
+              Bhagwan Parshuram Institute of Technology
+            </h1>
+            <div
+              className="text-sm xs:text-base md:text-lg font-bold text-red-600 leading-tight mt-0.5 md:mt-1"
+              style={{ fontFamily: "serif", letterSpacing: 0.2 }}
+            >
+              <span className="tracking-wide">
+                A Unit of Bhartiya Brahmin Charitable Trust (Regd.)
+              </span>
+            </div>
+            <div
+              className="text-xs md:text-sm text-blue-700 font-medium mt-0.5 md:mt-1"
+              style={{ fontFamily: "serif" }}
+            >
+              <span className="block">
+                (Approved by AICTE, Ministry of Education (MoE))
+              </span>
+              <span className="block">
+                Affiliated to Guru Gobind Singh Indraprastha University, Delhi
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mt-3 md:mt-0 md:ml-4">
+          <img
+            src="https://bpitindia.ac.in/wp-content/uploads/2024/03/Header-1-1-300x88-1.jpg"
+            alt="G20 Logo"
+            className="h-16 sm:h-20 md:h-24 w-auto object-contain bg-white rounded-lg border border-blue-100 shadow-sm p-1"
+            style={{ minWidth: 40 }}
+          />
+        </div>
+      </header>
+
       {/* Main Content */}
       <main className="flex-1 w-full flex flex-col items-center py-12 px-4">
-        {/* Animated Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={loaded ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="mb-12 text-center"
-        >
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
-            Join <span className="text-blue-600">CampusPro</span>
-          </h1>
-          <p className="text-lg text-gray-600 max-w-md">
-            Select your role to begin the registration process
-          </p>
-        </motion.div>
+
 
         {/* Registration Cards */}
         <motion.div
