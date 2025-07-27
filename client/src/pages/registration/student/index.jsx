@@ -8,6 +8,8 @@ import AcademicInfo from "./STEP3_AcademicInfo";
 import DocumentsUpload from "./STEP5_DocumentsUpload";
 import ReviewSubmit from "./STEP6_ReviewSubmit";
 import ParentsInfo from "./STEP4_ParentDetails"; // Assuming this is the correct import path
+import bpitLogo from "../../../assets/icons/BPIT-logo-transparent.png";
+import campusBackground from "../../../assets/images/BPIT.png";
 
 import { useEffect } from "react";
 
@@ -117,19 +119,12 @@ const StudentRegistration = () => {
         occupation: "",
         email: "",
         mobile: "",
-        telephoneSTD: "",
-        telephone: "",
-        officeAddress: "",
       },
       mother: {
         name: "",
         qualification: "",
         occupation: "",
-        email: "",
         mobile: "",
-        telephoneSTD: "",
-        telephone: "",
-        officeAddress: "",
       },
       familyIncome: "",
     },
@@ -137,134 +132,106 @@ const StudentRegistration = () => {
 
   const nextStep = () => {
     const missing = getIncompleteFields(currentStep);
-    if (missing.length === 0) {
-      if (currentStep < steps.length - 1) {
-        let stepName = steps[currentStep]?.label || "Current form";
-        showModal({
-          title: "Step Completed!",
-          message: `${stepName} successfully filled. Proceeding to next step...`,
-          type: "success",
-          onClose: () => {
-            setModal((m) => ({ ...m, isOpen: false }));
-            setCurrentStep(currentStep + 1);
-            setIncompleteFields([]);
-          },
-        });
-      }
-    } else {
+    if (missing.length > 0) {
       setIncompleteFields(missing);
       showModal({
         title: "Incomplete Fields",
-        message: "Please fill all required fields before proceeding.",
+        message: "Please fill all required fields before proceeding to the next section.",
         type: "error",
       });
+      return;
     }
+    // Show success modal before moving to next step
+    showModal({
+      title: "Section Completed!",
+      message: `You have successfully completed this section. Proceeding to the next section...`,
+      type: "success",
+      onClose: () => {
+        setModal((m) => ({ ...m, isOpen: false }));
+        setCurrentStep((prev) => prev + 1);
+        setIncompleteFields([]);
+      },
+    });
   };
 
   const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+    setCurrentStep((prev) => prev - 1);
+    setIncompleteFields([]);
   };
 
   const validateCurrentStep = () => {
-    switch (currentStep) {
-      case 0:
-        return true; // Instructions
-      case 1:
-        return validatePersonalInfo();
-      case 2:
-        return validateAcademicInfo();
-      case 3:
-        return validateParentInfo();
-      case 4:
-        return validateDocuments();
-      default:
-        return true;
+    const missing = getIncompleteFields(currentStep);
+    if (missing.length > 0) {
+      setIncompleteFields(missing);
+      showModal({
+        title: "Incomplete Information",
+        message: `Please complete all required fields before proceeding.`,
+        type: "warning",
+      });
+      return false;
     }
+    return true;
   };
 
   const validatePersonalInfo = () => {
     const { personal } = formData;
-    return (
-      personal.course &&
-      personal.firstName &&
-      personal.lastName &&
-      personal.abcId &&
-      personal.email &&
-      personal.mobile &&
-      personal.dob &&
-      personal.examRoll &&
-      personal.examRank &&
-      personal.gender &&
-      personal.category &&
-      personal.region &&
-      personal.currentAddress &&
-      personal.permanentAddress &&
-      personal.feeReimbursement &&
-      personal.antiRaggingRef
-    );
+    const missing = [];
+    if (!personal.course) missing.push("course");
+    if (!personal.firstName) missing.push("firstName");
+    if (!personal.lastName) missing.push("lastName");
+    if (!personal.abcId) missing.push("abcId");
+    if (!personal.dob) missing.push("dob");
+    if (!personal.placeOfBirth) missing.push("placeOfBirth");
+    if (!personal.mobile) missing.push("mobile");
+    if (!personal.email) missing.push("email");
+    if (!personal.examRoll) missing.push("examRoll");
+    if (!personal.examRank) missing.push("examRank");
+    if (!personal.gender) missing.push("gender");
+    if (!personal.category) missing.push("category");
+    if (!personal.region) missing.push("region");
+    if (!personal.currentAddress) missing.push("currentAddress");
+    if (!personal.permanentAddress) missing.push("permanentAddress");
+    if (!personal.feeReimbursement) missing.push("feeReimbursement");
+    if (!personal.antiRaggingRef) missing.push("antiRaggingRef");
+    return missing;
   };
 
   const validateAcademicInfo = () => {
     const { academic } = formData;
+    const missing = [];
+    const { classX, classXII, otherQualification } = academic;
 
-    const isClassXValid =
-      academic.classX.institute &&
-      academic.classX.board &&
-      academic.classX.year &&
-      academic.classX.aggregate &&
-      academic.classX.isDiplomaOrPolytechnic !== undefined &&
-      academic.classX.isDiplomaOrPolytechnic !== null;
+    // Class X validation
+    if (!classX.institute) missing.push("classX.institute");
+    if (!classX.board) missing.push("classX.board");
+    if (!classX.year) missing.push("classX.year");
+    if (!classX.aggregate) missing.push("classX.aggregate");
+    // PCM % is NOT required for classX
 
-    const isClassXIIValid =
-      academic.classXII.institute &&
-      academic.classXII.board &&
-      academic.classXII.year &&
-      academic.classXII.aggregate &&
-      academic.classXII.pcm;
+    // Class XII validation
+    if (!classXII.institute) missing.push("classXII.institute");
+    if (!classXII.board) missing.push("classXII.board");
+    if (!classXII.year) missing.push("classXII.year");
+    if (!classXII.aggregate) missing.push("classXII.aggregate");
+    if (!classXII.pcm) missing.push("classXII.pcm");
 
-    const hasOtherQualification =
-      academic.otherQualification.institute ||
-      academic.otherQualification.board ||
-      academic.otherQualification.year ||
-      academic.otherQualification.aggregate ||
-      academic.otherQualification.pcm;
-
-    const isOtherQualificationValid =
-      !hasOtherQualification ||
-      (academic.otherQualification.institute &&
-        academic.otherQualification.board &&
-        academic.otherQualification.year &&
-        academic.otherQualification.aggregate &&
-        academic.otherQualification.pcm);
-
-    const isAchievementsValid = academic.academicAchievements.every((ach) => {
-      const anyFilled = ach.event || ach.date || ach.outcome;
-      const allFilled = ach.event && ach.date && ach.outcome;
-      return !anyFilled || allFilled;
-    });
-
-    const isCoAchievementsValid = academic.coCurricularAchievements.every(
-      (ach) => {
-        const anyFilled = ach.event || ach.date || ach.outcome;
-        const allFilled = ach.event && ach.date && ach.outcome;
-        return !anyFilled || allFilled;
-      }
-    );
-
-    return (
-      isClassXValid &&
-      isClassXIIValid &&
-      isOtherQualificationValid &&
-      isAchievementsValid &&
-      isCoAchievementsValid
-      // && isCourseValid
-    );
+    // Other Qualification validation (if any field is filled)
+    const oq = otherQualification;
+    const oqAny =
+      oq.institute || oq.board || oq.year || oq.aggregate || oq.pcm;
+    if (oqAny) {
+      if (!oq.institute) missing.push("otherQualification.institute");
+      if (!oq.board) missing.push("otherQualification.board");
+      if (!oq.year) missing.push("otherQualification.year");
+      if (!oq.aggregate) missing.push("otherQualification.aggregate");
+      if (!oq.pcm) missing.push("otherQualification.pcm");
+    }
+    return missing;
   };
 
   const validateDocuments = () => {
     const { documents } = formData;
+    const missing = [];
     const requiredDocs = [
       "photo",
       "ipuRegistration",
@@ -283,124 +250,79 @@ const StudentRegistration = () => {
       "collegeFeeReceipt",
       "parentSignature",
     ];
-
-    return requiredDocs.every((doc) => documents[doc]);
+    requiredDocs.forEach((doc) => {
+      if (!documents[doc]) missing.push(doc);
+    });
+    return missing;
   };
 
   const validateParentInfo = () => {
     const { parents } = formData;
-
-    const fatherValid =
-      parents.father.name &&
-      parents.father.qualification &&
-      parents.father.occupation &&
-      parents.father.email &&
-      parents.father.mobile;
-
-    const motherValid =
-      parents.mother.name &&
-      parents.mother.qualification &&
-      parents.mother.occupation &&
-      parents.mother.mobile;
-
-    const incomeValid = parents.familyIncome;
-
-    return fatherValid && motherValid && incomeValid;
+    const missing = [];
+    // Father
+    if (!parents.father.name) missing.push("father.name");
+    if (!parents.father.qualification) missing.push("father.qualification");
+    if (!parents.father.occupation) missing.push("father.occupation");
+    if (!parents.father.email) missing.push("father.email");
+    if (!parents.father.mobile) missing.push("father.mobile");
+    // Mother
+    if (!parents.mother.name) missing.push("mother.name");
+    if (!parents.mother.qualification) missing.push("mother.qualification");
+    if (!parents.mother.occupation) missing.push("mother.occupation");
+    if (!parents.mother.mobile) missing.push("mother.mobile");
+    // Family Income
+    if (!parents.familyIncome) missing.push("familyIncome");
+    return missing;
   };
 
-  // console.log("Valid Parent Info:", validateParentInfo());
-
-  // Helper: convert File to base64
   const fileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
       reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
     });
   };
 
   const handleSubmit = async () => {
-    if (!validateCurrentStep()) {
-      alert("Please complete all required fields");
-      return;
-    }
-
     setIsSubmitting(true);
     setSubmitError(null);
 
     try {
-      // Build a plain object for JSON submission
-      const payload = {};
-
-      // Personal
-      for (const [key, value] of Object.entries(formData.personal)) {
-        if (value !== null && value !== undefined) {
-          payload[`personal.${key}`] = value;
+      // Convert all files to base64
+      const documentsWithBase64 = { ...formData.documents };
+      for (const [key, file] of Object.entries(documentsWithBase64)) {
+        if (file) {
+          documentsWithBase64[key] = await fileToBase64(file);
         }
       }
 
-      // Academic
-      for (const [section, data] of Object.entries(formData.academic)) {
-        if (Array.isArray(data)) {
-          payload[`academic.${section}`] = data;
-        } else {
-          for (const [field, value] of Object.entries(data)) {
-            if (value) payload[`academic.${section}.${field}`] = value;
-          }
-        }
-      }
-
-      // Parents
-      for (const [parentType, data] of Object.entries(formData.parents)) {
-        if (parentType === "familyIncome") {
-          if (data) payload["parents.familyIncome"] = data;
-          continue;
-        }
-        for (const [field, value] of Object.entries(data)) {
-          if (value) payload[`parents.${parentType}.${field}`] = value;
-        }
-      }
-
-      // Documents: convert File to base64
-      for (const [docType, file] of Object.entries(formData.documents)) {
-        if (file instanceof File) {
-          payload[docType] = await fileToBase64(file);
-        } else {
-          payload[docType] = null;
-        }
-      }
-
-      // Achievements arrays as JSON strings (for backend compatibility)
-      if (formData.academic.academicAchievements)
-        payload["academic.academicAchievements"] = JSON.stringify(
-          formData.academic.academicAchievements
-        );
-      if (formData.academic.coCurricularAchievements)
-        payload["academic.coCurricularAchievements"] = JSON.stringify(
-          formData.academic.coCurricularAchievements
-        );
+      const submissionData = {
+        ...formData,
+        documents: documentsWithBase64,
+      };
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/student/register`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
+        submissionData,
+        { withCredentials: true }
       );
 
-      setSubmitSuccess(true);
-      console.log("Registration successful:", response.data);
+      if (response.data.success) {
+        setSubmitSuccess(true);
+        showModal({
+          title: "Registration Successful",
+          message:
+            "Your registration has been submitted successfully. You will receive a confirmation email shortly.",
+          type: "success",
+        });
+      }
     } catch (error) {
       console.error("Registration error:", error);
-      const errorMessage =
+      setSubmitError(
         error.response?.data?.message ||
-        error.message ||
-        "Registration failed. Please try again.";
-      setSubmitError(errorMessage);
+          "An error occurred during registration. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -409,53 +331,9 @@ const StudentRegistration = () => {
   function getIncompleteFields(step) {
     const missing = [];
     if (step === 1) {
-      const { personal } = formData;
-      if (!personal.course) missing.push("course");
-      if (!personal.firstName) missing.push("firstName");
-      if (!personal.lastName) missing.push("lastName");
-      if (!personal.abcId) missing.push("abcId");
-      if (!personal.email) missing.push("email");
-      if (!personal.mobile) missing.push("mobile");
-      if (!personal.dob) missing.push("dob");
-      if (!personal.examRoll) missing.push("examRoll");
-      if (!personal.examRank) missing.push("examRank");
-      if (!personal.gender) missing.push("gender");
-      if (!personal.category) missing.push("category");
-      if (!personal.region) missing.push("region");
-      if (!personal.currentAddress) missing.push("currentAddress");
-      if (!personal.permanentAddress) missing.push("permanentAddress");
-      if (!personal.feeReimbursement) missing.push("feeReimbursement");
-      if (!personal.antiRaggingRef) missing.push("antiRaggingRef");
+      return validatePersonalInfo();
     } else if (step === 2) {
-      const { academic } = formData;
-      // Class X
-      if (!academic.classX.institute) missing.push("classX.institute");
-      if (!academic.classX.board) missing.push("classX.board");
-      if (!academic.classX.year) missing.push("classX.year");
-      if (!academic.classX.aggregate) missing.push("classX.aggregate");
-      if (
-        academic.classX.isDiplomaOrPolytechnic === undefined ||
-        academic.classX.isDiplomaOrPolytechnic === null ||
-        academic.classX.isDiplomaOrPolytechnic === ""
-      )
-        missing.push("classX.isDiplomaOrPolytechnic");
-      // Class XII
-      if (!academic.classXII.institute) missing.push("classXII.institute");
-      if (!academic.classXII.board) missing.push("classXII.board");
-      if (!academic.classXII.year) missing.push("classXII.year");
-      if (!academic.classXII.aggregate) missing.push("classXII.aggregate");
-      if (!academic.classXII.pcm) missing.push("classXII.pcm");
-      // Other Qualification (optional, but if any field is filled, all must be filled)
-      const oq = academic.otherQualification;
-      const oqAny =
-        oq.institute || oq.board || oq.year || oq.aggregate || oq.pcm;
-      if (oqAny) {
-        if (!oq.institute) missing.push("otherQualification.institute");
-        if (!oq.board) missing.push("otherQualification.board");
-        if (!oq.year) missing.push("otherQualification.year");
-        if (!oq.aggregate) missing.push("otherQualification.aggregate");
-        if (!oq.pcm) missing.push("otherQualification.pcm");
-      }
+      return validateAcademicInfo();
     } else if (step === 3) {
       const { parents } = formData;
       // Father
@@ -549,99 +427,190 @@ const StudentRegistration = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
-      <CustomModal
-        isOpen={modal.isOpen}
-        title={modal.title}
-        message={modal.message}
-        type={modal.type}
-        onClose={modal.onClose}
-      />
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-black">
-            Student Registration
-          </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Complete all steps to register
-          </p>
-        </div>
-
-        <ProgressBar steps={steps} currentStep={currentStep} />
-
-        <div className="bg-gray-50 shadow rounded-lg p-6">
-          {steps[currentStep].component}
-
-          <div className="flex justify-between mt-8">
-            <button
-              onClick={prevStep}
-              disabled={currentStep === 0 || isSubmitting}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Previous
-            </button>
-
-            {currentStep < steps.length - 1 ? (
-              currentStep !== 0 && (
-                <button
-                  onClick={nextStep}
-                  disabled={isSubmitting}
-                  className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
-              )
-            ) : (
-              <button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className={`px-4 py-2 rounded-md ${
-                  isSubmitting ? "bg-gray-500" : "bg-gray-900 hover:bg-gray-800"
-                } text-white flex items-center justify-center min-w-32`}
-              >
-                {isSubmitting ? (
-                  <>
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Processing...
-                  </>
-                ) : (
-                  "Submit Registration"
-                )}
-              </button>
-            )}
+    <div
+      className="min-h-screen flex flex-col bg-gradient-to-br from-white via-blue-50 to-red-50"
+      style={{
+        background: `
+          linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)),
+          url(${campusBackground}) center/cover fixed no-repeat
+        `,
+        minHeight: "100vh",
+      }}
+    >
+      {/* Header */}
+      <header
+        className="w-full bg-white border-t-4 border-b-4 border-red-500 shadow-lg flex flex-col md:flex-row items-center justify-between px-2 md:px-10 py-3 relative z-20"
+        style={{ minHeight: 100, borderRadius: "0 0 1.5rem 1.5rem" }}
+      >
+        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full md:w-auto">
+          <div className="flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-1 md:p-2 shadow-sm border border-blue-200">
+            <img
+              src={bpitLogo}
+              alt="BPIT Logo"
+              className="h-14 sm:h-16 w-auto object-contain drop-shadow-md"
+              style={{ minWidth: 56 }}
+            />
           </div>
-
-          {submitError && (
-            <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-md text-sm">
-              {submitError}
+          <div className="flex flex-col justify-center items-center sm:items-start text-center sm:text-left w-full">
+            <h1
+              className="text-lg xs:text-xl md:text-3xl font-extrabold text-blue-900 leading-tight tracking-tight drop-shadow-sm"
+              style={{ fontFamily: "serif", letterSpacing: 0.5 }}
+            >
+              Bhagwan Parshuram Institute of Technology
+            </h1>
+            <div
+              className="text-sm xs:text-base md:text-lg font-bold text-red-600 leading-tight mt-0.5 md:mt-1"
+              style={{ fontFamily: "serif", letterSpacing: 0.2 }}
+            >
+              <span className="tracking-wide">
+                A Unit of Bhartiya Brahmin Charitable Trust (Regd.)
+              </span>
             </div>
-          )}
-
-          {submitSuccess && (
-            <div className="mt-4 p-3 bg-green-50 text-green-600 rounded-md text-sm">
-              Registration successful! You will receive a confirmation email
-              shortly.
+            <div
+              className="text-xs md:text-sm text-blue-700 font-medium mt-0.5 md:mt-1"
+              style={{ fontFamily: "serif" }}
+            >
+              <span className="block">
+                (Approved by AICTE, Ministry of Education (MoE))
+              </span>
+              <span className="block">
+                Affiliated to Guru Gobind Singh Indraprastha University, Delhi
+              </span>
             </div>
-          )}
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mt-3 md:mt-0 md:ml-4">
+          <img
+            src="https://bpitindia.ac.in/wp-content/uploads/2024/03/Header-1-1-300x88-1.jpg"
+            alt="G20 Logo"
+            className="h-16 sm:h-20 md:h-24 w-auto object-contain bg-white rounded-lg border border-blue-100 shadow-sm p-1"
+            style={{ minWidth: 40 }}
+          />
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex-1 py-4 sm:py-6 lg:py-8 px-2 sm:px-4 lg:px-8">
+        <CustomModal
+          isOpen={modal.isOpen}
+          title={modal.title}
+          message={modal.message}
+          type={modal.type}
+          onClose={modal.onClose}
+        />
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-gradient-to-br from-white to-gray-50 p-1 rounded-2xl shadow-lg">
+            <div className="bg-white py-6 sm:py-8 px-4 sm:px-6 shadow-lg rounded-2xl border-2 border-gray-200">
+              {/* Headings */}
+              <div className="text-center mb-6 sm:mb-8">
+                <div className="flex justify-center items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+                  <span className="inline-block w-1 sm:w-2 h-8 sm:h-12 bg-gray-800 rounded-full"></span>
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
+                    Student Registration Portal
+                  </h1>
+                  <span className="inline-block w-1 sm:w-2 h-8 sm:h-12 bg-gray-800 rounded-full"></span>
+                </div>
+                <p className="text-base sm:text-lg text-gray-700 font-medium">
+                  Official Registration System for New Students
+                </p>
+                <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">
+                  Complete all steps to register with BPIT
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="px-2 sm:px-0">
+                <ProgressBar steps={steps} currentStep={currentStep} />
+              </div>
+
+              {/* Step Content */}
+              <div className="mt-6 sm:mt-8">
+                {steps[currentStep].component}
+              </div>
+
+              <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
+                <button
+                  onClick={prevStep}
+                  disabled={currentStep === 0 || isSubmitting}
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm sm:text-base"
+                >
+                  Previous
+                </button>
+
+                {currentStep < steps.length - 1 ? (
+                  currentStep !== 0 && (
+                    <button
+                      onClick={nextStep}
+                      disabled={isSubmitting}
+                      className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm sm:text-base"
+                    >
+                      Next
+                    </button>
+                  )
+                ) : (
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className={`px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
+                      isSubmitting 
+                        ? "bg-gray-500 cursor-not-allowed" 
+                        : "bg-gray-900 hover:bg-black"
+                    } text-white flex items-center justify-center min-w-32 sm:min-w-40`}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-3 w-3 sm:h-4 sm:w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Processing...
+                      </>
+                    ) : (
+                      "Submit Registration"
+                    )}
+                  </button>
+                )}
+              </div>
+
+              {submitError && (
+                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-red-50 text-red-600 rounded-lg text-xs sm:text-sm border border-red-200">
+                  <div className="flex items-center">
+                    <svg className="h-4 w-4 sm:h-5 sm:w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {submitError}
+                  </div>
+                </div>
+              )}
+
+              {submitSuccess && (
+                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-green-50 text-green-600 rounded-lg text-xs sm:text-sm border border-green-200">
+                  <div className="flex items-center">
+                    <svg className="h-4 w-4 sm:h-5 sm:w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Registration successful! You will receive a confirmation email shortly.
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

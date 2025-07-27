@@ -80,24 +80,24 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto bg-white p-6 sm:p-10 rounded-3xl shadow-2xl border border-gray-200 animate-fade-in">
+    <div className="max-w-5xl mx-auto bg-white p-4 sm:p-6 lg:p-10 rounded-3xl shadow-2xl border border-gray-200 animate-fade-in">
       {/* Header */}
-      <div className="mb-10 text-center">
-        <div className="flex justify-center items-center gap-4 mb-2">
-          <span className="inline-block w-2 h-10 bg-gray-800 rounded-full"></span>
-          <h2 className="text-4xl font-extrabold text-black">
+      <div className="mb-8 sm:mb-10 text-center">
+        <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2">
+          <span className="inline-block w-1 sm:w-2 h-8 sm:h-10 bg-gray-800 rounded-full"></span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
             Personal Information
           </h2>
-          <span className="inline-block w-2 h-10 bg-gray-800 rounded-full"></span>
+          <span className="inline-block w-1 sm:w-2 h-8 sm:h-10 bg-gray-800 rounded-full"></span>
         </div>
-        <p className="text-gray-700 text-lg font-medium tracking-wide">
+        <p className="text-gray-700 text-base sm:text-lg font-medium tracking-wide">
           Please complete all required fields carefully
         </p>
       </div>
 
       <div className="space-y-12">
         {/* Course Selection */}
-        <div className="bg-gray-100 p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl">
+        <div className="bg-gray-50 p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl">
           <label className="block text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
             <span className="text-xl">🎓</span> Select Course
             <span className="text-red-500 font-bold">*</span>
@@ -150,7 +150,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {/* Name Fields */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-800">
@@ -322,16 +322,16 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
               <label className="block text-sm font-semibold text-gray-800">
                 Mobile Number<span className="text-red-500">*</span>
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 w-full">
                 <select
                   value={mobileCountry}
                   onChange={handleMobileCountryChange}
-                  className={`px-2 py-3 border-2 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400 ${
+                  className={`w-full sm:w-auto px-2 py-3 border-2 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400 ${
                     incompleteFields.includes("mobile")
                       ? "border-red-500"
                       : "border-gray-400"
                   }`}
-                  style={{ minWidth: 140 }}
+                  style={{ minWidth: 120 }}
                 >
                   {countryCodes.map((c) => (
                     <option key={c.code} value={c.code}>
@@ -365,7 +365,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
               <label className="block text-sm font-semibold text-gray-800">
                 Email Address<span className="text-red-500">*</span>
               </label>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full">
                 <input
                   name="emailUser"
                   placeholder="your.email"
@@ -378,7 +378,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                   }`}
                   required
                 />
-                <span className="text-gray-700 font-semibold select-none">
+                <span className="text-gray-700 font-semibold select-none flex items-center px-2 sm:px-0">
                   @gmail.com
                 </span>
               </div>

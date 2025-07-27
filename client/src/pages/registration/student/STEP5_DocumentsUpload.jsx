@@ -71,25 +71,25 @@ export default function DocumentsUpload({
   ];
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-3xl shadow-2xl border border-gray-200 animate-fade-in">
-      <div className="text-center mb-10">
-        <div className="flex justify-center items-center gap-4 mb-2">
-          <span className="inline-block w-2 h-10 bg-gray-800 rounded-full"></span>
-          <h2 className="text-3xl font-extrabold text-black">
+    <div className="max-w-4xl mx-auto bg-white p-4 sm:p-6 lg:p-10 rounded-3xl shadow-2xl border border-gray-200 animate-fade-in">
+      <div className="text-center mb-8 sm:mb-10">
+        <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2">
+          <span className="inline-block w-1 sm:w-2 h-8 sm:h-10 bg-gray-800 rounded-full"></span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
             Documents Upload
           </h2>
-          <span className="inline-block w-2 h-10 bg-gray-800 rounded-full"></span>
+          <span className="inline-block w-1 sm:w-2 h-8 sm:h-10 bg-gray-800 rounded-full"></span>
         </div>
-        <p className="text-gray-700 text-lg font-medium tracking-wide">
+        <p className="text-gray-700 text-base sm:text-lg font-medium tracking-wide">
           Please upload scanned copies of your documents
         </p>
       </div>
 
-      <div className="bg-gray-50 p-4 sm:p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl">
-        <div className="mt-2 mb-4 p-4 bg-gray-100 rounded-lg border border-gray-200">
-          <div className="flex">
+      <div className="bg-gray-50 p-2 sm:p-4 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl">
+        <div className="mt-2 mb-4 p-2 sm:p-4 bg-gray-100 rounded-lg border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center">
             <svg
-              className="h-5 w-5 text-gray-500 mr-2 mt-0.5"
+              className="h-5 w-5 text-gray-500 mr-2 mt-0.5 flex-shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -101,11 +101,11 @@ export default function DocumentsUpload({
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <div>
-              <p className="text-sm font-medium text-gray-700">
+            <div className="flex-1">
+              <p className="text-sm sm:text-base font-medium text-gray-700">
                 Important Notes:
               </p>
-              <ul className="list-disc pl-5 text-sm text-gray-600 mt-1 space-y-1">
+              <ul className="list-disc pl-5 text-xs sm:text-sm text-gray-600 mt-1 space-y-1 break-words">
                 <li>Maximum file size: 2MB per document</li>
                 <li>
                   Name files clearly (e.g., "10th_Marksheet_YourName.pdf")

@@ -12,7 +12,7 @@ export default function ReviewSubmit({
       return <span className="text-gray-400 italic">Not provided</span>;
     const date = new Date(dateString);
     return (
-      <span className="font-medium text-blue-700">
+      <span className="font-medium text-gray-700">
         {date.toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
@@ -26,7 +26,7 @@ export default function ReviewSubmit({
   const renderFileInfo = (file) => {
     if (!file)
       return (
-        <span className="inline-flex items-center text-red-500 bg-red-50 px-3 py-1 rounded-full text-sm">
+        <span className="inline-flex items-center text-gray-600 bg-gray-100 px-3 py-1 rounded-full text-sm">
           <svg
             className="w-4 h-4 mr-1.5"
             fill="none"
@@ -45,7 +45,7 @@ export default function ReviewSubmit({
       );
 
     return (
-      <span className="inline-flex items-center bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm">
+      <span className="inline-flex items-center bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
         <svg
           className="w-4 h-4 mr-1.5"
           fill="none"
@@ -79,11 +79,11 @@ export default function ReviewSubmit({
         {achievements.map((ach, index) => (
           <div
             key={index}
-            className="bg-white p-4 rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow duration-200"
+            className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200"
           >
-            <h4 className="font-medium text-blue-800 flex items-center">
+            <h4 className="font-medium text-gray-800 flex items-center">
               <svg
-                className="w-5 h-5 mr-2 text-blue-500"
+                className="w-5 h-5 mr-2 text-gray-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

@@ -65,29 +65,43 @@ export default function AcademicInfo({
     section,
     type = "text",
     required = false
-  ) => (
-    <div className="space-y-1">
-      <label className="block text-sm font-medium text-gray-700">
-        {label}
-        {required && <span className="text-red-500">*</span>}
-      </label>
-      <input
-        type={type}
-        name={name}
-        value={formData.academic[section][name] || ""}
-        onChange={(e) => handleChange(e, section)}
-        className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300 bg-white/50 text-gray-900 placeholder-gray-300 shadow-inner ${
-          required && incompleteFields.includes(`${section}.${name}`)
-            ? "border-red-500"
-            : "border-gray-200"
-        }`}
-        required={required}
-      />
-      {required && incompleteFields.includes(`${section}.${name}`) && (
-        <div className="text-xs text-red-500 mt-1">{label} is required</div>
-      )}
-    </div>
-  );
+  ) => {
+    // Placeholders for common academic fields
+    const placeholderMap = {
+      institute: "School name",
+      year: section === 'classX' ? "10th passing year (e.g., 2022)" : section === 'classXII' ? "12th passing year (e.g., 2024)" : "Enter year",
+      board: "Board name (e.g., CBSE, ICSE)",
+      pcm: "PCM percentage (if applicable)",
+      aggregate: "Total percentage",
+      event: "Event/Competition name",
+      date: "Date (YYYY-MM-DD)",
+      outcome: "Achievement/Result",
+    };
+    return (
+      <div className="space-y-1">
+        <label className="block text-sm font-medium text-gray-700">
+          {label}
+          {required && <span className="text-red-500">*</span>}
+        </label>
+        <input
+          type={type}
+          name={name}
+          value={formData.academic[section][name] || ""}
+          onChange={(e) => handleChange(e, section)}
+          placeholder={placeholderMap[name] || label}
+          className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300 bg-white/50 text-gray-900 placeholder-gray-300 shadow-inner ${
+            required && incompleteFields.includes(`${section}.${name}`)
+              ? "border-red-500"
+              : "border-gray-200"
+          }`}
+          required={required}
+        />
+        {required && incompleteFields.includes(`${section}.${name}`) && (
+          <div className="text-xs text-red-500 mt-1">{label} is required</div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-12">

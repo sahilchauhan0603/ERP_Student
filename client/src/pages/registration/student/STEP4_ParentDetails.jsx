@@ -211,8 +211,17 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 value={formData.parents.father.qualification || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  incompleteFields.includes("father.qualification")
+                    ? "border-red-500"
+                    : "border-gray-400"
+                }`}
               />
+              {incompleteFields.includes("father.qualification") && (
+                <div className="text-xs text-red-500 mt-1">
+                  Father's qualification is required
+                </div>
+              )}
             </div>
             <div className="space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
@@ -224,38 +233,56 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 value={formData.parents.father.occupation || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  incompleteFields.includes("father.occupation")
+                    ? "border-red-500"
+                    : "border-gray-400"
+                }`}
               />
+              {incompleteFields.includes("father.occupation") && (
+                <div className="text-xs text-red-500 mt-1">
+                  Father's occupation is required
+                </div>
+              )}
             </div>
             <div className="space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
                 Email Address<span className="text-red-500">*</span>
               </label>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full">
                 <input
                   name="parents.father.emailUser"
                   placeholder="father.email"
                   value={fatherEmailUser}
                   onChange={handleFatherEmailUserChange}
                   required
-                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                  className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                    incompleteFields.includes("father.email")
+                      ? "border-red-500"
+                      : "border-gray-400"
+                  }`}
                 />
-                <span className="text-gray-700 font-semibold select-none">
+                <span className="text-gray-700 font-semibold select-none flex items-center px-2 sm:px-0">
                   @gmail.com
                 </span>
               </div>
+              {incompleteFields.includes("father.email") && (
+                <div className="text-xs text-red-500 mt-1">
+                  Father's email is required
+                </div>
+              )}
             </div>
             {/* Father Mobile and Email */}
             <div className="space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
                 Mobile Number<span className="text-red-500">*</span>
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 w-full">
                 <select
                   value={fatherMobileCountry}
                   onChange={handleFatherMobileCountryChange}
-                  className="px-2 py-2 border-2 border-gray-400 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400"
-                  style={{ minWidth: 140 }}
+                  className="w-full sm:w-auto px-2 py-2 border-2 border-gray-400 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400"
+                  style={{ minWidth: 120 }}
                 >
                   {countryCodes.map((c) => (
                     <option key={c.code} value={c.code}>
@@ -271,35 +298,35 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                   required
                   maxLength={15}
                   inputMode="numeric"
-                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                  className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                    incompleteFields.includes("father.mobile")
+                      ? "border-red-500"
+                      : "border-gray-400"
+                  }`}
                 />
               </div>
+              {incompleteFields.includes("father.mobile") && (
+                <div className="text-xs text-red-500 mt-1">
+                  Father's mobile number is required
+                </div>
+              )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="block text-sm font-semibold text-gray-800">
-                  Telephone STD
-                </label>
-                <input
-                  name="parents.father.telephoneSTD"
-                  placeholder="Telephone STD"
-                  value={formData.parents.father.telephoneSTD || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="block text-sm font-semibold text-gray-800">
-                  Telephone Number
-                </label>
-                <input
-                  name="parents.father.telephone"
-                  placeholder="Telephone No."
-                  value={formData.parents.father.telephone || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
-                />
-              </div>
+            {/* Father Telephone STD and Number */}
+            <div className="flex flex-col sm:flex-row gap-2 w-full">
+              <input
+                name="parents.father.telephoneSTD"
+                placeholder="Telephone STD"
+                value={formData.parents.father.telephoneSTD || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+              />
+              <input
+                name="parents.father.telephone"
+                placeholder="Telephone No."
+                value={formData.parents.father.telephone || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+              />
             </div>
             <div className="md:col-span-2 space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
@@ -349,8 +376,17 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 value={formData.parents.mother.name || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  incompleteFields.includes("mother.name")
+                    ? "border-red-500"
+                    : "border-gray-400"
+                }`}
               />
+              {incompleteFields.includes("mother.name") && (
+                <div className="text-xs text-red-500 mt-1">
+                  Mother's name is required
+                </div>
+              )}
             </div>
             <div className="space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
@@ -362,8 +398,17 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 value={formData.parents.mother.qualification || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  incompleteFields.includes("mother.qualification")
+                    ? "border-red-500"
+                    : "border-gray-400"
+                }`}
               />
+              {incompleteFields.includes("mother.qualification") && (
+                <div className="text-xs text-red-500 mt-1">
+                  Mother's qualification is required
+                </div>
+              )}
             </div>
             <div className="space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
@@ -375,37 +420,57 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 value={formData.parents.mother.occupation || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  incompleteFields.includes("mother.occupation")
+                    ? "border-red-500"
+                    : "border-gray-400"
+                }`}
               />
+              {incompleteFields.includes("mother.occupation") && (
+                <div className="text-xs text-red-500 mt-1">
+                  Mother's occupation is required
+                </div>
+              )}
             </div>
+            {/* Mother Email */}
             <div className="space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
-                Email Address
+                Email Address<span className="text-red-500">*</span>
               </label>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full">
                 <input
                   name="parents.mother.emailUser"
                   placeholder="mother.email"
                   value={motherEmailUser}
                   onChange={handleMotherEmailUserChange}
-                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                  required
+                  className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                    incompleteFields.includes("mother.email")
+                      ? "border-red-500"
+                      : "border-gray-400"
+                  }`}
                 />
-                <span className="text-gray-700 font-semibold select-none">
+                <span className="text-gray-700 font-semibold select-none flex items-center px-2 sm:px-0">
                   @gmail.com
                 </span>
               </div>
+              {incompleteFields.includes("mother.email") && (
+                <div className="text-xs text-red-500 mt-1">
+                  Mother's email is required
+                </div>
+              )}
             </div>
-            {/* Mother Mobile and Email */}
+            {/* Mother Mobile */}
             <div className="space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
                 Mobile Number<span className="text-red-500">*</span>
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 w-full">
                 <select
                   value={motherMobileCountry}
                   onChange={handleMotherMobileCountryChange}
-                  className="px-2 py-2 border-2 border-gray-400 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400"
-                  style={{ minWidth: 140 }}
+                  className="w-full sm:w-auto px-2 py-2 border-2 border-gray-400 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400"
+                  style={{ minWidth: 120 }}
                 >
                   {countryCodes.map((c) => (
                     <option key={c.code} value={c.code}>
@@ -421,35 +486,35 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                   required
                   maxLength={15}
                   inputMode="numeric"
-                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                  className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                    incompleteFields.includes("mother.mobile")
+                      ? "border-red-500"
+                      : "border-gray-400"
+                  }`}
                 />
               </div>
+              {incompleteFields.includes("mother.mobile") && (
+                <div className="text-xs text-red-500 mt-1">
+                  Mother's mobile number is required
+                </div>
+              )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="block text-sm font-semibold text-gray-800">
-                  Telephone STD
-                </label>
-                <input
-                  name="parents.mother.telephoneSTD"
-                  placeholder="Telephone STD"
-                  value={formData.parents.mother.telephoneSTD || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="block text-sm font-semibold text-gray-800">
-                  Telephone Number
-                </label>
-                <input
-                  name="parents.mother.telephone"
-                  placeholder="Telephone No."
-                  value={formData.parents.mother.telephone || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
-                />
-              </div>
+            {/* Mother Telephone STD and Number */}
+            <div className="flex flex-col sm:flex-row gap-2 w-full">
+              <input
+                name="parents.mother.telephoneSTD"
+                placeholder="Telephone STD"
+                value={formData.parents.mother.telephoneSTD || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+              />
+              <input
+                name="parents.mother.telephone"
+                placeholder="Telephone No."
+                value={formData.parents.mother.telephone || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+              />
             </div>
             <div className="md:col-span-2 space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
@@ -523,6 +588,11 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
               </label>
             ))}
           </div>
+          {incompleteFields.includes("familyIncome") && (
+            <div className="text-xs text-red-500 mt-1">
+              Family income is required
+            </div>
+          )}
         </div>
       </div>
     </div>
