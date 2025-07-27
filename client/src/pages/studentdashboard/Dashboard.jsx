@@ -465,33 +465,57 @@ const StudentDetailsDashboard = () => {
     editMode,
     isDeclined,
     onFileChange,
-  }) => (
-    <div className="border border-gray-200 rounded-xl p-4 flex flex-col bg-white hover:shadow-md transition-shadow">
-      <h4 className="font-medium text-gray-800 mb-3">{title}</h4>
-      {url ? (
-        <>
-          <div className="flex-1 flex items-center justify-center mb-3 bg-gray-100 rounded-lg overflow-hidden min-h-[160px]">
-            <img
-              src={url}
-              alt={title}
-              className="max-h-40 max-w-full object-contain"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://via.placeholder.com/150x150?text=Document+Error";
-              }}
-            />
-          </div>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-center py-2 px-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
-          >
-            View Full Document
-          </a>
-        </>
-      ) : (
+  }) => {
+    // Check if the document is a PDF or image
+    const isPDF = url && url.toLowerCase().includes('.pdf');
+    const isImage = url && (url.toLowerCase().includes('.jpg') || url.toLowerCase().includes('.jpeg') || url.toLowerCase().includes('.png') || url.toLowerCase().includes('.gif') || url.toLowerCase().includes('.webp'));
+
+    return (
+      <div className="border border-gray-200 rounded-xl p-4 flex flex-col bg-white hover:shadow-md transition-shadow">
+        <h4 className="font-medium text-gray-800 mb-3">{title}</h4>
+        {url ? (
+          <>
+            <div className="flex-1 flex items-center justify-center mb-3 bg-gray-100 rounded-lg overflow-hidden min-h-[160px]">
+              {isImage ? (
+                <img
+                  src={url}
+                  alt={title}
+                  className="max-h-40 max-w-full object-contain"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              {isPDF ? (
+                <div className="flex flex-col items-center justify-center p-4">
+                  <svg className="w-16 h-16 text-red-500 mb-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-gray-600 font-medium">PDF Document</p>
+                  <p className="text-xs text-gray-500">Click "View Full Document" to open</p>
+                </div>
+              ) : !isImage ? (
+                <div className="flex flex-col items-center justify-center p-4">
+                  <svg className="w-16 h-16 text-gray-400 mb-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-gray-600 font-medium">Document</p>
+                  <p className="text-xs text-gray-500">Click "View Full Document" to open</p>
+                </div>
+              ) : null}
+            </div>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-center py-2 px-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+            >
+              View Full Document
+            </a>
+          </>
+        ) : (
         <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] bg-gray-50 rounded-lg">
           <svg
             className="w-10 h-10 text-gray-400 mb-2"
@@ -519,6 +543,7 @@ const StudentDetailsDashboard = () => {
       )}
     </div>
   );
+  };
 
   // Helper to convert field name to label
   function fieldToLabel(field) {
