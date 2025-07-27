@@ -73,9 +73,9 @@ export default function PendingStudents() {
   const filteredStudents = students.filter((student) => {
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch =
-      student.firstName.toLowerCase().includes(searchLower) ||
-      student.lastName.toLowerCase().includes(searchLower) ||
-      student.email.toLowerCase().includes(searchLower) ||
+      (student.firstName?.toLowerCase() || '').includes(searchLower) ||
+      (student.lastName?.toLowerCase() || '').includes(searchLower) ||
+      (student.email?.toLowerCase() || '').includes(searchLower) ||
       (student.studentId &&
         student.studentId.toLowerCase().includes(searchLower));
     const matchesCourse = selectedCourse
@@ -226,12 +226,12 @@ export default function PendingStudents() {
                     <td className="px-4 py-4 text-sm text-gray-900">{(currentPage - 1) * 10 + idx + 1}</td>
                     <td className="px-6 py-4 whitespace-nowrap flex items-center">
                       <div className="h-10 w-10 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center font-bold">
-                        {student.firstName.charAt(0)}
-                        {student.lastName.charAt(0)}
+                        {student.firstName?.charAt(0) || 'N'}
+                        {student.lastName?.charAt(0) || 'A'}
                       </div>
                       <div className="ml-4">
                         <div className="font-medium text-gray-900">
-                          {student.firstName} {student.middleName}{" "}
+                          {student.firstName || 'N/A'} {student.middleName || ''}{" "}
                           {student.lastName}
                         </div>
                         <div className="text-gray-500 text-xs">

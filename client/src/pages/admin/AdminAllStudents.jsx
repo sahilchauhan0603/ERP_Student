@@ -307,12 +307,12 @@ export default function AdminAllStudents() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                        {student.firstName.charAt(0)}
-                        {student.lastName.charAt(0)}
+                        {student.firstName?.charAt(0) || 'N'}
+                        {student.lastName?.charAt(0) || 'A'}
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {student.firstName} {student.lastName}
+                          {student.firstName || 'N/A'} {student.lastName || ''}
                         </div>
                         <div className="text-sm text-gray-500">
                           {student.studentId}

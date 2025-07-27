@@ -300,7 +300,11 @@ exports.registerStudent = async (req, res) => {
       function calculateBatch(createdAt, course) {
         const year = new Date(createdAt).getFullYear();
         let endYear;
-        if (
+        
+        // Safety check for course parameter
+        if (!course || typeof course !== 'string') {
+          endYear = year + 4; // Default to 4 years
+        } else if (
           course.startsWith("B.Tech") ||
           course.startsWith("LE-B.Tech")
         ) {
