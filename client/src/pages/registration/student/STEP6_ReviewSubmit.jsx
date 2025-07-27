@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { formatFamilyIncome } from "../../../utils/formatters";
 
 export default function ReviewSubmit({
   formData,
@@ -22,7 +23,7 @@ export default function ReviewSubmit({
     );
   };
 
-  // Enhanced file display with icons
+  // Enhanced file display with icons and preview functionality
   const renderFileInfo = (file) => {
     if (!file)
       return (
@@ -44,23 +45,54 @@ export default function ReviewSubmit({
         </span>
       );
 
+    // Check if file is a PDF or image
+    const isPDF = file.name && file.name.toLowerCase().includes('.pdf');
+    const isImage = file.name && (file.name.toLowerCase().includes('.jpg') || file.name.toLowerCase().includes('.jpeg') || file.name.toLowerCase().includes('.png') || file.name.toLowerCase().includes('.gif') || file.name.toLowerCase().includes('.webp'));
+
     return (
-      <span className="inline-flex items-center bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-        <svg
-          className="w-4 h-4 mr-1.5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        {file.name}
-      </span>
+      <div className="flex items-center space-x-2">
+        <span className="inline-flex items-center bg-gray-100 text-gray-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
+          <svg
+            className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span className="truncate max-w-20 sm:max-w-32">{file.name}</span>
+        </span>
+        {file && (
+          <button
+            onClick={() => {
+              if (isImage) {
+                // For images, open in new tab
+                window.open(URL.createObjectURL(file), '_blank');
+              } else if (isPDF) {
+                // For PDFs, download
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(file);
+                link.download = file.name;
+                link.click();
+              } else {
+                // For other files, download
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(file);
+                link.download = file.name;
+                link.click();
+              }
+            }}
+            className="text-xs bg-gray-800 text-white px-2 py-1 rounded hover:bg-gray-700 transition-colors whitespace-nowrap"
+          >
+            {isImage ? 'View' : 'Download'}
+          </button>
+        )}
+      </div>
     );
   };
 
@@ -68,22 +100,22 @@ export default function ReviewSubmit({
   const renderAchievements = (achievements, title) => {
     if (!achievements || achievements.length === 0 || !achievements[0].event) {
       return (
-        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center">
-          <p className="text-gray-500">No {title} provided</p>
+        <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-200 text-center">
+          <p className="text-sm sm:text-base text-gray-500">No {title} provided</p>
         </div>
       );
     }
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {achievements.map((ach, index) => (
           <div
             key={index}
-            className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200"
+            className="bg-white p-3 sm:p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200"
           >
-            <h4 className="font-medium text-gray-800 flex items-center">
+            <h4 className="text-sm sm:text-base font-medium text-gray-800 flex items-center">
               <svg
-                className="w-5 h-5 mr-2 text-gray-600"
+                className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2 text-gray-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -97,9 +129,9 @@ export default function ReviewSubmit({
               </svg>
               {ach.event}
             </h4>
-            <div className="mt-2 flex items-center text-sm text-gray-600">
+            <div className="mt-2 flex items-center text-xs sm:text-sm text-gray-600">
               <svg
-                className="w-4 h-4 mr-1.5"
+                className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -114,7 +146,7 @@ export default function ReviewSubmit({
               {formatDate(ach.date)}
             </div>
             {ach.outcome && (
-              <p className="mt-2 text-sm bg-blue-50/50 p-2 rounded-md">
+              <p className="mt-2 text-xs sm:text-sm bg-gray-100 p-2 rounded-md text-gray-700">
                 {ach.outcome}
               </p>
             )}
@@ -126,11 +158,11 @@ export default function ReviewSubmit({
 
   // Section header component
   const SectionHeader = ({ icon, title }) => (
-    <div className="flex items-center mb-6">
-      <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-2 rounded-lg mr-3 shadow-sm">
+    <div className="flex items-center mb-4 sm:mb-6">
+      <div className="bg-gray-800 p-1.5 sm:p-2 rounded-lg mr-2 sm:mr-3 shadow-sm">
         {icon}
       </div>
-      <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+      <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
         {title}
       </h3>
     </div>
@@ -138,11 +170,11 @@ export default function ReviewSubmit({
 
   // Info row component
   const InfoRow = ({ label, value, cols = 1 }) => (
-    <div className={`space-y-1 ${cols > 1 ? `md:col-span-${cols}` : ""}`}>
-      <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+    <div className={`space-y-1 ${cols > 1 ? `md:col-span-${cols}` : ""} p-3 sm:p-4 border border-gray-100 rounded-lg bg-white hover:bg-gray-50 transition-colors`}>
+      <p className="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
         {label}
       </p>
-      <div className="text-gray-800 font-medium">{value}</div>
+      <div className="text-sm sm:text-base text-gray-800 font-medium">{value}</div>
     </div>
   );
 
@@ -174,7 +206,7 @@ export default function ReviewSubmit({
   if (showConfirmation) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="bg-gradient-to-r from-green-400 to-blue-500 p-8 rounded-2xl shadow-xl flex flex-col items-center">
+        <div className="bg-gray-800 p-8 rounded-2xl shadow-xl flex flex-col items-center">
           <svg
             className="w-20 h-20 text-white mb-4 animate-bounce"
             fill="none"
@@ -187,7 +219,7 @@ export default function ReviewSubmit({
               r="10"
               stroke="currentColor"
               strokeWidth="2"
-              fill="#22c55e"
+              fill="#10b981"
             />
             <path
               strokeLinecap="round"
@@ -215,26 +247,31 @@ export default function ReviewSubmit({
     );
   }
 
-  return (
-    <div className="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-6 sm:py-10 bg-white rounded-3xl shadow-2xl border border-gray-200 animate-fade-in">
-      <div className="text-center mb-12">
-        <div className="flex justify-center items-center gap-4 mb-2">
-          <span className="inline-block w-2 h-10 bg-gray-800 rounded-full"></span>
-          <h1 className="text-4xl font-extrabold text-black">
-            Application Review
-          </h1>
-          <span className="inline-block w-2 h-10 bg-gray-800 rounded-full"></span>
+    return (
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 lg:py-10 bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-lg sm:shadow-xl lg:shadow-2xl border border-gray-200 animate-fade-in relative">
+      {/* Background pattern for visual appeal */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white opacity-50 rounded-xl sm:rounded-2xl lg:rounded-3xl"></div>
+      <div className="relative z-10">
+        <div className="text-center mb-8 sm:mb-10 lg:mb-12">
+          <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2">
+            <span className="inline-block w-1 sm:w-2 h-6 sm:h-8 lg:h-10 bg-gray-800 rounded-full"></span>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-black">
+              Application Review
+            </h1>
+            <span className="inline-block w-1 sm:w-2 h-6 sm:h-8 lg:h-10 bg-gray-800 rounded-full"></span>
+          </div>
+          <p className="text-sm sm:text-base lg:text-lg text-gray-700 max-w-2xl mx-auto font-medium tracking-wide px-2">
+            Please verify all information before submission. Contact support if
+            any corrections are needed.
+          </p>
+          {/* Horizontal separator line */}
+          <div className="mt-6 sm:mt-8 border-t-2 border-gray-300 w-16 sm:w-20 lg:w-24 mx-auto"></div>
         </div>
-        <p className="text-lg text-gray-700 max-w-2xl mx-auto font-medium tracking-wide">
-          Please verify all information before submission. Contact support if
-          any corrections are needed.
-        </p>
-      </div>
 
-      <div className="space-y-12">
+      <div className="space-y-8 sm:space-y-10 lg:space-y-12">
         {/* Personal Information */}
-        <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200/40 transition-all duration-300 hover:shadow-xl overflow-hidden">
-          <div className="px-6 py-4 border-b-2 border-gray-200/40">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border-2 border-gray-200/40 transition-all duration-300 hover:shadow-xl overflow-hidden">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b-2 border-gray-200/40 bg-gray-50">
             <SectionHeader
               icon={
                 <svg
@@ -254,8 +291,8 @@ export default function ReviewSubmit({
               title="Personal Information"
             />
           </div>
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <InfoRow
                 label="Full Name"
                 value={`${formData.personal.firstName} ${
@@ -305,9 +342,12 @@ export default function ReviewSubmit({
           </div>
         </div>
 
+        {/* Section separator */}
+        <div className="border-t-2 border-gray-300 my-6 sm:my-8"></div>
+
         {/* Academic Information */}
-        <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200/40 transition-all duration-300 hover:shadow-xl overflow-hidden">
-          <div className="px-6 py-4 border-b-2 border-gray-200/40">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border-2 border-gray-200/40 transition-all duration-300 hover:shadow-xl overflow-hidden">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b-2 border-gray-200/40 bg-gray-50">
             <SectionHeader
               icon={
                 <svg
@@ -327,12 +367,12 @@ export default function ReviewSubmit({
               title="Academic Information"
             />
           </div>
-          <div className="p-6 space-y-8">
+          <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
             {/* Class X */}
-            <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
-              <h4 className="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+            <div className="bg-gray-50 p-4 sm:p-5 rounded-lg border border-gray-200 relative">
+              <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
                 <svg
-                  className="w-5 h-5 mr-2 text-blue-500"
+                  className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-gray-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -346,7 +386,9 @@ export default function ReviewSubmit({
                 </svg>
                 Class X Details
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Horizontal separator line */}
+              <div className="border-b border-gray-300 mb-4 sm:mb-6"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 <InfoRow
                   label="Institute"
                   value={formData.academic.classX.institute || formatDate(null)}
@@ -371,10 +413,10 @@ export default function ReviewSubmit({
             </div>
 
             {/* Class XII */}
-            <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
-              <h4 className="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+            <div className="bg-gray-50 p-4 sm:p-5 rounded-lg border border-gray-200 relative">
+              <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
                 <svg
-                  className="w-5 h-5 mr-2 text-blue-500"
+                  className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-gray-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -388,7 +430,9 @@ export default function ReviewSubmit({
                 </svg>
                 Class XII Details
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Horizontal separator line */}
+              <div className="border-b border-gray-300 mb-4 sm:mb-6"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 <InfoRow
                   label="Institute"
                   value={
@@ -418,7 +462,7 @@ export default function ReviewSubmit({
 
             {/* Achievements */}
             <div>
-              <h4 className="text-lg font-semibold text-blue-700 mb-4">
+              <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
                 Academic Achievements
               </h4>
               {renderAchievements(
@@ -428,7 +472,7 @@ export default function ReviewSubmit({
             </div>
 
             <div>
-              <h4 className="text-lg font-semibold text-blue-700 mb-4">
+              <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
                 Co-Curricular Achievements
               </h4>
               {renderAchievements(
@@ -439,9 +483,12 @@ export default function ReviewSubmit({
           </div>
         </div>
 
+        {/* Section separator */}
+        <div className="border-t-2 border-gray-300 my-6 sm:my-8"></div>
+
         {/* Parents Information */}
-        <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200/40 transition-all duration-300 hover:shadow-xl overflow-hidden">
-          <div className="px-6 py-4 border-b-2 border-gray-200/40">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border-2 border-gray-200/40 transition-all duration-300 hover:shadow-xl overflow-hidden">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b-2 border-gray-200/40 bg-gray-50">
             <SectionHeader
               icon={
                 <svg
@@ -461,12 +508,12 @@ export default function ReviewSubmit({
               title="Parents Information"
             />
           </div>
-          <div className="p-6 space-y-8">
+          <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
             {/* Father */}
-            <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
-              <h4 className="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+            <div className="bg-gray-50 p-4 sm:p-5 rounded-lg border border-gray-200 relative">
+              <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
                 <svg
-                  className="w-5 h-5 mr-2 text-blue-500"
+                  className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-gray-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -480,7 +527,9 @@ export default function ReviewSubmit({
                 </svg>
                 Father's Details
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Horizontal separator line */}
+              <div className="border-b border-gray-300 mb-4 sm:mb-6"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 <InfoRow
                   label="Name"
                   value={formData.parents.father.name || formatDate(null)}
@@ -514,10 +563,10 @@ export default function ReviewSubmit({
             </div>
 
             {/* Mother */}
-            <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
-              <h4 className="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+            <div className="bg-gray-50 p-4 sm:p-5 rounded-lg border border-gray-200 relative">
+              <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
                 <svg
-                  className="w-5 h-5 mr-2 text-blue-500"
+                  className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-gray-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -531,7 +580,9 @@ export default function ReviewSubmit({
                 </svg>
                 Mother's Details
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Horizontal separator line */}
+              <div className="border-b border-gray-300 mb-4 sm:mb-6"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 <InfoRow
                   label="Name"
                   value={formData.parents.mother.name || formatDate(null)}
@@ -565,13 +616,13 @@ export default function ReviewSubmit({
             </div>
 
             {/* Family Income */}
-            <div className="bg-blue-50/50 p-5 rounded-lg border border-blue-200">
-              <h4 className="text-lg font-semibold text-blue-700 mb-3">
+            <div className="bg-gray-50 p-4 sm:p-5 rounded-lg border border-gray-200">
+              <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-3">
                 Family Income
               </h4>
-              <div className="inline-flex items-center bg-white px-4 py-2 rounded-full shadow-sm border border-blue-200">
+              <div className="inline-flex items-center bg-white px-3 sm:px-4 py-2 rounded-full shadow-sm border border-gray-200">
                 <svg
-                  className="w-5 h-5 mr-2 text-blue-500"
+                  className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-gray-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -583,24 +634,20 @@ export default function ReviewSubmit({
                     d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span className="font-medium text-blue-700">
-                  {formData.parents.familyIncome === "<5" && "Less than 5 lacs"}
-                  {formData.parents.familyIncome === "5-7" &&
-                    "5 lacs to 7 lacs"}
-                  {formData.parents.familyIncome === "7-10" &&
-                    "7 lacs to 10 lacs"}
-                  {formData.parents.familyIncome === ">10" &&
-                    "More than 10 lacs"}
-                  {!formData.parents.familyIncome && "Not provided"}
+                <span className="text-sm sm:text-base font-medium text-gray-700">
+                  {formatFamilyIncome(formData.parents.familyIncome)}
                 </span>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Section separator */}
+        <div className="border-t-2 border-gray-300 my-6 sm:my-8"></div>
+
         {/* Documents */}
-        <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200/40 transition-all duration-300 hover:shadow-xl overflow-hidden">
-          <div className="px-6 py-4 border-b-2 border-gray-200/40">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border-2 border-gray-200/40 transition-all duration-300 hover:shadow-xl overflow-hidden">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b-2 border-gray-200/40 bg-gray-50">
             <SectionHeader
               icon={
                 <svg
@@ -620,8 +667,8 @@ export default function ReviewSubmit({
               title="Uploaded Documents"
             />
           </div>
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="p-4 sm:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                 <InfoRow
                   label="Photograph"
@@ -719,6 +766,7 @@ export default function ReviewSubmit({
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

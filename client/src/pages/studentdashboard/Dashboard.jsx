@@ -507,12 +507,12 @@ const StudentDetailsDashboard = () => {
               ) : null}
             </div>
             <a
-              href={url}
+              href={isPDF ? url.replace('/upload/', '/upload/fl_attachment/') : url}
               target="_blank"
               rel="noopener noreferrer"
               className="text-center py-2 px-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
             >
-              View Full Document
+              {isPDF ? 'Download PDF' : 'View Full Document'}
             </a>
           </>
         ) : (
