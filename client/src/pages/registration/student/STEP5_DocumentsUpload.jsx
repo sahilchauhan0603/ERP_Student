@@ -14,6 +14,16 @@ export default function DocumentsUpload({
     }));
   };
 
+  const handleRemoveFile = (name) => {
+    setFormData((prev) => ({
+      ...prev,
+      documents: {
+        ...prev.documents,
+        [name]: undefined,
+      },
+    }));
+  };
+
   const documentFields = [
     { name: "photo", label: "Photograph", icon: "📷" },
     { name: "ipuRegistration", label: "IPU Registration Slip", icon: "📄" },
@@ -179,6 +189,26 @@ export default function DocumentsUpload({
                   </div>
                 )}
               </div>
+              {/* Move preview/cancel area here, outside the label */}
+              {formData.documents[name] && (
+                <div className="mt-2 flex flex-col items-center">
+                  <a
+                    href={URL.createObjectURL(formData.documents[name])}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mb-2 text-center py-1 px-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+                  >
+                    View Document
+                  </a>
+                  <button
+                    type="button"
+                    className="mt-2 px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+                    onClick={() => handleRemoveFile(name)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

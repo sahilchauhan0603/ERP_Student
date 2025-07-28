@@ -913,24 +913,34 @@ exports.updateDeclinedFields = async (req, res) => {
 
     // Handle file uploads (if any)
     if (req.files && req.files.length > 0) {
+      console.log(`Processing ${req.files.length} uploaded files`);
       for (const file of req.files) {
         const field = file.fieldname;
+        console.log(`Processing file for field: ${field}, filename: ${file.originalname}, size: ${file.size}`);
+        
         if (declinedFields.includes(`documents.${field}`)) {
           // Upload to Cloudinary
           try {
+            console.log(`Uploading ${field} to Cloudinary...`);
             const url = await uploadToCloudinary(
               file.buffer,
-              `${field}_${Date.now()}`
+              `${field}_${Date.now()}_${file.originalname}`
             );
+            console.log(`Successfully uploaded ${field}: ${url}`);
             if (!data.documents) data.documents = {};
             data.documents[field] = url;
           } catch (e) {
+            console.error(`Failed to upload ${field}:`, e);
             return res
               .status(500)
-              .json({ success: false, message: `Failed to upload ${field}` });
+              .json({ success: false, message: `Failed to upload ${field}: ${e.message}` });
           }
+        } else {
+          console.log(`Field ${field} is not in declined fields, skipping upload`);
         }
       }
+    } else {
+      console.log('No files uploaded');
     }
 
     // Prepare updates for SQL

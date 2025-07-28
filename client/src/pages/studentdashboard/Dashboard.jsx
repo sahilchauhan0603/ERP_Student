@@ -465,84 +465,127 @@ const StudentDetailsDashboard = () => {
     editMode,
     isDeclined,
     onFileChange,
+    previousUrl,
+    newFile,
+    onCancelNewFile,
   }) => {
     // Check if the document is a PDF or image
     const isPDF = url && url.toLowerCase().includes('.pdf');
     const isImage = url && (url.toLowerCase().includes('.jpg') || url.toLowerCase().includes('.jpeg') || url.toLowerCase().includes('.png') || url.toLowerCase().includes('.gif') || url.toLowerCase().includes('.webp'));
 
+    // For previous document
+    const prevIsPDF = previousUrl && previousUrl.toLowerCase().includes('.pdf');
+    const prevIsImage = previousUrl && (previousUrl.toLowerCase().includes('.jpg') || previousUrl.toLowerCase().includes('.jpeg') || previousUrl.toLowerCase().includes('.png') || previousUrl.toLowerCase().includes('.gif') || previousUrl.toLowerCase().includes('.webp'));
+
+    // Replace the getNewFileUrl logic with a universal blob URL for any file type
+    const newFileUrl = newFile ? URL.createObjectURL(newFile) : null;
+    const newFileIsPDF = newFile && newFile.type === 'application/pdf';
+
     return (
-      <div className="border border-gray-200 rounded-xl p-4 flex flex-col bg-white hover:shadow-md transition-shadow">
-        <h4 className="font-medium text-gray-800 mb-3">{title}</h4>
-        {url ? (
-          <>
-            <div className="flex-1 flex items-center justify-center mb-3 bg-gray-100 rounded-lg overflow-hidden min-h-[160px]">
-              {isImage ? (
-                <img
-                  src={url}
-                  alt={title}
-                  className="max-h-40 max-w-full object-contain"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-              ) : null}
-              {isPDF ? (
-                <div className="flex flex-col items-center justify-center p-4">
-                  <svg className="w-16 h-16 text-red-500 mb-2" fill="currentColor" viewBox="0 0 20 20">
+      <div className={`rounded-xl p-4 flex flex-col bg-white hover:shadow-md transition-shadow relative ${isDeclined ? 'border-2 border-red-400' : 'border border-gray-200'}`}>
+        <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
+          {title}
+          {isDeclined && (
+            <span className="ml-2 px-2 py-0.5 text-xs rounded bg-red-100 text-red-700 font-semibold">Declined</span>
+          )}
+          {editMode && isDeclined && newFile && (
+            <span className="ml-2 px-2 py-0.5 text-xs rounded bg-green-100 text-green-700 font-semibold">Ready to Re-upload</span>
+          )}
+        </h4>
+        <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
+          {/* Previous Document */}
+          <div className="flex-1 flex flex-col items-center justify-center mb-2 bg-gray-50 rounded-lg overflow-hidden min-h-[120px] p-2">
+            <span className="text-xs text-gray-500 mb-1">Previously Submitted</span>
+            {previousUrl ? (
+              prevIsImage ? (
+                <img src={previousUrl} alt={title} className="max-h-24 max-w-full object-contain rounded" />
+              ) : prevIsPDF ? (
+                <a
+                  href={previousUrl.replace('/upload/', '/upload/fl_attachment/')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center text-blue-600 hover:underline"
+                >
+                  <svg className="w-8 h-8 mb-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm text-gray-600 font-medium">PDF Document</p>
-                  <p className="text-xs text-gray-500">Click "View Full Document" to open</p>
-                </div>
-              ) : !isImage ? (
-                <div className="flex flex-col items-center justify-center p-4">
-                  <svg className="w-16 h-16 text-gray-400 mb-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                  Download PDF
+                </a>
+              ) : (
+                <span className="text-gray-400 italic">Not viewable</span>
+              )
+            ) : (
+              <span className="text-gray-400 italic">Not uploaded</span>
+            )}
+          </div>
+          {/* New Upload Preview */}
+          {editMode && isDeclined && (
+            <div className="flex-1 flex flex-col items-center justify-center mb-2 bg-gray-50 rounded-lg overflow-hidden min-h-[120px] p-2 w-full">
+              <span className="text-xs text-gray-500 mb-1">New Upload</span>
+              {newFile ? (
+                <>
+                  {newFile.type && newFile.type.startsWith('image') ? (
+                    <a
+                      href={newFileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 mb-2 text-center py-1 px-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+                    >
+                      View Document
+                    </a>
+                  ) : newFileIsPDF ? (
+                    <>
+                      <a
+                        href={newFileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 mb-2 text-center py-1 px-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+                      >
+                        View Document
+                      </a>
+                    </>
+                  ) : (
+                    <span className="text-gray-400 italic">File selected</span>
+                  )}
+                  <button
+                    className="mt-2 px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+                    onClick={() => onCancelNewFile(field)}
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <label className="w-full flex flex-col items-center justify-center cursor-pointer border-2 border-dashed border-gray-400 rounded-lg py-6 bg-white hover:bg-gray-100 transition-all">
+                  <svg className="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4a1 1 0 011-1h8a1 1 0 011 1v12m-5 4h.01M12 20h0" />
                   </svg>
-                  <p className="text-sm text-gray-600 font-medium">Document</p>
-                  <p className="text-xs text-gray-500">Click "View Full Document" to open</p>
-                </div>
-              ) : null}
+                  <span className="text-gray-700 font-medium">Upload Document</span>
+                  <span className="text-xs text-gray-500">(PDF, JPG, PNG, etc.)</span>
+                  <input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    className="hidden"
+                    onChange={(e) => onFileChange(field, e.target.files[0])}
+                  />
+                </label>
+              )}
             </div>
-            <a
-              href={isPDF ? url.replace('/upload/', '/upload/fl_attachment/') : url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-center py-2 px-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
-            >
-              {isPDF ? 'Download PDF' : 'View Full Document'}
-            </a>
-          </>
-        ) : (
-        <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] bg-gray-50 rounded-lg">
-          <svg
-            className="w-10 h-10 text-gray-400 mb-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <p className="text-gray-400 text-sm italic">Not uploaded</p>
+          )}
         </div>
-      )}
-      {editMode && isDeclined && (
-        <input
-          type="file"
-          accept="image/*,application/pdf"
-          className="mt-2"
-          onChange={(e) => onFileChange(field, e.target.files[0])}
-        />
-      )}
-    </div>
-  );
+        {/* Main Document View/Download Button (if not in edit mode or not declined) */}
+        {!editMode && url && (
+          <a
+            href={isPDF ? url.replace('/upload/', '/upload/fl_attachment/') : url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 text-center py-2 px-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+          >
+            {isPDF ? 'Download PDF' : 'View Full Document'}
+          </a>
+        )}
+      </div>
+    );
   };
 
   // Helper to convert field name to label
@@ -1414,9 +1457,11 @@ const StudentDetailsDashboard = () => {
                     key={field}
                     title={fieldToLabel(field)}
                     url={formData.documents?.[field] || url}
+                    previousUrl={url}
                     field={field}
                     editMode={editMode}
                     isDeclined={declinedFields.includes(`documents.${field}`)}
+                    newFile={updatedDocuments[field] || null}
                     onFileChange={(docField, file) => {
                       if (file) {
                         setUpdatedDocuments((prev) => ({
@@ -1435,6 +1480,22 @@ const StudentDetailsDashboard = () => {
                           prev.includes(fieldPath) ? prev : [...prev, fieldPath]
                         );
                       }
+                    }}
+                    onCancelNewFile={(docField) => {
+                      setUpdatedDocuments((prev) => {
+                        const copy = { ...prev };
+                        delete copy[docField];
+                        return copy;
+                      });
+                      setFormData((prev) => ({
+                        ...prev,
+                        documents: {
+                          ...prev.documents,
+                          [docField]: url,
+                        },
+                      }));
+                      const fieldPath = `documents.${docField}`;
+                      setUpdatedFields((prev) => prev.filter((f) => f !== fieldPath));
                     }}
                   />
                 ))}
