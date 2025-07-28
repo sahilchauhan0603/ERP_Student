@@ -597,6 +597,18 @@ const StudentDetailsDashboard = () => {
       .replace(/\b12th\b/, "12th");
   }
 
+  // Helper to check if a section has declined fields
+  const getDeclinedSections = () => {
+    const declinedSections = new Set();
+    declinedFields.forEach(fieldPath => {
+      const section = fieldPath.split('.')[0];
+      declinedSections.add(section);
+    });
+    return declinedSections;
+  };
+
+  const declinedSections = getDeclinedSections();
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-gray-50">
@@ -964,22 +976,43 @@ const StudentDetailsDashboard = () => {
         {/* Main Content Tabs */}
         <Tab.Group selectedIndex={activeTab} onChange={setActiveTab}>
           <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/10 p-1 mb-6">
-            {["Personal", "Parent", "Academic", "Documents"].map((category) => (
-              <Tab
-                key={category}
-                className={({ selected }) =>
-                  `w-full rounded-lg py-3 text-sm font-medium leading-5 transition-all duration-200
-                  ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2
-                  ${
-                    selected
-                      ? "bg-white shadow text-blue-700"
-                      : "text-gray-600 hover:bg-white/50 hover:text-blue-600"
-                  }`
-                }
-              >
-                {category}
-              </Tab>
-            ))}
+            {["Personal", "Parent", "Academic", "Documents"].map((category) => {
+              const sectionKey = category.toLowerCase();
+              const hasDeclinedFields = declinedSections.has(sectionKey);
+              
+              return (
+                <Tab
+                  key={category}
+                  className={({ selected }) =>
+                    `w-full rounded-lg py-3 text-sm font-medium leading-5 transition-all duration-200
+                    ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2 relative
+                    ${
+                      selected
+                        ? "bg-white shadow text-blue-700"
+                        : "text-gray-600 hover:bg-white/50 hover:text-blue-600"
+                    }
+                    ${hasDeclinedFields ? 'border-2 border-red-400' : ''}`
+                  }
+                >
+                  <div className="relative flex items-center justify-center">
+                    <span>{category}</span>
+                    {hasDeclinedFields && (
+                      <div className="relative ml-1 group">
+                        <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center animate-pulse cursor-help">
+                          <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-red-600 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-20">
+                          Declined section
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-red-600"></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Tab>
+              );
+            })}
           </Tab.List>
 
           <Tab.Panels className="mt-2">

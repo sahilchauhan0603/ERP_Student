@@ -50,7 +50,7 @@ export default function ReviewSubmit({
     const isImage = file.name && (file.name.toLowerCase().includes('.jpg') || file.name.toLowerCase().includes('.jpeg') || file.name.toLowerCase().includes('.png') || file.name.toLowerCase().includes('.gif') || file.name.toLowerCase().includes('.webp'));
 
     return (
-      <div className="flex items-center space-x-2">
+      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
         <span className="inline-flex items-center bg-gray-100 text-gray-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
           <svg
             className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5"
@@ -87,7 +87,7 @@ export default function ReviewSubmit({
                 link.click();
               }
             }}
-            className="text-xs bg-gray-800 text-white px-2 py-1 rounded hover:bg-gray-700 transition-colors whitespace-nowrap"
+            className="text-xs bg-gray-800 text-white px-2 py-1 rounded hover:bg-gray-700 transition-colors whitespace-nowrap w-full sm:w-auto text-center"
           >
             {isImage ? 'View' : 'Download'}
           </button>
@@ -291,8 +291,8 @@ export default function ReviewSubmit({
               title="Personal Information"
             />
           </div>
-                      <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="p-6 bg-gray-50">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <InfoRow
                 label="Full Name"
                 value={`${formData.personal.firstName} ${

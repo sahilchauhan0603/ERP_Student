@@ -50,8 +50,81 @@ export default function AdminStudentDetailsModal({
     false,
   ]);
 
-  const declinedFields =
-    student?.declinedFields || details?.declinedFields || [];
+  // Parse declined fields - handle both string and array formats
+  const parseDeclinedFields = (fields) => {
+    if (!fields) return [];
+    if (Array.isArray(fields)) return fields;
+    if (typeof fields === 'string') {
+      try {
+        return JSON.parse(fields);
+      } catch (e) {
+        console.error('Error parsing declined fields:', e);
+        return [];
+      }
+    }
+    return [];
+  };
+
+  const declinedFields = parseDeclinedFields(
+    student?.declinedFields || details?.declinedFields
+  );
+
+  // Helper to check if a section has declined fields
+  const getDeclinedSections = () => {
+    const declinedSections = new Set();
+    if (Array.isArray(declinedFields)) {
+      declinedFields.forEach(fieldPath => {
+        // Handle both formats: "section.field" and just "field"
+        const parts = fieldPath.split('.');
+        if (parts.length > 1) {
+          // Format: "section.field"
+          declinedSections.add(parts[0]);
+        } else {
+          // Format: just "field" - need to find which section it belongs to
+          const field = parts[0];
+          // Check each section's fields to find where this field belongs
+          const sectionFields = {
+            personal: [
+              "firstName", "middleName", "lastName", "email", "mobile", "dob", 
+              "gender", "category", "subCategory", "region", "currentAddress", 
+              "permanentAddress", "course", "examRoll", "examRank", "abcId"
+            ],
+            academic: [
+              "classX_institute", "classX_board", "classX_year", "classX_aggregate", 
+              "classX_pcm", "classX_isDiplomaOrPolytechnic", "classXII_institute", 
+              "classXII_board", "classXII_year", "classXII_aggregate", "classXII_pcm",
+              "otherQualification_institute", "otherQualification_board", 
+              "otherQualification_year", "otherQualification_aggregate", 
+              "otherQualification_pcm", "academicAchievements", "coCurricularAchievements"
+            ],
+            parent: [
+              "father_name", "father_mobile", "father_email", "mother_name", 
+              "mother_mobile", "mother_email", "family_income"
+            ],
+            documents: [
+              "photo", "ipuRegistration", "allotmentLetter", "examAdmitCard", 
+              "examScoreCard", "marksheet10", "passing10", "marksheet12", 
+              "passing12", "aadhar", "characterCertificate", "medicalCertificate", 
+              "migrationCertificate", "categoryCertificate"
+            ]
+          };
+          
+          // Find which section contains this field
+          for (const [section, fields] of Object.entries(sectionFields)) {
+            if (fields.includes(field)) {
+              declinedSections.add(section);
+              break;
+            }
+          }
+        }
+      });
+    }
+    console.log('Declined fields:', declinedFields);
+    console.log('Declined sections:', Array.from(declinedSections));
+    return declinedSections;
+  };
+
+  const declinedSections = getDeclinedSections();
 
   useEffect(() => {
     if (!student?.id) return;
@@ -353,9 +426,8 @@ export default function AdminStudentDetailsModal({
   }) => {
     const verifiedStatus = verifications[section]?.[field];
 
-    // Highlight if this field is declined and tableType is 'declined'
-    const isDeclined =
-      tableType === "declined" && declinedFields?.includes(field);
+    // Highlight if this field is declined (for any declined student)
+    const isDeclined = declinedFields?.includes(field);
 
     let displayValue = value;
     if (
@@ -968,12 +1040,30 @@ export default function AdminStudentDetailsModal({
               )}
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
-          >
-            <FiX size={24} />
-          </button>
+          <div className="flex items-center space-x-2">
+            {/* Status Icon */}
+            {student?.status === 'approved' && (
+              <div className="p-2 rounded-full bg-green-100 text-green-600">
+                <FiCheckCircle size={20} />
+              </div>
+            )}
+            {student?.status === 'declined' && (
+              <div className="p-2 rounded-full bg-red-100 text-red-600">
+                <FiXCircle size={20} />
+              </div>
+            )}
+            {student?.status === 'pending' && (
+              <div className="p-2 rounded-full bg-yellow-100 text-yellow-600">
+                <FiClock size={20} />
+              </div>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+            >
+              <FiX size={24} />
+            </button>
+          </div>
         </div>
 
         {/* Progress bar for pending review */}
@@ -1024,23 +1114,43 @@ export default function AdminStudentDetailsModal({
         <div className="border-b border-gray-200 px-6">
           <div className="overflow-x-auto -mx-4 px-4">
             <div className="flex space-x-4 whitespace-nowrap">
-              {sectionDefs.map((section, index) => (
-                <button
-                  key={section.key}
-                  onClick={() => tableType !== "pending" && setActiveTab(index)}
-                  className={`py-4 px-1 font-medium text-sm border-b-2 transition-colors flex items-center ${
-                    activeTab === index
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  {section.icon}
-                  {section.label}
-                  {tableType === "pending" && sectionCompleted[index] && (
-                    <FiCheckCircle className="ml-2 text-green-500" size={16} />
-                  )}
-                </button>
-              ))}
+              {sectionDefs.map((section, index) => {
+                const hasDeclinedFields = declinedSections.has(section.key);
+                
+                return (
+                  <button
+                    key={section.key}
+                    onClick={() => tableType !== "pending" && setActiveTab(index)}
+                    className={`py-4 px-1 font-medium text-sm border-b-2 transition-colors flex items-center relative ${
+                      activeTab === index
+                        ? "border-blue-500 text-blue-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    }
+                    ${hasDeclinedFields ? 'border-red-400' : ''}`}
+                  >
+                    {section.icon}
+                    <span className="flex items-center">
+                      {section.label}
+                      {hasDeclinedFields && (
+                        <div className="relative ml-1 group">
+                          <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center animate-pulse cursor-help">
+                            <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-red-600 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50 mb-0">
+                            Declined section
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-red-600"></div>
+                          </div>
+                        </div>
+                      )}
+                    </span>
+                    {tableType === "pending" && sectionCompleted[index] && (
+                      <FiCheckCircle className="ml-2 text-green-500" size={16} />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
