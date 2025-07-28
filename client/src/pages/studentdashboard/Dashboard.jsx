@@ -439,16 +439,14 @@ const StudentDetailsDashboard = () => {
     return (
       <tr className="border-b last:border-b-0">
         <td
-          className={`py-2 px-4 text-gray-600 font-medium align-top border-r border-gray-200 break-words max-w-[120px] ${
-            isDeclined ? "text-red-600" : ""
-          }`}
+          className={`py-2 px-4 text-gray-600 font-medium align-top border-r border-gray-200 break-words max-w-[120px] ${isDeclined ? "text-red-600" : ""
+            }`}
         >
           {label}:
         </td>
         <td
-          className={`py-2 px-4 text-gray-900 font-semibold align-top break-words max-w-[220px] ${
-            isDeclined ? "text-red-600" : ""
-          }`}
+          className={`py-2 px-4 text-gray-900 font-semibold align-top break-words max-w-[220px] ${isDeclined ? "text-red-600" : ""
+            }`}
           style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
         >
           {displayValue || <span className="text-gray-400 italic">N/A</span>}
@@ -711,11 +709,10 @@ const StudentDetailsDashboard = () => {
             {details.personal?.status === "declined" && (
               <button
                 onClick={handleEditToggle}
-                className={`px-4 py-2 rounded-lg transition-all shadow-sm ${
-                  editMode
+                className={`px-4 py-2 rounded-lg transition-all shadow-sm ${editMode
                     ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
                     : "bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700"
-                }`}
+                  }`}
               >
                 {editMode ? "Cancel Editing" : "Update Profile"}
               </button>
@@ -744,13 +741,12 @@ const StudentDetailsDashboard = () => {
 
         {/* Student Profile Summary */}
         <div
-          className={`rounded-xl shadow-lg overflow-hidden mb-8 ${
-            details.personal?.status === "declined"
+          className={`rounded-xl shadow-lg overflow-hidden mb-8 ${details.personal?.status === "declined"
               ? "bg-gradient-to-r from-red-500 to-red-600"
               : details.personal?.status === "approved"
-              ? "bg-gradient-to-r from-green-500 to-green-600"
-              : "bg-gradient-to-r from-orange-400 to-yellow-400"
-          }`}
+                ? "bg-gradient-to-r from-green-500 to-green-600"
+                : "bg-gradient-to-r from-orange-400 to-yellow-400"
+            }`}
         >
           <div className="p-6 flex flex-col md:flex-row items-center">
             <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white/80 shadow-lg mb-4 md:mb-0 md:mr-6">
@@ -759,8 +755,8 @@ const StudentDetailsDashboard = () => {
                   details.documents?.photo ||
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(
                     (details.personal?.firstName || "") +
-                      " " +
-                      (details.personal?.lastName || "")
+                    " " +
+                    (details.personal?.lastName || "")
                   )}&background=random&size=112`
                 }
                 alt="Student"
@@ -769,8 +765,8 @@ const StudentDetailsDashboard = () => {
                   e.target.onerror = null;
                   e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
                     (details.personal?.firstName || "Student") +
-                      " " +
-                      (details.personal?.lastName || "")
+                    " " +
+                    (details.personal?.lastName || "")
                   )}&background=random&size=112`;
                 }}
               />
@@ -817,13 +813,12 @@ const StudentDetailsDashboard = () => {
                   </span>
                 )}
                 <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                    details.personal?.status === "approved"
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${details.personal?.status === "approved"
                       ? "bg-green-100 text-green-800"
                       : details.personal?.status === "declined"
-                      ? "bg-red-100 text-red-800"
-                      : "bg-orange-100 text-orange-800"
-                  }`}
+                        ? "bg-red-100 text-red-800"
+                        : "bg-orange-100 text-orange-800"
+                    }`}
                 >
                   {details.personal?.status?.toUpperCase() || "PENDING"}
                 </span>
@@ -979,17 +974,16 @@ const StudentDetailsDashboard = () => {
             {["Personal", "Parent", "Academic", "Documents"].map((category) => {
               const sectionKey = category.toLowerCase();
               const hasDeclinedFields = declinedSections.has(sectionKey);
-              
+
               return (
                 <Tab
                   key={category}
                   className={({ selected }) =>
                     `w-full rounded-lg py-3 text-sm font-medium leading-5 transition-all duration-200
                     ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2 relative
-                    ${
-                      selected
-                        ? "bg-white shadow text-blue-700"
-                        : "text-gray-600 hover:bg-white/50 hover:text-blue-600"
+                    ${selected
+                      ? "bg-white shadow text-blue-700"
+                      : "text-gray-600 hover:bg-white/50 hover:text-blue-600"
                     }
                     ${hasDeclinedFields ? 'border-2 border-red-400' : ''}`
                   }
@@ -1061,11 +1055,10 @@ const StudentDetailsDashboard = () => {
                   />
                   <DetailItem
                     label="Category"
-                    value={`${formData.personal?.category || ""}${
-                      formData.personal?.subCategory
+                    value={`${formData.personal?.category || ""}${formData.personal?.subCategory
                         ? ` (${formData.personal.subCategory})`
                         : ""
-                    }`}
+                      }`}
                     field="category"
                     section="personal"
                   />
@@ -1549,11 +1542,10 @@ const StudentDetailsDashboard = () => {
               disabled={
                 !allDeclinedFieldsUpdated() || saveStatus.final?.loading
               }
-              className={`px-6 py-3 text-white font-medium rounded-lg transition-all shadow-lg flex items-center gap-2 ${
-                allDeclinedFieldsUpdated()
+              className={`px-6 py-3 text-white font-medium rounded-lg transition-all shadow-lg flex items-center gap-2 ${allDeclinedFieldsUpdated()
                   ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
                   : "bg-gray-400 cursor-not-allowed"
-              }`}
+                }`}
             >
               {saveStatus.final?.loading ? (
                 <>

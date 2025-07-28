@@ -17,6 +17,7 @@ import {
   FiDollarSign,
   FiUsers,
   FiCalendar,
+  FiClock,
 } from "react-icons/fi";
 import Swal from "sweetalert2";
 
@@ -85,30 +86,30 @@ export default function AdminStudentDetailsModal({
           // Check each section's fields to find where this field belongs
           const sectionFields = {
             personal: [
-              "firstName", "middleName", "lastName", "email", "mobile", "dob", 
-              "gender", "category", "subCategory", "region", "currentAddress", 
+              "firstName", "middleName", "lastName", "email", "mobile", "dob",
+              "gender", "category", "subCategory", "region", "currentAddress",
               "permanentAddress", "course", "examRoll", "examRank", "abcId"
             ],
             academic: [
-              "classX_institute", "classX_board", "classX_year", "classX_aggregate", 
-              "classX_pcm", "classX_isDiplomaOrPolytechnic", "classXII_institute", 
+              "classX_institute", "classX_board", "classX_year", "classX_aggregate",
+              "classX_pcm", "classX_isDiplomaOrPolytechnic", "classXII_institute",
               "classXII_board", "classXII_year", "classXII_aggregate", "classXII_pcm",
-              "otherQualification_institute", "otherQualification_board", 
-              "otherQualification_year", "otherQualification_aggregate", 
+              "otherQualification_institute", "otherQualification_board",
+              "otherQualification_year", "otherQualification_aggregate",
               "otherQualification_pcm", "academicAchievements", "coCurricularAchievements"
             ],
             parent: [
-              "father_name", "father_mobile", "father_email", "mother_name", 
+              "father_name", "father_mobile", "father_email", "mother_name",
               "mother_mobile", "mother_email", "family_income"
             ],
             documents: [
-              "photo", "ipuRegistration", "allotmentLetter", "examAdmitCard", 
-              "examScoreCard", "marksheet10", "passing10", "marksheet12", 
-              "passing12", "aadhar", "characterCertificate", "medicalCertificate", 
+              "photo", "ipuRegistration", "allotmentLetter", "examAdmitCard",
+              "examScoreCard", "marksheet10", "passing10", "marksheet12",
+              "passing12", "aadhar", "characterCertificate", "medicalCertificate",
               "migrationCertificate", "categoryCertificate"
             ]
           };
-          
+
           // Find which section contains this field
           for (const [section, fields] of Object.entries(sectionFields)) {
             if (fields.includes(field)) {
@@ -437,7 +438,7 @@ export default function AdminStudentDetailsModal({
     ) {
       try {
         displayValue = typeof value === "string" ? JSON.parse(value) : value;
-      } catch {}
+      } catch { }
       if (Array.isArray(displayValue)) {
         displayValue =
           displayValue.length === 0 ? (
@@ -464,22 +465,20 @@ export default function AdminStudentDetailsModal({
 
     return (
       <div
-        className={`p-4 rounded-lg border transition-all ${
-          isDeclined
+        className={`p-4 rounded-lg border transition-all ${isDeclined
             ? "border-red-400 bg-red-50"
             : verifiedStatus === true
-            ? "border-green-200 bg-green-50"
-            : verifiedStatus === false
-            ? "border-red-200 bg-red-50"
-            : "border-gray-200 bg-white hover:bg-gray-50"
-        }`}
+              ? "border-green-200 bg-green-50"
+              : verifiedStatus === false
+                ? "border-red-200 bg-red-50"
+                : "border-gray-200 bg-white hover:bg-gray-50"
+          }`}
       >
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <h4
-              className={`font-medium flex items-center ${
-                isDeclined ? "text-red-700" : "text-gray-800"
-              }`}
+              className={`font-medium flex items-center ${isDeclined ? "text-red-700" : "text-gray-800"
+                }`}
             >
               {label}
               {isDeclined && (
@@ -515,22 +514,20 @@ export default function AdminStudentDetailsModal({
             <div className="flex space-x-2 ml-4">
               <button
                 onClick={() => handleVerify(section, field, true)}
-                className={`p-1.5 rounded-full ${
-                  verifiedStatus === true
+                className={`p-1.5 rounded-full ${verifiedStatus === true
                     ? "bg-green-100 text-green-600"
                     : "bg-gray-100 text-gray-400 hover:bg-green-50"
-                }`}
+                  }`}
                 title="Mark as correct"
               >
                 <FiCheck size={16} />
               </button>
               <button
                 onClick={() => handleVerify(section, field, false)}
-                className={`p-1.5 rounded-full ${
-                  verifiedStatus === false
+                className={`p-1.5 rounded-full ${verifiedStatus === false
                     ? "bg-red-100 text-red-600"
                     : "bg-gray-100 text-gray-400 hover:bg-red-50"
-                }`}
+                  }`}
                 title="Mark as incorrect"
               >
                 <FiX size={16} />
@@ -1073,22 +1070,20 @@ export default function AdminStudentDetailsModal({
               {sectionDefs.map((section, index) => (
                 <div key={index} className="flex flex-col items-center">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      sectionCompleted[index]
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${sectionCompleted[index]
                         ? "bg-green-100 text-green-600"
                         : activeTab === index
-                        ? "bg-blue-100 text-blue-600"
-                        : "bg-gray-100 text-gray-400"
-                    }`}
+                          ? "bg-blue-100 text-blue-600"
+                          : "bg-gray-100 text-gray-400"
+                      }`}
                   >
                     {sectionCompleted[index] ? <FiCheckCircle /> : index + 1}
                   </div>
                   <span
-                    className={`text-xs mt-1 ${
-                      activeTab === index
+                    className={`text-xs mt-1 ${activeTab === index
                         ? "font-medium text-blue-600"
                         : "text-gray-500"
-                    }`}
+                      }`}
                   >
                     {section.label}
                   </span>
@@ -1099,11 +1094,10 @@ export default function AdminStudentDetailsModal({
               <div
                 className="bg-blue-600 h-1.5 rounded-full"
                 style={{
-                  width: `${
-                    ((activeTab + (sectionCompleted[activeTab] ? 1 : 0)) /
+                  width: `${((activeTab + (sectionCompleted[activeTab] ? 1 : 0)) /
                       sectionDefs.length) *
                     100
-                  }%`,
+                    }%`,
                 }}
               ></div>
             </div>
@@ -1116,16 +1110,15 @@ export default function AdminStudentDetailsModal({
             <div className="flex space-x-4 whitespace-nowrap">
               {sectionDefs.map((section, index) => {
                 const hasDeclinedFields = declinedSections.has(section.key);
-                
+
                 return (
                   <button
                     key={section.key}
                     onClick={() => tableType !== "pending" && setActiveTab(index)}
-                    className={`py-4 px-1 font-medium text-sm border-b-2 transition-colors flex items-center relative ${
-                      activeTab === index
+                    className={`py-4 px-1 font-medium text-sm border-b-2 transition-colors flex items-center relative ${activeTab === index
                         ? "border-blue-500 text-blue-600"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }
+                      }
                     ${hasDeclinedFields ? 'border-red-400' : ''}`}
                   >
                     {section.icon}
@@ -1195,11 +1188,10 @@ export default function AdminStudentDetailsModal({
                   <button
                     onClick={handleProceed}
                     disabled={!isSectionVerified(sectionDefs[activeTab].key)}
-                    className={`flex items-center px-4 py-2 rounded-md text-white ${
-                      isSectionVerified(sectionDefs[activeTab].key)
+                    className={`flex items-center px-4 py-2 rounded-md text-white ${isSectionVerified(sectionDefs[activeTab].key)
                         ? "bg-blue-600 hover:bg-blue-700"
                         : "bg-blue-300 cursor-not-allowed"
-                    }`}
+                      }`}
                   >
                     Next <FiArrowRight className="ml-2" />
                   </button>
