@@ -16,6 +16,7 @@ connection.connect((err) => {
     console.error('❌ MySQL connection failed:', err.stack);
     return;
   }
+  console.log('✅ Connected to MySQL');
 
 });
 
