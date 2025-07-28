@@ -120,8 +120,7 @@ export default function AdminStudentDetailsModal({
         }
       });
     }
-    console.log('Declined fields:', declinedFields);
-    console.log('Declined sections:', Array.from(declinedSections));
+
     return declinedSections;
   };
 

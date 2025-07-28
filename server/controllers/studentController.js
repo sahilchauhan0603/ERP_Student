@@ -169,13 +169,7 @@ const docFields = [
 
 exports.registerStudent = async (req, res) => {
   try {
-    console.log("Registration request received:", {
-      bodyKeys: Object.keys(req.body),
-      hasPersonal: !!req.body["personal.firstName"],
-      hasAcademic: !!req.body["academic.classX.institute"],
-      hasParents: !!req.body["parents.father.name"],
-      hasDocuments: !!req.body.photo
-    });
+
     // Parse JSON fields for achievements
     let academicAchievements =
       req.body["academicAchievements"] ||
@@ -332,12 +326,6 @@ exports.registerStudent = async (req, res) => {
       student.created_at = createdAt;
 
       // Insert into DB
-      console.log("Attempting to insert student:", {
-        studentKeys: Object.keys(student),
-        email: student.email,
-        firstName: student.firstName,
-        course: student.course
-      });
       
       const sql = "INSERT INTO students SET ?";
       db.query(sql, student, async (err, result) => {
@@ -345,7 +333,7 @@ exports.registerStudent = async (req, res) => {
           console.error("DB Insert Error:", err);
           return res.status(500).json({ message: "Database error", error: err });
         }
-        console.log("Student successfully inserted with ID:", result.insertId);
+
         
         // Send confirmation email to the student
         try {
@@ -358,7 +346,7 @@ exports.registerStudent = async (req, res) => {
             html: emailHtml
           });
           
-          console.log("Confirmation email sent successfully to:", student.email);
+
         } catch (emailError) {
           console.error("Failed to send confirmation email:", emailError);
           // Don't fail the registration if email fails
@@ -913,20 +901,16 @@ exports.updateDeclinedFields = async (req, res) => {
 
     // Handle file uploads (if any)
     if (req.files && req.files.length > 0) {
-      console.log(`Processing ${req.files.length} uploaded files`);
       for (const file of req.files) {
         const field = file.fieldname;
-        console.log(`Processing file for field: ${field}, filename: ${file.originalname}, size: ${file.size}`);
         
         if (declinedFields.includes(`documents.${field}`)) {
           // Upload to Cloudinary
           try {
-            console.log(`Uploading ${field} to Cloudinary...`);
             const url = await uploadToCloudinary(
               file.buffer,
               `${field}_${Date.now()}_${file.originalname}`
             );
-            console.log(`Successfully uploaded ${field}: ${url}`);
             if (!data.documents) data.documents = {};
             data.documents[field] = url;
           } catch (e) {
@@ -935,12 +919,8 @@ exports.updateDeclinedFields = async (req, res) => {
               .status(500)
               .json({ success: false, message: `Failed to upload ${field}: ${e.message}` });
           }
-        } else {
-          console.log(`Field ${field} is not in declined fields, skipping upload`);
         }
       }
-    } else {
-      console.log('No files uploaded');
     }
 
     // Prepare updates for SQL
