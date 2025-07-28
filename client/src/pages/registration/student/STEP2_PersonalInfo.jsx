@@ -27,16 +27,49 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
     // Add more as needed
   ];
 
+  const emailDomains = [
+    "@gmail.com",
+    "@yahoo.com",
+    "@outlook.com",
+    "@hotmail.com",
+    "@protonmail.com",
+    "@rediffmail.com",
+    "@icloud.com",
+    "@zoho.com",
+  ];
   const [mobileCountry, setMobileCountry] = useState(
     formData.personal.mobileCountry || "+91"
   );
+  const [emailDomain, setEmailDomain] = useState(
+    formData.personal.email && emailDomains.some(d => formData.personal.email.endsWith(d))
+      ? emailDomains.find(d => formData.personal.email.endsWith(d))
+      : emailDomains[0]
+  );
   const [emailUser, setEmailUser] = useState(
     formData.personal.email
-      ? formData.personal.email.replace(/@gmail\.com$/, "")
+      ? formData.personal.email.replace(/@.*/, "")
       : ""
   );
   const [emailError, setEmailError] = useState("");
   const [abcIdError, setAbcIdError] = useState("");
+  const [mobileError, setMobileError] = useState("");
+  const [dobError, setDobError] = useState("");
+
+  // Place of Birth Dropdown Data
+  const countries = [
+    "India", "United States", "United Kingdom", "Australia", "Canada", "Germany", "France", "China", "Japan", "Singapore", "UAE", "South Africa", "Brazil", "Russia", "New Zealand", "Nepal", "Bangladesh", "Sri Lanka", "Pakistan", "Other"
+  ];
+  const indianStates = [
+    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+    // Union Territories
+    "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
+  ];
+  const usStates = ["California", "Texas", "New York", "Florida", "Illinois", "Other"];
+  const ukRegions = ["England", "Scotland", "Wales", "Northern Ireland", "Other"];
+  const ausStates = ["New South Wales", "Victoria", "Queensland", "Western Australia", "South Australia", "Tasmania", "Australian Capital Territory", "Northern Territory", "Other"];
+  const [birthCountry, setBirthCountry] = useState(formData.personal.placeOfBirth?.split(", ").pop() || "India");
+  const [birthState, setBirthState] = useState(formData.personal.placeOfBirth?.split(", ")[0] || "");
+  const [birthOtherCity, setBirthOtherCity] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,6 +92,14 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
         mobileCountry,
       },
     }));
+    // Validation: must be exactly 10 digits for India
+    if (mobileCountry === "+91" && value.length !== 10) {
+      setMobileError("Mobile number must be exactly 10 digits");
+    } else if (!/^\d{10,15}$/.test(value)) {
+      setMobileError("Mobile number must be numeric and 10-15 digits");
+    } else {
+      setMobileError("");
+    }
   };
   const handleMobileCountryChange = (e) => {
     setMobileCountry(e.target.value);
@@ -77,7 +118,98 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
       ...prev,
       personal: {
         ...prev.personal,
-        email: value ? value + "@gmail.com" : "",
+        email: value ? value + emailDomain : "",
+      },
+    }));
+  };
+  const handleEmailDomainChange = (e) => {
+    const domain = e.target.value;
+    setEmailDomain(domain);
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        email: emailUser ? emailUser + domain : "",
+      },
+    }));
+  };
+
+  const handleAbcIdChange = (e) => {
+    const value = e.target.value.replace(/[^0-9]/g, "");
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        abcId: value,
+      },
+    }));
+    // Validation: must be exactly 12 digits
+    if (!/^\d{12}$/.test(value)) {
+      setAbcIdError("ABC ID must be a 12-digit number");
+    } else {
+      setAbcIdError("");
+    }
+  };
+
+  const handleDobChange = (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        dob: value,
+      },
+    }));
+    // Validation: must be a valid date, not in future, reasonable age
+    const dobDate = new Date(value);
+    const now = new Date();
+    if (isNaN(dobDate.getTime())) {
+      setDobError("Invalid date of birth");
+    } else if (dobDate > now) {
+      setDobError("Date of birth cannot be in the future");
+    } else {
+      // Check age >= 15
+      const age = now.getFullYear() - dobDate.getFullYear();
+      if (age < 15) {
+        setDobError("You must be at least 15 years old");
+      } else {
+        setDobError("");
+      }
+    }
+  };
+
+  const handleBirthCountryChange = (e) => {
+    const country = e.target.value;
+    setBirthCountry(country);
+    setBirthState("");
+    setBirthOtherCity("");
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        placeOfBirth: country,
+      },
+    }));
+  };
+  const handleBirthStateChange = (e) => {
+    const state = e.target.value;
+    setBirthState(state);
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        placeOfBirth: `${state}, ${birthCountry}`,
+      },
+    }));
+  };
+  const handleBirthOtherCityChange = (e) => {
+    const city = e.target.value;
+    setBirthOtherCity(city);
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        placeOfBirth: city ? `${city}, ${birthCountry}` : birthCountry,
       },
     }));
   };
@@ -262,7 +394,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 name="abcId"
                 placeholder="ABC ID"
                 value={formData.personal.abcId || ""}
-                onChange={handleChange}
+                onChange={handleAbcIdChange}
                 onBlur={e => checkAbcIdUnique(e.target.value)}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
                   incompleteFields.includes("abcId") || abcIdError
@@ -270,6 +402,8 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                     : "border-gray-400"
                 }`}
                 required
+                maxLength={12}
+                inputMode="numeric"
               />
               {(incompleteFields.includes("abcId") || abcIdError) && (
                 <div className="text-xs text-red-500 mt-1">
@@ -287,17 +421,17 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 type="date"
                 name="dob"
                 value={formData.personal.dob || ""}
-                onChange={handleChange}
+                onChange={handleDobChange}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("dob")
+                  incompleteFields.includes("dob") || dobError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
                 required
               />
-              {incompleteFields.includes("dob") && (
+              {(incompleteFields.includes("dob") || dobError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Date of birth is required
+                  {dobError || "Date of birth is required"}
                 </div>
               )}
             </div>
@@ -307,17 +441,80 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
               <label className="block text-sm font-semibold text-gray-800">
                 Place of Birth
               </label>
-              <input
-                name="placeOfBirth"
-                placeholder="City, Country"
-                value={formData.personal.placeOfBirth || ""}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("placeOfBirth")
-                    ? "border-red-500"
-                    : "border-gray-400"
-                }`}
-              />
+              <div className="flex flex-col sm:flex-row gap-2">
+                <select
+                  value={birthCountry}
+                  onChange={handleBirthCountryChange}
+                  className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
+                  required
+                >
+                  {countries.map((country) => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </select>
+                {birthCountry === "India" && (
+                  <select
+                    value={birthState}
+                    onChange={handleBirthStateChange}
+                    className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
+                    required
+                  >
+                    <option value="">State</option>
+                    {indianStates.map((state) => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
+                )}
+                {birthCountry === "United States" && (
+                  <select
+                    value={birthState}
+                    onChange={handleBirthStateChange}
+                    className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
+                    required
+                  >
+                    <option value="">-- Select State --</option>
+                    {usStates.map((state) => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
+                )}
+                {birthCountry === "United Kingdom" && (
+                  <select
+                    value={birthState}
+                    onChange={handleBirthStateChange}
+                    className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
+                    required
+                  >
+                    <option value="">-- Select Region --</option>
+                    {ukRegions.map((state) => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
+                )}
+                {birthCountry === "Australia" && (
+                  <select
+                    value={birthState}
+                    onChange={handleBirthStateChange}
+                    className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
+                    required
+                  >
+                    <option value="">-- Select State --</option>
+                    {ausStates.map((state) => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
+                )}
+                {birthCountry !== "India" && birthCountry !== "United States" && birthCountry !== "United Kingdom" && birthCountry !== "Australia" && (
+                  <input
+                    type="text"
+                    value={birthOtherCity}
+                    onChange={handleBirthOtherCityChange}
+                    placeholder="City/State"
+                    className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 font-semibold"
+                    required
+                  />
+                )}
+              </div>
               {incompleteFields.includes("placeOfBirth") && (
                 <div className="text-xs text-red-500 mt-1">
                   Place of birth is required
@@ -379,7 +576,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                   value={formData.personal.mobile || ""}
                   onChange={handleMobileChange}
                   className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                    incompleteFields.includes("mobile")
+                    incompleteFields.includes("mobile") || mobileError
                       ? "border-red-500"
                       : "border-gray-400"
                   }`}
@@ -388,9 +585,9 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                   inputMode="numeric"
                 />
               </div>
-              {incompleteFields.includes("mobile") && (
+              {(incompleteFields.includes("mobile") || mobileError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Mobile number is required
+                  {mobileError || "Mobile number is required"}
                 </div>
               )}
             </div>
@@ -399,23 +596,33 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
               <label className="block text-sm font-semibold text-gray-800">
                 Email Address<span className="text-red-500">*</span>
               </label>
-              <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full">
+              <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full min-w-0">
                 <input
                   name="emailUser"
                   placeholder="your.email"
                   value={emailUser}
                   onChange={handleEmailUserChange}
-                  onBlur={e => checkEmailUnique(e.target.value + "@gmail.com")}
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  onBlur={e => checkEmailUnique(e.target.value + emailDomain)}
+                  className={`flex-1 sm:max-w-md px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold text-base sm:text-base ${
                     incompleteFields.includes("email") || emailError
                       ? "border-red-500"
                       : "border-gray-400"
                   }`}
                   required
+                  style={{ minWidth: 0 }}
                 />
-                <span className="text-gray-700 font-semibold select-none flex items-center px-2 sm:px-0">
-                  @gmail.com
-                </span>
+                <select
+                  value={emailDomain}
+                  onChange={handleEmailDomainChange}
+                  className="flex-shrink-0 w-full sm:w-40 px-4 py-3 border-2 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400 text-base sm:text-base transition-all duration-300 truncate text-ellipsis"
+                  style={{ minWidth: 0, maxWidth: 200 }}
+                >
+                  {emailDomains.map((domain) => (
+                    <option key={domain} value={domain} className="truncate text-ellipsis">
+                      {domain}
+                    </option>
+                  ))}
+                </select>
               </div>
               {(incompleteFields.includes("email") || emailError) && (
                 <div className="text-xs text-red-500 mt-1">

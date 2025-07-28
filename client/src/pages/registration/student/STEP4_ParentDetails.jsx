@@ -42,6 +42,16 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
     // Add more as needed
   ];
 
+  const emailDomains = [
+    "@gmail.com",
+    "@yahoo.com",
+    "@outlook.com",
+    "@hotmail.com",
+    "@protonmail.com",
+    "@rediffmail.com",
+    "@icloud.com",
+    "@zoho.com",
+  ];
   const [fatherMobileCountry, setFatherMobileCountry] = useState(
     formData.parents.father.mobileCountry || "+91"
   );
@@ -49,6 +59,11 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
     formData.parents.father.email
       ? formData.parents.father.email.replace(/@gmail\.com$/, "")
       : ""
+  );
+  const [fatherEmailDomain, setFatherEmailDomain] = useState(
+    formData.parents.father.email && emailDomains.some(d => formData.parents.father.email.endsWith(d))
+      ? emailDomains.find(d => formData.parents.father.email.endsWith(d))
+      : emailDomains[0]
   );
   const [motherMobileCountry, setMotherMobileCountry] = useState(
     formData.parents.mother.mobileCountry || "+91"
@@ -58,6 +73,13 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
       ? formData.parents.mother.email.replace(/@gmail\.com$/, "")
       : ""
   );
+  const [motherEmailDomain, setMotherEmailDomain] = useState(
+    formData.parents.mother.email && emailDomains.some(d => formData.parents.mother.email.endsWith(d))
+      ? emailDomains.find(d => formData.parents.mother.email.endsWith(d))
+      : emailDomains[0]
+  );
+  const [fatherMobileError, setFatherMobileError] = useState("");
+  const [motherMobileError, setMotherMobileError] = useState("");
 
   const handleFatherMobileChange = (e) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
@@ -72,6 +94,14 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
         },
       },
     }));
+    // Validation: must be exactly 10 digits for India
+    if (fatherMobileCountry === "+91" && value.length !== 10) {
+      setFatherMobileError("Mobile number must be exactly 10 digits");
+    } else if (!/^\d{10,15}$/.test(value)) {
+      setFatherMobileError("Mobile number must be numeric and 10-15 digits");
+    } else {
+      setFatherMobileError("");
+    }
   };
   const handleFatherMobileCountryChange = (e) => {
     setFatherMobileCountry(e.target.value);
@@ -95,7 +125,21 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
         ...prev.parents,
         father: {
           ...prev.parents.father,
-          email: value ? value + "@gmail.com" : "",
+          email: value ? value + fatherEmailDomain : "",
+        },
+      },
+    }));
+  };
+  const handleFatherEmailDomainChange = (e) => {
+    const domain = e.target.value;
+    setFatherEmailDomain(domain);
+    setFormData((prev) => ({
+      ...prev,
+      parents: {
+        ...prev.parents,
+        father: {
+          ...prev.parents.father,
+          email: fatherEmailUser ? fatherEmailUser + domain : "",
         },
       },
     }));
@@ -113,6 +157,14 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
         },
       },
     }));
+    // Validation: must be exactly 10 digits for India
+    if (motherMobileCountry === "+91" && value.length !== 10) {
+      setMotherMobileError("Mobile number must be exactly 10 digits");
+    } else if (!/^\d{10,15}$/.test(value)) {
+      setMotherMobileError("Mobile number must be numeric and 10-15 digits");
+    } else {
+      setMotherMobileError("");
+    }
   };
   const handleMotherMobileCountryChange = (e) => {
     setMotherMobileCountry(e.target.value);
@@ -136,7 +188,21 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
         ...prev.parents,
         mother: {
           ...prev.parents.mother,
-          email: value ? value + "@gmail.com" : "",
+          email: value ? value + motherEmailDomain : "",
+        },
+      },
+    }));
+  };
+  const handleMotherEmailDomainChange = (e) => {
+    const domain = e.target.value;
+    setMotherEmailDomain(domain);
+    setFormData((prev) => ({
+      ...prev,
+      parents: {
+        ...prev.parents,
+        mother: {
+          ...prev.parents.mother,
+          email: motherEmailUser ? motherEmailUser + domain : "",
         },
       },
     }));
@@ -249,22 +315,32 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
               <label className="block text-sm font-semibold text-gray-800">
                 Email Address<span className="text-red-500">*</span>
               </label>
-              <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full">
+              <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full min-w-0">
                 <input
                   name="parents.father.emailUser"
                   placeholder="father.email"
                   value={fatherEmailUser}
                   onChange={handleFatherEmailUserChange}
                   required
-                  className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  className={`flex-1 sm:max-w-md px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold text-base sm:text-base ${
                     incompleteFields.includes("father.email")
                       ? "border-red-500"
                       : "border-gray-400"
                   }`}
+                  style={{ minWidth: 0 }}
                 />
-                <span className="text-gray-700 font-semibold select-none flex items-center px-2 sm:px-0">
-                  @gmail.com
-                </span>
+                <select
+                  value={fatherEmailDomain}
+                  onChange={handleFatherEmailDomainChange}
+                  className="flex-shrink-0 w-full sm:w-40 px-4 py-2 border-2 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400 text-base sm:text-base transition-all duration-300 truncate text-ellipsis"
+                  style={{ minWidth: 0, maxWidth: 200 }}
+                >
+                  {emailDomains.map((domain) => (
+                    <option key={domain} value={domain} className="truncate text-ellipsis">
+                      {domain}
+                    </option>
+                  ))}
+                </select>
               </div>
               {incompleteFields.includes("father.email") && (
                 <div className="text-xs text-red-500 mt-1">
@@ -299,15 +375,15 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                   maxLength={15}
                   inputMode="numeric"
                   className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                    incompleteFields.includes("father.mobile")
+                    incompleteFields.includes("father.mobile") || fatherMobileError
                       ? "border-red-500"
                       : "border-gray-400"
                   }`}
                 />
               </div>
-              {incompleteFields.includes("father.mobile") && (
+              {(incompleteFields.includes("father.mobile") || fatherMobileError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Father's mobile number is required
+                  {fatherMobileError || "Father's mobile number is required"}
                 </div>
               )}
             </div>
@@ -437,22 +513,32 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
               <label className="block text-sm font-semibold text-gray-800">
                 Email Address<span className="text-red-500">*</span>
               </label>
-              <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full">
+              <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full min-w-0">
                 <input
                   name="parents.mother.emailUser"
                   placeholder="mother.email"
                   value={motherEmailUser}
                   onChange={handleMotherEmailUserChange}
                   required
-                  className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  className={`flex-1 sm:max-w-md px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold text-base sm:text-base ${
                     incompleteFields.includes("mother.email")
                       ? "border-red-500"
                       : "border-gray-400"
                   }`}
+                  style={{ minWidth: 0 }}
                 />
-                <span className="text-gray-700 font-semibold select-none flex items-center px-2 sm:px-0">
-                  @gmail.com
-                </span>
+                <select
+                  value={motherEmailDomain}
+                  onChange={handleMotherEmailDomainChange}
+                  className="flex-shrink-0 w-full sm:w-40 px-4 py-2 border-2 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400 text-base sm:text-base transition-all duration-300 truncate text-ellipsis"
+                  style={{ minWidth: 0, maxWidth: 200 }}
+                >
+                  {emailDomains.map((domain) => (
+                    <option key={domain} value={domain} className="truncate text-ellipsis">
+                      {domain}
+                    </option>
+                  ))}
+                </select>
               </div>
               {incompleteFields.includes("mother.email") && (
                 <div className="text-xs text-red-500 mt-1">
@@ -487,15 +573,15 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                   maxLength={15}
                   inputMode="numeric"
                   className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                    incompleteFields.includes("mother.mobile")
+                    incompleteFields.includes("mother.mobile") || motherMobileError
                       ? "border-red-500"
                       : "border-gray-400"
                   }`}
                 />
               </div>
-              {incompleteFields.includes("mother.mobile") && (
+              {(incompleteFields.includes("mother.mobile") || motherMobileError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Mother's mobile number is required
+                  {motherMobileError || "Mother's mobile number is required"}
                 </div>
               )}
             </div>
