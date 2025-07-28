@@ -495,23 +495,7 @@ const StudentDetailsDashboard = () => {
           <div className="flex-1 flex flex-col items-center justify-center mb-2 bg-gray-50 rounded-lg overflow-hidden min-h-[120px] p-2">
             <span className="text-xs text-gray-500 mb-1">Previously Submitted</span>
             {previousUrl ? (
-              prevIsImage ? (
-                <img src={previousUrl} alt={title} className="max-h-24 max-w-full object-contain rounded" />
-              ) : prevIsPDF ? (
-                <a
-                  href={previousUrl.replace('/upload/', '/upload/fl_attachment/')}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center text-blue-600 hover:underline"
-                >
-                  <svg className="w-8 h-8 mb-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                  </svg>
-                  View Document
-                </a>
-              ) : (
-                <span className="text-gray-400 italic">Not viewable</span>
-              )
+              <img src={previousUrl} alt={title} className="max-h-24 max-w-full object-contain rounded" />
             ) : (
               <span className="text-gray-400 italic">Not uploaded</span>
             )}
@@ -522,29 +506,7 @@ const StudentDetailsDashboard = () => {
               <span className="text-xs text-gray-500 mb-1">New Upload</span>
               {newFile ? (
                 <>
-                  {newFile.type && newFile.type.startsWith('image') ? (
-                    <a
-                      href={newFileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 mb-2 text-center py-1 px-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
-                    >
-                      View Document
-                    </a>
-                  ) : newFileIsPDF ? (
-                    <>
-                      <a
-                        href={newFileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-2 mb-2 text-center py-1 px-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
-                      >
-                        View Document
-                      </a>
-                    </>
-                  ) : (
-                    <span className="text-gray-400 italic">File selected</span>
-                  )}
+                  <span className="text-green-600 text-xs font-medium">File selected</span>
                   <button
                     className="mt-2 px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
                     onClick={() => onCancelNewFile(field)}
