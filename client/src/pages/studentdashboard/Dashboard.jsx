@@ -82,8 +82,8 @@ const StudentDetailsDashboard = () => {
         {},
         { withCredentials: true }
       );
-      // Removed localStorage.setItem since we no longer need the popup functionality
-      forceLogoutStudent();
+      // Instead of forceLogoutStudent(), use window.location.replace to prevent back navigation
+      window.location.replace('/login');
     } catch (err) {
       console.error("Logout failed:", err);
       // Optionally show error

@@ -74,8 +74,8 @@ export default function AdminSidebar({ open, onClose }) {
           {},
           { withCredentials: true }
         );
-        // Removed localStorage.setItem since we no longer need the popup functionality
-        forceLogoutAdmin();
+        // Instead of forceLogoutAdmin(), use window.location.replace to prevent back navigation
+        window.location.replace('/admin');
       } catch (err) {
         console.error("Logout failed:", err);
         Swal.fire("Error", "Logout failed. Please try again.", "error");
