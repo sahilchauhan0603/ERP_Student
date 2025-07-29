@@ -146,6 +146,16 @@ export default function AdminAllStudents() {
     }
   };
 
+  // Filter students client-side by name or email
+  const filteredStudents = students.filter((student) => {
+    const searchLower = search.toLowerCase();
+    return (
+      (student.firstName?.toLowerCase() || '').includes(searchLower) ||
+      (student.lastName?.toLowerCase() || '').includes(searchLower) ||
+      (student.email?.toLowerCase() || '').includes(searchLower)
+    );
+  });
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       {/* Header */}
@@ -156,7 +166,7 @@ export default function AdminAllStudents() {
               Student Management
             </h2>
             <p className="text-sm text-gray-500">
-              Manage all student applications
+              {filteredStudents.length} student{filteredStudents.length !== 1 ? "s" : ""} found
             </p>
           </div>
           <button
@@ -184,9 +194,10 @@ export default function AdminAllStudents() {
             <input
               type="text"
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Search by name, email..."
+              placeholder="name, email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              title="search by name, email, id"
             />
           </div>
 
@@ -297,8 +308,8 @@ export default function AdminAllStudents() {
                   </p>
                 </td>
               </tr>
-            ) : students.length > 0 ? (
-              students.map((student, idx) => (
+            ) : filteredStudents.length > 0 ? (
+              filteredStudents.map((student, idx) => (
                 <tr className="hover:bg-gray-50 transition-colors divide-x divide-gray-200"
                   key={student.id}
                 >

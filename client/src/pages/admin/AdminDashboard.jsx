@@ -431,11 +431,10 @@ export default function AdminDashboard() {
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900">
-                  System Settings
+                  Manage Application Workflow
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
-                  Configure application deadlines, requirements, and other
-                  system parameters in Settings
+                  Define application stages, automate status updates, and streamline the review process.
                 </p>
               </div>
             </div>
