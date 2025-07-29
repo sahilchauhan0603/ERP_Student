@@ -13,6 +13,7 @@ import bpitLogo from "../../../assets/icons/BPIT-logo-transparent.png";
 import campusBackground from "../../../assets/images/BPIT.png";
 
 import { useEffect } from "react";
+import { FiInfo } from "react-icons/fi";
 
 const StudentRegistration = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -598,10 +599,23 @@ const StudentRegistration = () => {
             <div className="bg-white py-6 sm:py-8 px-4 sm:px-6 shadow-lg rounded-2xl border-2 border-gray-200">
               {/* Headings */}
               <div className="text-center mb-6 sm:mb-8">
-                <div className="flex justify-center items-center mb-3 sm:mb-4">
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
-                    Student Registration Portal
-                  </h1>
+                <div className="relative mb-3 sm:mb-4">
+                  <div className="flex justify-center items-center">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
+                      Student Registration Portal
+                    </h1>
+                  </div>
+                  <button
+                    onClick={() => (window.location.href = "/")}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 bg-white border border-gray-200 hover:bg-gray-50 text-black p-2 rounded-full shadow transition-all duration-300 hover:scale-110 group"
+                    title="Go to Homepage"
+                    style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
+                  >
+                    <FiInfo className="w-6 h-6" />
+                    <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                      Go to Homepage
+                    </div>
+                  </button>
                 </div>
                 <p className="text-base sm:text-lg text-gray-700 font-medium">
                   Official Registration System for New Students

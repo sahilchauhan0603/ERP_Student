@@ -11,7 +11,7 @@ const StudentDetailsDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  // Removed showLogoutModal state since we now use SweetAlert
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({});
   const [declinedFields, setDeclinedFields] = useState([]);
@@ -82,17 +82,27 @@ const StudentDetailsDashboard = () => {
         {},
         { withCredentials: true }
       );
-      localStorage.setItem("showBackToHomePopup", "student");
+      // Removed localStorage.setItem since we no longer need the popup functionality
       forceLogoutStudent();
     } catch (err) {
       console.error("Logout failed:", err);
       // Optionally show error
     }
-    setShowLogoutModal(false);
   };
 
-  const handleBackClick = () => {
-    setShowLogoutModal(true);
+  const handleBackClick = async () => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, logout!",
+    });
+    if (result.isConfirmed) {
+      handleLogout();
+    }
   };
 
   const handleEditToggle = () => {
@@ -249,52 +259,7 @@ const StudentDetailsDashboard = () => {
     </div>
   );
 
-  const LogoutModal = () => (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-      <div className="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
-        <div className="mt-3 text-center">
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
-            <svg
-              className="h-6 w-6 text-yellow-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
-          </div>
-          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mt-2">
-            Confirm Logout
-          </h3>
-          <div className="mt-2 px-7 py-3">
-            <p className="text-sm text-gray-500 dark:text-gray-300">
-              Are you sure you want to log out? You'll need to log in again to
-              access your dashboard.
-            </p>
-          </div>
-          <div className="flex items-center justify-center gap-4 mt-4">
-            <button
-              className="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 text-base font-medium rounded-md shadow-sm hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
-              onClick={() => setShowLogoutModal(false)}
-            >
-              Cancel
-            </button>
-            <button
-              className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-base font-medium rounded-md shadow-sm hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  // Removed LogoutModal component since we now use SweetAlert
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
@@ -693,7 +658,7 @@ const StudentDetailsDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50">
-      {showLogoutModal && <LogoutModal />}
+              {/* Removed LogoutModal rendering since we now use SweetAlert */}
       {showSuccessModal && <SuccessModal />}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -739,7 +704,7 @@ const StudentDetailsDashboard = () => {
                   d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
-              Back to Home
+              Logout
             </button>
           </div>
         </div>

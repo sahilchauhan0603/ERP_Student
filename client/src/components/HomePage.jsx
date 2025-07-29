@@ -214,7 +214,7 @@ const HomePage = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-grow flex flex-col items-center justify-center px-2 sm:px-4 mt-8 md:mt-16">
+      <main className="flex-grow flex flex-col items-center justify-center px-2 sm:px-4 mt-8 md:mt-10">
         <motion.div
           className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 w-full max-w-xs xs:max-w-2xl md:max-w-4xl xl:max-w-6xl mt-10 sm:mt-16 md:mt-20"
           variants={containerVariants}

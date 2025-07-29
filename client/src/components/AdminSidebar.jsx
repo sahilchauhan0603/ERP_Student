@@ -74,7 +74,7 @@ export default function AdminSidebar({ open, onClose }) {
           {},
           { withCredentials: true }
         );
-        localStorage.setItem("showBackToHomePopup", "admin");
+        // Removed localStorage.setItem since we no longer need the popup functionality
         forceLogoutAdmin();
       } catch (err) {
         console.error("Logout failed:", err);
