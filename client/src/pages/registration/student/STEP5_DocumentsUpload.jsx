@@ -83,12 +83,10 @@ export default function DocumentsUpload({
   return (
     <div className="max-w-4xl mx-auto bg-white p-4 sm:p-6 lg:p-10 rounded-3xl shadow-2xl border border-gray-200 animate-fade-in">
       <div className="text-center mb-8 sm:mb-10">
-        <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2">
-          <span className="inline-block w-1 sm:w-2 h-8 sm:h-10 bg-gray-800 rounded-full"></span>
+        <div className="flex justify-center items-center mb-2">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
             Documents Upload
           </h2>
-          <span className="inline-block w-1 sm:w-2 h-8 sm:h-10 bg-gray-800 rounded-full"></span>
         </div>
         <p className="text-gray-700 text-base sm:text-lg font-medium tracking-wide">
           Please upload scanned copies of your documents

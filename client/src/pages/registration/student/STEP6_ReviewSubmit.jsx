@@ -253,12 +253,10 @@ export default function ReviewSubmit({
       <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white opacity-50 rounded-xl sm:rounded-2xl lg:rounded-3xl"></div>
       <div className="relative z-10">
         <div className="text-center mb-8 sm:mb-10 lg:mb-12">
-          <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2">
-            <span className="inline-block w-1 sm:w-2 h-6 sm:h-8 lg:h-10 bg-gray-800 rounded-full"></span>
+          <div className="flex justify-center items-center mb-2">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-black">
               Application Review
             </h1>
-            <span className="inline-block w-1 sm:w-2 h-6 sm:h-8 lg:h-10 bg-gray-800 rounded-full"></span>
           </div>
           <p className="text-sm sm:text-base lg:text-lg text-gray-700 max-w-2xl mx-auto font-medium tracking-wide px-2">
             Please verify all information before submission. Contact support if

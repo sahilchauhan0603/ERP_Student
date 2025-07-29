@@ -4,28 +4,24 @@ const cloudinary = require('../config/cloudinary');
 const uploadToCloudinary = (fileBuffer, fileName, folder = 'student_uploads') => {
   return new Promise((resolve, reject) => {
     try {
-      // Determine resource type based on file extension and MIME type
+      // Determine resource type based on file extension
       const fileExtension = fileName.split('.').pop().toLowerCase();
-      const isPDF = fileExtension === 'pdf' || fileName.toLowerCase().includes('pdf');
-      const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension) || 
-                     fileName.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/);
-      
+      const isPDF = fileExtension === 'pdf';
+      const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension);
 
-      
       const uploadOptions = {
         folder,
         public_id: fileName,
-        resource_type: isPDF ? 'raw' : (isImage ? 'image' : 'auto'),
-        // Add timeout and other options for better reliability
+        resource_type: isPDF ? 'raw' : 'image', // PDFs as raw, images as image
         timeout: 60000, // 60 seconds timeout
+        access_mode: 'public' // Ensure all files are publicly accessible
       };
 
-      // Only set access_mode for PDFs
+      // For PDFs, ensure they're uploaded as raw files with proper URL structure
       if (isPDF) {
-        uploadOptions.access_mode = 'public';
+        uploadOptions.format = 'pdf';
+        uploadOptions.flags = 'attachment';
       }
-
-      
 
       cloudinary.uploader.upload_stream(
         uploadOptions,

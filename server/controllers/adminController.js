@@ -200,8 +200,8 @@ exports.updateStudentStatus = (req, res) => {
                   <div style="background:#f0f8ff;padding:15px;margin:20px 0;border-left:4px solid #4CAF50;">
                     <p style="margin:0;">Next Steps:</p>
                     <ul style="margin:10px 0 0 20px;">
-                      <li>Check your profile by logging in at <a href="https://erp-student-sm4v.onrender.com/login target="_blank" rel="noopener noreferrer">Student Portal</a></li>
-                      <li>Contact admissions if you have any questions <a href="mailto:https://admissions-enquiry.bpitindia.ac.in/">https://admissions-enquiry.bpitindia.ac.in/</a></li>
+                      <li>Access your profile at <a href="https://erp-student-sm4v.onrender.com/login" target="_blank" rel="noopener noreferrer">Student Portal</a> to view your approved application</li>
+                      <li>Contact admissions for any queries at <a href="https://admissions-enquiry.bpitindia.ac.in/" target="_blank" rel="noopener noreferrer">https://admissions-enquiry.bpitindia.ac.in/</a></li>
                     </ul>
                   </div>
                   <p>Welcome to BPIT! We look forward to having you as part of our academic community.</p>
@@ -226,7 +226,7 @@ exports.updateStudentStatus = (req, res) => {
                   <ul style="margin:10px 0 0 20px;">
                     ${declinedArr.map((field) => `<li>${field}</li>`).join("")}
                   </ul>
-                  <p>Please review and update these fields before resubmitting your application.</p>
+                  <p>Please review and update these fields before resubmitting your application. Access your profile at <a href="https://erp-student-sm4v.onrender.com/login" target="_blank" rel="noopener noreferrer">https://erp-student-sm4v.onrender.com/login</a> and update your declined sections.</p>
                 </div>
               `;
             }
@@ -244,7 +244,7 @@ exports.updateStudentStatus = (req, res) => {
                   <div style="background:#fff8f8;padding:15px;margin:20px 0;border-left:4px solid #f44336;">
                     <p>For more information about this decision, please contact our admissions office:</p>
                     <p style="margin:10px 0 0 0;">
-                      Email: <a href="mailto:https://admissions-enquiry.bpitindia.ac.in/">https://admissions-enquiry.bpitindia.ac.in/</a><br>
+                      Website: <a href="https://admissions-enquiry.bpitindia.ac.in/" target="_blank" rel="noopener noreferrer">https://admissions-enquiry.bpitindia.ac.in/</a><br>
                       Phone: 011-2757 2900, 011-2757 1080
                     </p>
                   </div>
@@ -271,6 +271,7 @@ exports.updateStudentStatus = (req, res) => {
                   <div style="background:#fffaf0;padding:15px;margin:20px 0;border-left:4px solid #FFA500;">
                     <p>Current Status: <strong>Pending Review</strong></p>
                     <p>Expected decision timeline: 5-7 business days</p>
+                    <p>Track your application status at <a href="https://erp-student-sm4v.onrender.com/login" target="_blank" rel="noopener noreferrer">https://erp-student-sm4v.onrender.com/login</a></p>
                   </div>
                   <p>Thank you for your patience.</p>
                   <p>Best regards,<br>The Admissions Team</p>
@@ -449,7 +450,7 @@ exports.getStudentFullDetails = (req, res) => {
         mother_name: student.mother_name,
         mother_mobile: student.mother_mobile,
         mother_email: student.mother_email,
-        family_income: student.family_income,
+        familyIncome: student.familyIncome,
       };
       // Documents
       const documents = {

@@ -104,7 +104,19 @@ export default function AcademicInfo({
   };
 
   return (
-    <div className="space-y-12">
+    <div className="max-w-4xl mx-auto bg-white p-4 sm:p-6 lg:p-10 rounded-3xl shadow-2xl border border-gray-200 animate-fade-in">
+      <div className="text-center mb-8 sm:mb-10">
+        <div className="flex justify-center items-center mb-2">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
+            Academic Information
+          </h2>
+        </div>
+        <p className="text-gray-700 text-base sm:text-lg font-medium tracking-wide">
+          Please provide your academic details and achievements
+        </p>
+      </div>
+
+      <div className="space-y-12">
       {/* Class X */}
       <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl">
         <div className="flex items-center mb-6 pb-3 border-b border-gray-200">
@@ -484,6 +496,7 @@ export default function AcademicInfo({
           Add Co-Curricular Achievement
         </button>
       </div>
+    </div>
     </div>
   );
 }

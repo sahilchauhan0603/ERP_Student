@@ -598,12 +598,10 @@ const StudentRegistration = () => {
             <div className="bg-white py-6 sm:py-8 px-4 sm:px-6 shadow-lg rounded-2xl border-2 border-gray-200">
               {/* Headings */}
               <div className="text-center mb-6 sm:mb-8">
-                <div className="flex justify-center items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
-                  <span className="inline-block w-1 sm:w-2 h-8 sm:h-12 bg-gray-800 rounded-full"></span>
+                <div className="flex justify-center items-center mb-3 sm:mb-4">
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
                     Student Registration Portal
                   </h1>
-                  <span className="inline-block w-1 sm:w-2 h-8 sm:h-12 bg-gray-800 rounded-full"></span>
                 </div>
                 <p className="text-base sm:text-lg text-gray-700 font-medium">
                   Official Registration System for New Students

@@ -475,9 +475,10 @@ const StudentDetailsDashboard = () => {
     const prevIsPDF = previousUrl && previousUrl.toLowerCase().includes('.pdf');
     const prevIsImage = previousUrl && (previousUrl.toLowerCase().includes('.jpg') || previousUrl.toLowerCase().includes('.jpeg') || previousUrl.toLowerCase().includes('.png') || previousUrl.toLowerCase().includes('.gif') || previousUrl.toLowerCase().includes('.webp'));
 
-    // Replace the getNewFileUrl logic with a universal blob URL for any file type
+    // For new file
     const newFileUrl = newFile ? URL.createObjectURL(newFile) : null;
     const newFileIsPDF = newFile && newFile.type === 'application/pdf';
+    const newFileIsImage = newFile && newFile.type.startsWith('image');
 
     return (
       <div className={`rounded-xl p-4 flex flex-col bg-white hover:shadow-md transition-shadow relative ${isDeclined ? 'border-2 border-red-400' : 'border border-gray-200'}`}>
@@ -495,7 +496,18 @@ const StudentDetailsDashboard = () => {
           <div className="flex-1 flex flex-col items-center justify-center mb-2 bg-gray-50 rounded-lg overflow-hidden min-h-[120px] p-2">
             <span className="text-xs text-gray-500 mb-1">Previously Submitted</span>
             {previousUrl ? (
-              <img src={previousUrl} alt={title} className="max-h-24 max-w-full object-contain rounded" />
+              prevIsImage ? (
+                <img src={previousUrl} alt={title} className="max-h-24 max-w-full object-contain rounded" />
+              ) : prevIsPDF ? (
+                <div className="flex flex-col items-center text-gray-600">
+                  <svg className="w-8 h-8 mb-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-xs">PDF Document</span>
+                </div>
+              ) : (
+                <span className="text-gray-400 italic">Not viewable</span>
+              )
             ) : (
               <span className="text-gray-400 italic">Not uploaded</span>
             )}
@@ -506,7 +518,27 @@ const StudentDetailsDashboard = () => {
               <span className="text-xs text-gray-500 mb-1">New Upload</span>
               {newFile ? (
                 <>
-                  <span className="text-green-600 text-xs font-medium">File selected</span>
+                  {newFileIsImage ? (
+                    <a
+                      href={newFileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 mb-2 text-center py-1 px-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+                    >
+                      View Document
+                    </a>
+                  ) : newFileIsPDF ? (
+                    <a
+                      href={newFileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 mb-2 text-center py-1 px-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+                    >
+                      View Document
+                    </a>
+                  ) : (
+                    <span className="text-gray-400 italic">File selected</span>
+                  )}
                   <button
                     className="mt-2 px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
                     onClick={() => onCancelNewFile(field)}
@@ -535,14 +567,25 @@ const StudentDetailsDashboard = () => {
         </div>
         {/* Main Document View/Download Button (if not in edit mode or not declined) */}
         {!editMode && url && (
-          <a
-            href={isPDF ? url.replace('/upload/', '/upload/fl_attachment/') : url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 text-center py-2 px-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
-          >
-            View Document
-          </a>
+          isPDF ? (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 text-center py-2 px-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+            >
+              Download Document
+            </a>
+          ) : (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 text-center py-2 px-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+            >
+              View Document
+            </a>
+          )
         )}
       </div>
     );

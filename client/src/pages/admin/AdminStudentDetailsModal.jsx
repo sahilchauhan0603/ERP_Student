@@ -20,6 +20,7 @@ import {
   FiClock,
 } from "react-icons/fi";
 import Swal from "sweetalert2";
+import { formatFamilyIncome } from "../../utils/formatters";
 
 const sectionDefs = [
   { label: "Personal", key: "personal", icon: <FiUser className="mr-2" /> },
@@ -330,7 +331,7 @@ export default function AdminStudentDetailsModal({
       onClose();
       Swal.fire({
         icon: "success",
-        title: "Profile Reviewed",
+        title: "Profile Reviewed Successfully",
         text: `You have successfully reviewed the profile and ${student.firstName} ${student.lastName} has been approved.`,
         timer: 2500,
         showConfirmButton: false,
@@ -362,7 +363,7 @@ export default function AdminStudentDetailsModal({
       onClose();
       Swal.fire({
         icon: "info",
-        title: "Profile Reviewed",
+        title: "Profile Reviewed Successfully",
         text: `You have successfully reviewed the profile and ${student.firstName} ${student.lastName} has been declined.`,
         timer: 2500,
         showConfirmButton: false,
@@ -406,6 +407,16 @@ export default function AdminStudentDetailsModal({
       );
       refresh?.();
       onClose();
+      
+      // Show success popup based on status
+      const actionText = status === "approved" ? "approved" : "declined";
+      Swal.fire({
+        icon: status === "approved" ? "success" : "info",
+        title: "Profile Reviewed Successfully",
+        text: `You have successfully reviewed the profile and ${student.firstName} ${student.lastName} has been ${actionText}.`,
+        timer: 2500,
+        showConfirmButton: false,
+      });
     } catch (e) {
       Swal.fire({
         icon: "error",
@@ -430,6 +441,12 @@ export default function AdminStudentDetailsModal({
     const isDeclined = declinedFields?.includes(field);
 
     let displayValue = value;
+    
+    // Format family income if it's the familyIncome field
+    if (field === "familyIncome" && value) {
+      displayValue = formatFamilyIncome(value);
+    }
+    
     if (
       (field === "academicAchievements" ||
         field === "coCurricularAchievements") &&
@@ -494,14 +511,30 @@ export default function AdminStudentDetailsModal({
             </h4>
             <div className="mt-1 text-gray-600 text-sm">
               {isDocument && value ? (
-                <a
-                  href={value}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 flex items-center"
-                >
-                  <FiDownload className="mr-1" /> View Document
-                </a>
+                (() => {
+                  // Check if the document is a PDF or image
+                  const isPDF = value && value.toLowerCase().includes('.pdf');
+                  const isImage = value && (value.toLowerCase().includes('.jpg') || value.toLowerCase().includes('.jpeg') || value.toLowerCase().includes('.png') || value.toLowerCase().includes('.gif') || value.toLowerCase().includes('.webp'));
+                  
+                  return (
+                    <a
+                      href={value}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 flex items-center"
+                    >
+                      {isPDF ? (
+                        <>
+                          <FiDownload className="mr-1" /> Download Document
+                        </>
+                      ) : (
+                        <>
+                          <FiDownload className="mr-1" /> View Document
+                        </>
+                      )}
+                    </a>
+                  );
+                })()
               ) : (
                 displayValue || (
                   <span className="text-gray-400">Not provided</span>
@@ -943,9 +976,9 @@ export default function AdminStudentDetailsModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4">
             <DetailField
               label="Annual Income"
-              value={details?.parent?.family_income}
+              value={details?.parent?.familyIncome}
               section="parent"
-              field="family_income"
+              field="familyIncome"
               showVerify={tableType === "pending"}
             />
           </div>
@@ -1039,18 +1072,33 @@ export default function AdminStudentDetailsModal({
           <div className="flex items-center space-x-2">
             {/* Status Icon */}
             {student?.status === 'approved' && (
-              <div className="p-2 rounded-full bg-green-100 text-green-600">
-                <FiCheckCircle size={20} />
+              <div className="relative group">
+                <div className="p-2 rounded-full bg-green-100 text-green-600 cursor-help">
+                  <FiCheckCircle size={20} />
+                </div>
+                <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                  Approved Student
+                </div>
               </div>
             )}
             {student?.status === 'declined' && (
-              <div className="p-2 rounded-full bg-red-100 text-red-600">
-                <FiXCircle size={20} />
+              <div className="relative group">
+                <div className="p-2 rounded-full bg-red-100 text-red-600 cursor-help">
+                  <FiXCircle size={20} />
+                </div>
+                <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                  Declined Student
+                </div>
               </div>
             )}
             {student?.status === 'pending' && (
-              <div className="p-2 rounded-full bg-yellow-100 text-yellow-600">
-                <FiClock size={20} />
+              <div className="relative group">
+                <div className="p-2 rounded-full bg-yellow-100 text-yellow-600 cursor-help">
+                  <FiClock size={20} />
+                </div>
+                <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                  Pending Student
+                </div>
               </div>
             )}
             <button

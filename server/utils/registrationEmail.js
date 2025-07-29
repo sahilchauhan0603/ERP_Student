@@ -187,7 +187,12 @@ const sendRegistrationEmail = (studentEmail, studentName, studentId) => {
                 
                 <div class="message">
                     If you have any questions or need to update your information, please don't hesitate 
-                    to contact our support team.
+                    to contact our support team at <a href="https://admissions-enquiry.bpitindia.ac.in/" style="color: #1e40af; text-decoration: underline;">https://admissions-enquiry.bpitindia.ac.in/</a>
+                </div>
+                
+                <div class="message">
+                    Visit the student portal to access your profile and track your application status at 
+                    <a href="https://erp-student-sm4v.onrender.com/login" style="color: #1e40af; text-decoration: underline;">https://erp-student-sm4v.onrender.com/login</a>
                 </div>
             </div>
             

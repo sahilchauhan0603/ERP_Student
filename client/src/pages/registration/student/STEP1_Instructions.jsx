@@ -6,12 +6,10 @@ const Instructions = ({ nextStep }) => {
   return (
     <div className="max-w-4xl mx-auto bg-white p-4 sm:p-6 lg:p-10 rounded-3xl shadow-2xl border border-gray-200 animate-fade-in">
       <div className="text-center mb-8 sm:mb-10">
-        <div className="flex justify-center items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
-          <span className="inline-block w-1 sm:w-2 h-8 sm:h-12 bg-gray-800 rounded-full"></span>
+        <div className="flex justify-center items-center mb-3 sm:mb-4">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
             Official Registration Instructions
           </h2>
-          <span className="inline-block w-1 sm:w-2 h-8 sm:h-12 bg-gray-800 rounded-full"></span>
         </div>
         <p className="text-base sm:text-lg text-gray-700 font-medium tracking-wide">
           Bhagwan Parshuram Institute of Technology
