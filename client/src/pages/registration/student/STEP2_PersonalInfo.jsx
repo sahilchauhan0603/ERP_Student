@@ -54,6 +54,11 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
   const [abcIdError, setAbcIdError] = useState("");
   const [mobileError, setMobileError] = useState("");
   const [dobError, setDobError] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [examRollError, setExamRollError] = useState("");
+  const [examRankError, setExamRankError] = useState("");
+  const [addressError, setAddressError] = useState("");
+  const [antiRaggingError, setAntiRaggingError] = useState("");
 
   // Place of Birth Dropdown Data
   const countries = [
@@ -80,6 +85,33 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
         [name]: value,
       },
     }));
+  };
+
+  // Validation functions
+  const validateName = (name, value) => {
+    if (!value) return "";
+    // Only letters, spaces, and common name characters (hyphens, apostrophes)
+    if (!/^[a-zA-Z\s\-']+$/.test(value)) {
+      return "Name can only contain letters, spaces, hyphens, and apostrophes";
+    }
+    return "";
+  };
+
+  const validateNumber = (name, value) => {
+    if (!value) return "";
+    if (!/^\d+$/.test(value)) {
+      return `${name} must contain only numbers`;
+    }
+    return "";
+  };
+
+  const validateAddress = (name, value) => {
+    if (!value) return "";
+    // Alphanumeric with spaces, commas, periods, hyphens, and common address characters
+    if (!/^[a-zA-Z0-9\s,.\-/#()]+$/.test(value)) {
+      return `${name} can only contain letters, numbers, spaces, and common address characters (comma, period, hyphen, slash, hash, parentheses)`;
+    }
+    return "";
   };
 
   const handleMobileChange = (e) => {
@@ -176,6 +208,76 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
         setDobError("");
       }
     }
+  };
+
+  // Name validation handlers
+  const handleNameChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        [name]: value,
+      },
+    }));
+    const error = validateName(name, value);
+    setNameError(error);
+  };
+
+  // Exam roll number validation
+  const handleExamRollChange = (e) => {
+    const { value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        examRoll: value,
+      },
+    }));
+    const error = validateNumber("Exam Roll Number", value);
+    setExamRollError(error);
+  };
+
+  // Exam rank validation
+  const handleExamRankChange = (e) => {
+    const { value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        examRank: value,
+      },
+    }));
+    const error = validateNumber("Exam Rank", value);
+    setExamRankError(error);
+  };
+
+  // Address validation handlers
+  const handleAddressChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        [name]: value,
+      },
+    }));
+    const error = validateAddress(name, value);
+    setAddressError(error);
+  };
+
+  // Anti-ragging reference number validation
+  const handleAntiRaggingChange = (e) => {
+    const { value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        antiRaggingRef: value,
+      },
+    }));
+    const error = validateNumber("Anti Ragging Reference Number", value);
+    setAntiRaggingError(error);
   };
 
   const handleBirthCountryChange = (e) => {
@@ -323,17 +425,17 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 name="firstName"
                 placeholder="First Name"
                 value={formData.personal.firstName || ""}
-                onChange={handleChange}
+                onChange={handleNameChange}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("firstName")
+                  incompleteFields.includes("firstName") || nameError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
                 required
               />
-              {incompleteFields.includes("firstName") && (
+              {(incompleteFields.includes("firstName") || nameError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  First name is required
+                  {nameError || "First name is required"}
                 </div>
               )}
             </div>
@@ -346,16 +448,16 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 name="middleName"
                 placeholder="Middle Name"
                 value={formData.personal.middleName || ""}
-                onChange={handleChange}
+                onChange={handleNameChange}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("middleName")
+                  incompleteFields.includes("middleName") || nameError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
               />
-              {incompleteFields.includes("middleName") && (
+              {(incompleteFields.includes("middleName") || nameError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Middle name is required
+                  {nameError || "Middle name is required"}
                 </div>
               )}
             </div>
@@ -368,17 +470,17 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 name="lastName"
                 placeholder="Last Name"
                 value={formData.personal.lastName || ""}
-                onChange={handleChange}
+                onChange={handleNameChange}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("lastName")
+                  incompleteFields.includes("lastName") || nameError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
                 required
               />
-              {incompleteFields.includes("lastName") && (
+              {(incompleteFields.includes("lastName") || nameError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Last name is required
+                  {nameError || "Last name is required"}
                 </div>
               )}
             </div>
@@ -663,17 +765,18 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 name="examRoll"
                 placeholder="Roll Number"
                 value={formData.personal.examRoll || ""}
-                onChange={handleChange}
+                onChange={handleExamRollChange}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("examRoll")
+                  incompleteFields.includes("examRoll") || examRollError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
                 required
+                inputMode="numeric"
               />
-              {incompleteFields.includes("examRoll") && (
+              {(incompleteFields.includes("examRoll") || examRollError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Exam roll number is required
+                  {examRollError || "Exam roll number is required"}
                 </div>
               )}
             </div>
@@ -686,16 +789,17 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 name="examRank"
                 placeholder="Rank (if applicable)"
                 value={formData.personal.examRank || ""}
-                onChange={handleChange}
+                onChange={handleExamRankChange}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("examRank")
+                  incompleteFields.includes("examRank") || examRankError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
+                inputMode="numeric"
               />
-              {incompleteFields.includes("examRank") && (
+              {(incompleteFields.includes("examRank") || examRankError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Exam rank is required
+                  {examRankError || "Exam rank is required"}
                 </div>
               )}
             </div>
@@ -927,18 +1031,18 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 name="currentAddress"
                 placeholder="Your current residential address"
                 value={formData.personal.currentAddress || ""}
-                onChange={handleChange}
+                onChange={handleAddressChange}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("currentAddress")
+                  incompleteFields.includes("currentAddress") || addressError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
                 rows={4}
                 required
               />
-              {incompleteFields.includes("currentAddress") && (
+              {(incompleteFields.includes("currentAddress") || addressError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Current address is required
+                  {addressError || "Current address is required"}
                 </div>
               )}
             </div>
@@ -951,18 +1055,18 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 name="permanentAddress"
                 placeholder="Your permanent residential address"
                 value={formData.personal.permanentAddress || ""}
-                onChange={handleChange}
+                onChange={handleAddressChange}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("permanentAddress")
+                  incompleteFields.includes("permanentAddress") || addressError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
                 rows={4}
                 required
               />
-              {incompleteFields.includes("permanentAddress") && (
+              {(incompleteFields.includes("permanentAddress") || addressError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Permanent address is required
+                  {addressError || "Permanent address is required"}
                 </div>
               )}
             </div>
@@ -1066,17 +1170,18 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
               name="antiRaggingRef"
               placeholder="Enter your reference number"
               value={formData.personal.antiRaggingRef || ""}
-              onChange={handleChange}
+              onChange={handleAntiRaggingChange}
               className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                incompleteFields.includes("antiRaggingRef")
+                incompleteFields.includes("antiRaggingRef") || antiRaggingError
                   ? "border-red-500"
                   : "border-gray-400"
               }`}
               required
+              inputMode="numeric"
             />
-            {incompleteFields.includes("antiRaggingRef") && (
+            {(incompleteFields.includes("antiRaggingRef") || antiRaggingError) && (
               <div className="text-xs text-red-500 mt-1">
-                Anti-ragging reference number is required
+                {antiRaggingError || "Anti-ragging reference number is required"}
               </div>
             )}
           </div>

@@ -1,13 +1,67 @@
-import React from "react";
+import React, { useState } from "react";
 
 export default function AcademicInfo({
   formData,
   setFormData,
   incompleteFields = [],
 }) {
+  // Error states for validation
+  const [yearError, setYearError] = useState("");
+  const [percentageError, setPercentageError] = useState("");
+  const [instituteError, setInstituteError] = useState("");
+  const [boardError, setBoardError] = useState("");
+  const [eventError, setEventError] = useState("");
+  // Validation functions
+  const validateYear = (value) => {
+    if (!value) return "";
+    const year = parseInt(value);
+    const currentYear = new Date().getFullYear();
+    if (isNaN(year) || year < 1950 || year > currentYear + 1) {
+      return "Year must be between 1950 and next year";
+    }
+    return "";
+  };
+
+  const validatePercentage = (value) => {
+    if (!value) return "";
+    const percentage = parseFloat(value);
+    if (isNaN(percentage) || percentage < 0 || percentage > 100) {
+      return "Percentage must be between 0 and 100";
+    }
+    return "";
+  };
+
+  const validateInstitute = (value) => {
+    if (!value) return "";
+    // Allow letters, numbers, spaces, and common punctuation
+    if (!/^[a-zA-Z0-9\s\-'.,&()]+$/.test(value)) {
+      return "Institute name can only contain letters, numbers, spaces, and common punctuation";
+    }
+    return "";
+  };
+
+  const validateBoard = (value) => {
+    if (!value) return "";
+    // Allow letters, numbers, spaces, and common punctuation
+    if (!/^[a-zA-Z0-9\s\-'.,&()]+$/.test(value)) {
+      return "Board name can only contain letters, numbers, spaces, and common punctuation";
+    }
+    return "";
+  };
+
+  const validateEvent = (value) => {
+    if (!value) return "";
+    // Allow letters, numbers, spaces, and common punctuation
+    if (!/^[a-zA-Z0-9\s\-'.,&()]+$/.test(value)) {
+      return "Event name can only contain letters, numbers, spaces, and common punctuation";
+    }
+    return "";
+  };
+
   const handleChange = (e, section, field, index = null) => {
     const { name, value } = e.target;
 
+    // Update form data
     if (index !== null) {
       setFormData((prev) => ({
         ...prev,
@@ -29,6 +83,34 @@ export default function AcademicInfo({
           },
         },
       }));
+    }
+
+    // Validate based on field type
+    let error = "";
+    switch (name) {
+      case "year":
+        error = validateYear(value);
+        setYearError(error);
+        break;
+      case "pcm":
+      case "aggregate":
+        error = validatePercentage(value);
+        setPercentageError(error);
+        break;
+      case "institute":
+        error = validateInstitute(value);
+        setInstituteError(error);
+        break;
+      case "board":
+        error = validateBoard(value);
+        setBoardError(error);
+        break;
+      case "event":
+        error = validateEvent(value);
+        setEventError(error);
+        break;
+      default:
+        break;
     }
   };
 
@@ -77,6 +159,38 @@ export default function AcademicInfo({
       date: "Date (YYYY-MM-DD)",
       outcome: "Achievement/Result",
     };
+
+    // Get appropriate error message
+    let errorMessage = "";
+    let hasError = false;
+    
+    if (incompleteFields.includes(`${section}.${name}`)) {
+      errorMessage = `${label} is required`;
+      hasError = true;
+    } else {
+      switch (name) {
+        case "year":
+          errorMessage = yearError;
+          hasError = !!yearError;
+          break;
+        case "pcm":
+        case "aggregate":
+          errorMessage = percentageError;
+          hasError = !!percentageError;
+          break;
+        case "institute":
+          errorMessage = instituteError;
+          hasError = !!instituteError;
+          break;
+        case "board":
+          errorMessage = boardError;
+          hasError = !!boardError;
+          break;
+        default:
+          break;
+      }
+    }
+
     return (
       <div className="space-y-1">
         <label className="block text-sm font-medium text-gray-700">
@@ -90,14 +204,13 @@ export default function AcademicInfo({
           onChange={(e) => handleChange(e, section)}
           placeholder={placeholderMap[name] || label}
           className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300 bg-white/50 text-gray-900 placeholder-gray-300 shadow-inner ${
-            required && incompleteFields.includes(`${section}.${name}`)
-              ? "border-red-500"
-              : "border-gray-200"
+            hasError ? "border-red-500" : "border-gray-200"
           }`}
           required={required}
+          inputMode={name === "year" || name === "pcm" || name === "aggregate" ? "numeric" : "text"}
         />
-        {required && incompleteFields.includes(`${section}.${name}`) && (
-          <div className="text-xs text-red-500 mt-1">{label} is required</div>
+        {hasError && (
+          <div className="text-xs text-red-500 mt-1">{errorMessage}</div>
         )}
       </div>
     );
@@ -295,8 +408,13 @@ export default function AcademicInfo({
                 onChange={(e) =>
                   handleChange(e, "academicAchievements", "event", index)
                 }
-                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  eventError ? "border-red-500" : "border-gray-400"
+                }`}
               />
+              {eventError && (
+                <div className="text-xs text-red-500 mt-1">{eventError}</div>
+              )}
             </div>
             <div className="space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
@@ -413,8 +531,13 @@ export default function AcademicInfo({
                 onChange={(e) =>
                   handleChange(e, "coCurricularAchievements", "event", index)
                 }
-                className="w-full px-4 py-2 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  eventError ? "border-red-500" : "border-gray-400"
+                }`}
               />
+              {eventError && (
+                <div className="text-xs text-red-500 mt-1">{eventError}</div>
+              )}
             </div>
             <div className="space-y-1">
               <label className="block text-sm font-semibold text-gray-800">

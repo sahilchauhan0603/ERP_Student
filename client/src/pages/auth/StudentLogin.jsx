@@ -194,7 +194,7 @@ const StudentLogin = () => {
                   Student Portal Login
                 </h2>
                 <p className="text-sm text-blue-700">
-                  Please use the same email you registered with
+                  Secure access for registered students
                 </p>
               </div>
               {error && (

@@ -1,6 +1,42 @@
 import React, { useState } from "react";
 
 const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
+  // Validation functions
+  const validateName = (value) => {
+    if (!value) return "";
+    // Only letters, spaces, and common name characters (hyphens, apostrophes)
+    if (!/^[a-zA-Z\s\-']+$/.test(value)) {
+      return "Name can only contain letters, spaces, hyphens, and apostrophes";
+    }
+    return "";
+  };
+
+  const validateQualification = (value) => {
+    if (!value) return "";
+    // Allow letters, numbers, spaces, and common punctuation
+    if (!/^[a-zA-Z0-9\s\-'.,&()]+$/.test(value)) {
+      return "Qualification can only contain letters, numbers, spaces, and common punctuation";
+    }
+    return "";
+  };
+
+  const validateOccupation = (value) => {
+    if (!value) return "";
+    // Allow letters, numbers, spaces, and common punctuation
+    if (!/^[a-zA-Z0-9\s\-'.,&()]+$/.test(value)) {
+      return "Occupation can only contain letters, numbers, spaces, and common punctuation";
+    }
+    return "";
+  };
+
+  const validateTelephone = (value) => {
+    if (!value) return "";
+    if (!/^\d+$/.test(value)) {
+      return "Telephone number must contain only numbers";
+    }
+    return "";
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     const path = name.split(".");
@@ -31,6 +67,42 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
       }
       return prev;
     });
+
+    // Validate based on field type
+    let error = "";
+    switch (path[path.length - 1]) {
+      case "name":
+        error = validateName(value);
+        if (path[1] === "father") {
+          setFatherNameError(error);
+        } else if (path[1] === "mother") {
+          setMotherNameError(error);
+        }
+        break;
+      case "qualification":
+        error = validateQualification(value);
+        if (path[1] === "father") {
+          setFatherQualificationError(error);
+        } else if (path[1] === "mother") {
+          setMotherQualificationError(error);
+        }
+        break;
+      case "occupation":
+        error = validateOccupation(value);
+        if (path[1] === "father") {
+          setFatherOccupationError(error);
+        } else if (path[1] === "mother") {
+          setMotherOccupationError(error);
+        }
+        break;
+      case "telephone":
+      case "telephoneSTD":
+        error = validateTelephone(value);
+        setTelephoneError(error);
+        break;
+      default:
+        break;
+    }
   };
 
   const countryCodes = [
@@ -80,6 +152,13 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
   );
   const [fatherMobileError, setFatherMobileError] = useState("");
   const [motherMobileError, setMotherMobileError] = useState("");
+  const [fatherNameError, setFatherNameError] = useState("");
+  const [motherNameError, setMotherNameError] = useState("");
+  const [fatherQualificationError, setFatherQualificationError] = useState("");
+  const [motherQualificationError, setMotherQualificationError] = useState("");
+  const [fatherOccupationError, setFatherOccupationError] = useState("");
+  const [motherOccupationError, setMotherOccupationError] = useState("");
+  const [telephoneError, setTelephoneError] = useState("");
 
   const handleFatherMobileChange = (e) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
@@ -254,14 +333,14 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 onChange={handleChange}
                 required
                 className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("father.name")
+                  incompleteFields.includes("father.name") || fatherNameError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
               />
-              {incompleteFields.includes("father.name") && (
+              {(incompleteFields.includes("father.name") || fatherNameError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Father's name is required
+                  {fatherNameError || "Father's name is required"}
                 </div>
               )}
             </div>
@@ -276,14 +355,14 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 onChange={handleChange}
                 required
                 className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("father.qualification")
+                  incompleteFields.includes("father.qualification") || fatherQualificationError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
               />
-              {incompleteFields.includes("father.qualification") && (
+              {(incompleteFields.includes("father.qualification") || fatherQualificationError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Father's qualification is required
+                  {fatherQualificationError || "Father's qualification is required"}
                 </div>
               )}
             </div>
@@ -298,14 +377,14 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 onChange={handleChange}
                 required
                 className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("father.occupation")
+                  incompleteFields.includes("father.occupation") || fatherOccupationError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
               />
-              {incompleteFields.includes("father.occupation") && (
+              {(incompleteFields.includes("father.occupation") || fatherOccupationError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Father's occupation is required
+                  {fatherOccupationError || "Father's occupation is required"}
                 </div>
               )}
             </div>
@@ -392,16 +471,25 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 placeholder="Telephone STD"
                 value={formData.parents.father.telephoneSTD || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  telephoneError ? "border-red-500" : "border-gray-400"
+                }`}
+                inputMode="numeric"
               />
               <input
                 name="parents.father.telephone"
                 placeholder="Telephone No."
                 value={formData.parents.father.telephone || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  telephoneError ? "border-red-500" : "border-gray-400"
+                }`}
+                inputMode="numeric"
               />
             </div>
+            {telephoneError && (
+              <div className="text-xs text-red-500 mt-1">{telephoneError}</div>
+            )}
             <div className="md:col-span-2 space-y-1">
               <label className="block text-sm font-semibold text-gray-800">
                 Office Address
@@ -451,14 +539,14 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 onChange={handleChange}
                 required
                 className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("mother.name")
+                  incompleteFields.includes("mother.name") || motherNameError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
               />
-              {incompleteFields.includes("mother.name") && (
+              {(incompleteFields.includes("mother.name") || motherNameError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Mother's name is required
+                  {motherNameError || "Mother's name is required"}
                 </div>
               )}
             </div>
@@ -473,14 +561,14 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 onChange={handleChange}
                 required
                 className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("mother.qualification")
+                  incompleteFields.includes("mother.qualification") || motherQualificationError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
               />
-              {incompleteFields.includes("mother.qualification") && (
+              {(incompleteFields.includes("mother.qualification") || motherQualificationError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Mother's qualification is required
+                  {motherQualificationError || "Mother's qualification is required"}
                 </div>
               )}
             </div>
@@ -495,14 +583,14 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 onChange={handleChange}
                 required
                 className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
-                  incompleteFields.includes("mother.occupation")
+                  incompleteFields.includes("mother.occupation") || motherOccupationError
                     ? "border-red-500"
                     : "border-gray-400"
                 }`}
               />
-              {incompleteFields.includes("mother.occupation") && (
+              {(incompleteFields.includes("mother.occupation") || motherOccupationError) && (
                 <div className="text-xs text-red-500 mt-1">
-                  Mother's occupation is required
+                  {motherOccupationError || "Mother's occupation is required"}
                 </div>
               )}
             </div>
@@ -590,14 +678,20 @@ const ParentDetails = ({ formData, setFormData, incompleteFields = [] }) => {
                 placeholder="Telephone STD"
                 value={formData.parents.mother.telephoneSTD || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  telephoneError ? "border-red-500" : "border-gray-400"
+                }`}
+                inputMode="numeric"
               />
               <input
                 name="parents.mother.telephone"
                 placeholder="Telephone No."
                 value={formData.parents.mother.telephone || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold"
+                className={`w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                  telephoneError ? "border-red-500" : "border-gray-400"
+                }`}
+                inputMode="numeric"
               />
             </div>
             <div className="md:col-span-2 space-y-1">
