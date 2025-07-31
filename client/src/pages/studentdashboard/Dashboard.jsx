@@ -3,7 +3,6 @@ import axios from "axios";
 import { Tab } from "@headlessui/react";
 import { formatFamilyIncome } from "../../utils/formatters";
 import { useNavigate } from "react-router-dom";
-import { forceLogoutStudent } from "../../App";
 import Swal from "sweetalert2";
 
 const StudentDetailsDashboard = () => {

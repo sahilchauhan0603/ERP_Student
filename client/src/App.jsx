@@ -1,6 +1,6 @@
 // src/App.js
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import StudentRegistration from './pages/registration/student/index';
 import FacultyRegistration from './pages/registration/faculty/FacultyRegistration';
@@ -15,43 +15,67 @@ import AdminAllStudents from './pages/admin/AdminAllStudents';
 import PendingStudents from './pages/admin/PendingStudents';
 import ApprovedStudents from './pages/admin/ApprovedStudents';
 import DeclinedStudents from './pages/admin/DeclinedStudents';
-// import CustomModal from './components/CustomModal';
 import axios from 'axios';
 
 function AuthRoute({ children, role }) {
   const [unauthorized, setUnauthorized] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     let endpoint = '';
     if (role === 'admin') endpoint = '/admin/stats';
     else endpoint = '/student/students/me/details'; // Use a valid endpoint or skip check
-    axios.get(`${import.meta.env.VITE_API_URL}${endpoint}`, { withCredentials: true })
-      .catch(err => {
-        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-          setUnauthorized(true);
-          setTimeout(() => {
-            setRedirecting(true);
-            if (role === 'admin') navigate('/admin');
-            else navigate('/login');
-          }, 1800);
-        }
-      });
-  }, [role, navigate]);
+    
+    const checkAuth = () => {
+      axios.get(`${import.meta.env.VITE_API_URL}${endpoint}`, { withCredentials: true })
+        .catch(err => {
+          if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+            setUnauthorized(true);
+            setTimeout(() => {
+              setRedirecting(true);
+              if (role === 'admin') navigate('/admin');
+              else navigate('/login');
+            }, 1800);
+          }
+        });
+    };
+    
+    // Initial check
+    checkAuth();
+    
+    // Set up continuous authentication monitoring
+    const authInterval = setInterval(checkAuth, 10000); // Check every 30 seconds
+    
+    return () => {
+      clearInterval(authInterval);
+    };
+  }, [role, navigate, location.pathname]); // Added location.pathname to dependency array
 
-  // if (unauthorized) {
-  //   return <CustomModal isOpen title="Unauthorized" message="You must be logged in to access this page." type="error" duration={1800} />;
-  // }
+  // Check authentication when route changes
+  useEffect(() => {
+    if (!redirecting) {
+      let endpoint = '';
+      if (role === 'admin') endpoint = '/admin/stats';
+      else endpoint = '/student/students/me/details';
+      
+      axios.get(`${import.meta.env.VITE_API_URL}${endpoint}`, { withCredentials: true })
+        .catch(err => {
+          if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+            setUnauthorized(true);
+            setTimeout(() => {
+              setRedirecting(true);
+              if (role === 'admin') navigate('/admin');
+              else navigate('/login');
+            }, 1800);
+          }
+        });
+    }
+  }, [location.pathname, role, navigate]);
+
   if (redirecting) return null;
   return children;
-}
-
-export function forceLogoutStudent() {
-  window.location.href = '/login';
-}
-export function forceLogoutAdmin() {
-  window.location.href = '/admin';
 }
 
 function App() {

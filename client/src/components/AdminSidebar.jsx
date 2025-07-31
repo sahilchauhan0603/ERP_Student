@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiLogOut, FiX } from "react-icons/fi";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { forceLogoutAdmin } from "../App";
 
 const navItems = [
   {

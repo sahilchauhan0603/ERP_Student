@@ -1,6 +1,6 @@
 // src/layouts/AdminLayout.jsx
 import React, { useState, useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -10,10 +10,27 @@ export default function AdminLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     checkAuth();
+    
+    // Set up continuous authentication monitoring
+    const authInterval = setInterval(() => {
+      checkAuth();
+    }, 10000); // Check every 30 seconds
+    
+    return () => {
+      clearInterval(authInterval);
+    };
   }, []);
+
+  // Check authentication when route changes
+  useEffect(() => {
+    if (!loading) {
+      checkAuth();
+    }
+  }, [location.pathname]);
 
   const checkAuth = async () => {
     try {
