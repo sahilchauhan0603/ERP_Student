@@ -123,7 +123,7 @@ const RegistrationPage = () => {
             whileHover="hover"
             className="relative"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-indigo-600 rounded-xl blur opacity-20 group-hover:opacity-60 transition duration-200"></div>
+            <div className="absolute -inset-1 rounded-xl blur opacity-20 group-hover:opacity-60 transition duration-200"></div>
             <Link
               to="/registration/student"
               className="relative flex flex-col items-center justify-center p-4 md:p-5 min-w-[220px] max-w-[260px] mx-auto rounded-xl shadow-lg h-full text-center text-gray-700 transition-all duration-300 hover:border-blue-500 border-2 border-black backdrop-blur-[10px]"
@@ -153,7 +153,7 @@ const RegistrationPage = () => {
             whileHover="hover"
             className="relative"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-teal-600 rounded-xl blur opacity-20 group-hover:opacity-60 transition duration-200"></div>
+            <div className="absolute -inset-1 rounded-xl blur opacity-20 group-hover:opacity-60 transition duration-200"></div>
             <Link
               to="/registration/faculty"
               className="relative flex flex-col items-center justify-center p-4 md:p-5 min-w-[220px] max-w-[260px] mx-auto rounded-xl shadow-lg h-full text-center text-gray-700 transition-all duration-300 hover:border-green-500 border-2 border-black backdrop-blur-[10px]"
@@ -183,7 +183,7 @@ const RegistrationPage = () => {
             whileHover="hover"
             className="relative"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-purple-400 to-pink-600 rounded-xl blur opacity-20 group-hover:opacity-60 transition duration-200"></div>
+            <div className="absolute -inset-1 rounded-xl blur opacity-20 group-hover:opacity-60 transition duration-200"></div>
             <Link
               to="/registration/non-teaching-staff"
               className="relative flex flex-col items-center justify-center p-4 md:p-5 min-w-[220px] max-w-[260px] mx-auto rounded-xl shadow-lg h-full text-center text-gray-700 transition-all duration-300 hover:border-purple-500 border-2 border-black backdrop-blur-[10px]"
