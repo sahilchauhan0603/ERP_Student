@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 import { FiHome } from "react-icons/fi";
+import { useAuth } from "../../context/AuthContext";
 import bpitLogo from "../../assets/icons/BPIT-logo-transparent.png";
 import campusBackground from "../../assets/images/BPIT.png";
+import Swal from "sweetalert2";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const StudentLogin = () => {
   const [email, setEmail] = useState("");
-  const navigate = useNavigate();
   const [otp, setOtp] = useState("");
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState(1); // 1: email, 2: otp
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
-  // Removed showInfoButton state since we no longer need the popup functionality
+  const navigate = useNavigate();
+  const { checkAuthStatus } = useAuth();
 
   useEffect(() => {
-    // Removed the SweetAlert popup since we now have persistent home navigation
     // Clean up any leftover localStorage items
     if (localStorage.getItem("showBackToHomePopup") === "student") {
       localStorage.removeItem("showBackToHomePopup");
     }
   }, []);
-
-  // Removed handleInfoClick function since we no longer need the popup functionality
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
@@ -33,7 +33,7 @@ const StudentLogin = () => {
     setLoading(true);
     try {
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/student/send-login-otp`,
+        `${API_URL}/student/send-login-otp`,
         { email },
         { withCredentials: true }
       );
@@ -58,6 +58,10 @@ const StudentLogin = () => {
         { withCredentials: true }
       );
       setSuccess("Login successful! Redirecting...");
+      
+      // Update authentication state
+      await checkAuthStatus();
+      
       if (
         response.data.success &&
         response.data.student &&

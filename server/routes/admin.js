@@ -4,6 +4,22 @@ const adminController = require('../controllers/adminController');
 const { authenticate, authorizeRole } = require('../middleware/auth');
 const { otpLimiter } = require('../controllers/adminController');
 
+// Simple auth check endpoint (no authentication required)
+router.get('/auth-check', (req, res) => {
+  const token = req.cookies && req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ authenticated: false });
+  }
+  
+  const { verifyToken } = require('../utils/jwt');
+  const payload = verifyToken(token);
+  if (!payload || payload.role !== 'admin') {
+    return res.status(401).json({ authenticated: false });
+  }
+  
+  res.json({ authenticated: true, role: 'admin' });
+});
+
 // Admin dashboard stats
 router.get('/stats', authenticate, authorizeRole('admin'), adminController.getStudentStats);
 

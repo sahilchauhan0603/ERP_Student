@@ -4,6 +4,7 @@ import { Tab } from "@headlessui/react";
 import { formatFamilyIncome } from "../../utils/formatters";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { useAuth } from "../../context/AuthContext";
 
 const StudentDetailsDashboard = () => {
   const [details, setDetails] = useState(null);
@@ -21,6 +22,7 @@ const StudentDetailsDashboard = () => {
   });
   const [updatedDocuments, setUpdatedDocuments] = useState({});
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   useEffect(() => {
     const fetchStudentDetails = async () => {
@@ -76,13 +78,7 @@ const StudentDetailsDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/student/logout`,
-        {},
-        { withCredentials: true }
-      );
-      // Instead of forceLogoutStudent(), use window.location.replace to prevent back navigation
-      window.location.replace('/login');
+      await logout('student');
     } catch (err) {
       console.error("Logout failed:", err);
       // Optionally show error

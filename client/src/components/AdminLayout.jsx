@@ -2,44 +2,20 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
-import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 import Swal from "sweetalert2";
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated, userRole, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    checkAuth();
-    
-    // Set up continuous authentication monitoring
-    const authInterval = setInterval(() => {
-      checkAuth();
-    }, 10000); // Check every 30 seconds
-    
-    return () => {
-      clearInterval(authInterval);
-    };
-  }, []);
-
-  // Check authentication when route changes
-  useEffect(() => {
-    if (!loading) {
-      checkAuth();
-    }
-  }, [location.pathname]);
-
-  const checkAuth = async () => {
-    try {
-      await axios.get(`${import.meta.env.VITE_API_URL}/admin/stats`, {
-        withCredentials: true,
-      });
-      setIsAuthenticated(true);
-    } catch (err) {
-      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+    // Only show unauthorized message if not loading and not authenticated
+    if (!loading && (!isAuthenticated || userRole !== 'admin')) {
+      // Don't show the message if we're already on the login page
+      if (location.pathname !== '/admin') {
         Swal.fire({
           icon: "error",
           title: "Unauthorized Access",
@@ -50,19 +26,11 @@ export default function AdminLayout() {
         }).then(() => {
           navigate('/admin');
         });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Authentication Error",
-          text: "Failed to verify authentication. Please try again.",
-        });
-        navigate('/admin');
       }
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [isAuthenticated, userRole, loading, navigate, location.pathname]);
 
+  // Show loading spinner while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -74,8 +42,9 @@ export default function AdminLayout() {
     );
   }
 
-  if (!isAuthenticated) {
-    return null; // Don't render anything if not authenticated
+  // Don't render anything if not authenticated or wrong role
+  if (!isAuthenticated || userRole !== 'admin') {
+    return null;
   }
 
   return (

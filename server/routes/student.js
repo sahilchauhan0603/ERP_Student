@@ -6,6 +6,22 @@ const { otpLimiter } = require('../controllers/studentController');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 
+// Simple auth check endpoint (no authentication required)
+router.get('/auth-check', (req, res) => {
+  const token = req.cookies && req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ authenticated: false });
+  }
+  
+  const { verifyToken } = require('../utils/jwt');
+  const payload = verifyToken(token);
+  if (!payload || payload.role !== 'student') {
+    return res.status(401).json({ authenticated: false });
+  }
+  
+  res.json({ authenticated: true, role: 'student' });
+});
+
 // Accept only JSON (base64 for files)
 router.post('/register', studentController.registerStudent);
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FiHome } from "react-icons/fi";
+import { useAuth } from "../../context/AuthContext";
 import bpitLogo from "../../assets/icons/BPIT-logo-transparent.png";
 import campusBackground from "../../assets/images/BPIT.png";
 import Swal from "sweetalert2";
@@ -16,17 +17,14 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-  // Removed showInfoButton state since we no longer need the popup functionality
+  const { checkAuthStatus } = useAuth();
 
   useEffect(() => {
-    // Removed the SweetAlert popup since we now have persistent home navigation
     // Clean up any leftover localStorage items
     if (localStorage.getItem("showBackToHomePopup") === "admin") {
       localStorage.removeItem("showBackToHomePopup");
     }
   }, []);
-
-  // Removed handleInfoClick function since we no longer need the popup functionality
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
@@ -59,6 +57,11 @@ const AdminLogin = () => {
         { withCredentials: true }
       );
       setSuccess("Login successful! Redirecting...");
+      
+      // Update authentication state
+      await checkAuthStatus();
+      
+      // Redirect to admin dashboard
       setTimeout(() => navigate("/admin/dashboard"), 1000);
     } catch (err) {
       setError(err.response?.data?.message || "Invalid OTP.");

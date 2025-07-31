@@ -1007,8 +1007,8 @@ exports.updateDeclinedFields = async (req, res) => {
 exports.logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+    secure: true,
+    sameSite: "none",
   });
   res.json({ message: "Logged out successfully" });
 };

@@ -1,7 +1,8 @@
+// src/components/AdminSidebar.jsx
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiLogOut, FiX } from "react-icons/fi";
-import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 import Swal from "sweetalert2";
 
 const navItems = [
@@ -36,16 +37,17 @@ export default function AdminSidebar({ open, onClose }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [adminEmail, setAdminEmail] = useState("");
+  const { logout } = useAuth();
 
   useEffect(() => {
     async function fetchAdminEmail() {
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/admin/me`,
-          { withCredentials: true }
-        );
-        if (res.data && res.data.email) {
-          setAdminEmail(res.data.email);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/me`, {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setAdminEmail(data.email || "Admin");
         } else {
           setAdminEmail("");
         }
@@ -67,18 +69,7 @@ export default function AdminSidebar({ open, onClose }) {
       confirmButtonText: "Yes, logout!",
     });
     if (result.isConfirmed) {
-      try {
-        await axios.post(
-          `${import.meta.env.VITE_API_URL}/admin/logout`,
-          {},
-          { withCredentials: true }
-        );
-        // Instead of forceLogoutAdmin(), use window.location.replace to prevent back navigation
-        window.location.replace('/admin');
-      } catch (err) {
-        console.error("Logout failed:", err);
-        Swal.fire("Error", "Logout failed. Please try again.", "error");
-      }
+      await logout('admin');
     }
   };
 
