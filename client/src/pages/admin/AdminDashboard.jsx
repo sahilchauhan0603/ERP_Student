@@ -45,24 +45,11 @@ export default function AdminDashboard() {
       setStats(res.data);
     } catch (err) {
       setStats({ total: 0, pending: 0, approved: 0, declined: 0 });
-      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-        Swal.fire({
-          icon: "error",
-          title: "Unauthorized Access",
-          text: "This page can only be accessed by authorized admins. Please log in as an admin.",
-          timer: 3000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        }).then(() => {
-          window.location.href = "/admin";
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Failed to load stats",
-          text: "Could not fetch dashboard statistics. Please try again later.",
-        });
-      }
+      Swal.fire({
+        icon: "error",
+        title: "Failed to load stats",
+        text: "Could not fetch dashboard statistics. Please try again later.",
+      });
     }
     setLoading(false);
   };
@@ -119,10 +106,6 @@ export default function AdminDashboard() {
         </div>
       </div>
     );
-  }
-  if (stats.total === 0 && stats.pending === 0 && stats.approved === 0 && stats.declined === 0) {
-    // If unauthorized, SweetAlert will handle it, so don't render the background alert
-    return null;
   }
   return (
     <div className="min-h-screen bg-gray-50 p-6">

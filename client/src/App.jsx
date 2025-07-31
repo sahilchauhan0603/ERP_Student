@@ -74,33 +74,13 @@ function App() {
           </AuthRoute>
         } />
 
-        {/* Admin Routes - Wrapped in AdminLayout */}
+        {/* Admin Routes - Authentication handled at AdminLayout level */}
         <Route element={<AdminLayout />}>
-          <Route path="/admin/dashboard" element={
-            <AuthRoute role="admin">
-              <AdminDashboard />
-            </AuthRoute>
-          } />
-          <Route path="/admin/students" element={
-            <AuthRoute role="admin">
-              <AdminAllStudents />
-            </AuthRoute>
-          } />
-          <Route path="/admin/students/pending" element={
-            <AuthRoute role="admin">
-              <PendingStudents />
-            </AuthRoute>
-          } />
-          <Route path="/admin/students/approved" element={
-            <AuthRoute role="admin">
-              <ApprovedStudents />
-            </AuthRoute>
-          } />
-          <Route path="/admin/students/declined" element={
-            <AuthRoute role="admin">
-              <DeclinedStudents />
-            </AuthRoute>
-          } />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/students" element={<AdminAllStudents />} />
+          <Route path="/admin/students/pending" element={<PendingStudents />} />
+          <Route path="/admin/students/approved" element={<ApprovedStudents />} />
+          <Route path="/admin/students/declined" element={<DeclinedStudents />} />
         </Route>
 
         {/* 404 Page */}

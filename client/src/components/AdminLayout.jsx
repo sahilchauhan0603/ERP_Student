@@ -1,10 +1,65 @@
 // src/layouts/AdminLayout.jsx
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      await axios.get(`${import.meta.env.VITE_API_URL}/admin/stats`, {
+        withCredentials: true,
+      });
+      setIsAuthenticated(true);
+    } catch (err) {
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        Swal.fire({
+          icon: "error",
+          title: "Unauthorized Access",
+          text: "This page can only be accessed by authorized admins. Please log in as an admin.",
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        }).then(() => {
+          navigate('/admin');
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Authentication Error",
+          text: "Failed to verify authentication. Please try again.",
+        });
+        navigate('/admin');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="h-12 w-12 bg-blue-200 rounded-full mb-4"></div>
+          <div className="h-4 w-32 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null; // Don't render anything if not authenticated
+  }
 
   return (
     <>
