@@ -326,7 +326,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
         setEmailError("");
       }
     } catch (error) {
-      console.error("Email check error:", error);
+      // Email check error
       setEmailError("Could not verify email uniqueness.");
     }
   };
@@ -341,7 +341,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
         setAbcIdError("");
       }
     } catch (error) {
-      console.error("ABC ID check error:", error);
+      // ABC ID check error
       setAbcIdError("Could not verify ABC ID uniqueness.");
     }
   };

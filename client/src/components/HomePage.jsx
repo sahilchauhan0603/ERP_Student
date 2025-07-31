@@ -32,7 +32,7 @@ const HomePage = () => {
           setPopupEmail(parsed.email || "");
         }
       } catch (e) {
-        console.error("Failed to parse popup data from localStorage", e);
+        // Failed to parse popup data from localStorage
       }
       // Remove so it doesn't show again
       localStorage.removeItem("showLoginPopup");

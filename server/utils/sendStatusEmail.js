@@ -13,7 +13,7 @@ async function sendStatusEmail(to, subject, html) {
     await transporter.sendMail(mailOptions);
     return true;
   } catch (err) {
-    console.error('Email send error:', err);
+    // Email send error
     return false;
   }
 }

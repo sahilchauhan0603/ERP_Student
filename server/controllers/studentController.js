@@ -80,7 +80,7 @@ exports.verifyLoginOtp = (req, res) => {
     "SELECT id, email, firstName, lastName, status FROM students WHERE email = ?";
   db.query(query, [email], (err, results) => {
     if (err) {
-      console.error("❌ MySQL error:", err);
+      // MySQL error occurred
       return res
         .status(500)
         .json({ message: "Internal server error during login verification" });
@@ -292,7 +292,7 @@ exports.registerStudent = async (req, res) => {
     const duplicateCheckSql = "SELECT id FROM students WHERE email = ? OR abcId = ? LIMIT 1";
     db.query(duplicateCheckSql, [student.email, student.abcId], (dupErr, dupResults) => {
       if (dupErr) {
-        console.error("DB Duplicate Check Error:", dupErr);
+        // Database duplicate check error
         return res.status(500).json({ message: "Database error", error: dupErr });
       }
       if (dupResults && dupResults.length > 0) {
@@ -330,7 +330,7 @@ exports.registerStudent = async (req, res) => {
       const sql = "INSERT INTO students SET ?";
       db.query(sql, student, async (err, result) => {
         if (err) {
-          console.error("DB Insert Error:", err);
+          // Database insert error
           return res.status(500).json({ message: "Database error", error: err });
         }
 
@@ -348,7 +348,7 @@ exports.registerStudent = async (req, res) => {
           
 
         } catch (emailError) {
-          console.error("Failed to send confirmation email:", emailError);
+          // Failed to send confirmation email
           // Don't fail the registration if email fails
         }
         
@@ -362,7 +362,7 @@ exports.registerStudent = async (req, res) => {
       });
     });
   } catch (error) {
-    console.error("Register Student Error:", error);
+    // Register student error
     res.status(500).json({ message: "Server error", error });
   }
 };
@@ -515,7 +515,7 @@ exports.getStudentDetailsById = (req, res) => {
     [studentId],
     (err, results) => {
       if (err) {
-        console.error("Database error:", err);
+        // Database error
         return res.status(500).json({ message: "Database error" });
       }
 
@@ -535,7 +535,7 @@ exports.getStudentDetailsById = (req, res) => {
           academicAchievements = JSON.parse(academicAchievements);
         }
       } catch (e) {
-        console.warn("Failed to parse academicAchievements JSON:", e);
+        // Failed to parse academicAchievements JSON
         academicAchievements = [];
       }
 
@@ -544,7 +544,7 @@ exports.getStudentDetailsById = (req, res) => {
           coCurricularAchievements = JSON.parse(coCurricularAchievements);
         }
       } catch (e) {
-        console.warn("Failed to parse coCurricularAchievements JSON:", e);
+        // Failed to parse coCurricularAchievements JSON
         coCurricularAchievements = [];
       }
 
@@ -556,7 +556,7 @@ exports.getStudentDetailsById = (req, res) => {
           declinedFields = declinedFields.map(normalizeDeclinedField);
         }
       } catch (e) {
-        console.warn("Failed to parse declinedFields JSON:", e);
+        // Failed to parse declinedFields JSON
         declinedFields = [];
       }
 
@@ -859,7 +859,7 @@ exports.updateDeclinedFields = async (req, res) => {
     "SELECT declinedFields, status FROM students WHERE id = ?";
   db.query(getDeclinedSql, [studentId], async (err, results) => {
     if (err) {
-      console.error("❌ Error fetching declinedFields:", err);
+      // Error fetching declinedFields
       return res
         .status(500)
         .json({ success: false, message: "Database error" });
@@ -914,7 +914,7 @@ exports.updateDeclinedFields = async (req, res) => {
             if (!data.documents) data.documents = {};
             data.documents[field] = url;
           } catch (e) {
-            console.error(`Failed to upload ${field}:`, e);
+            // Failed to upload field
             return res
               .status(500)
               .json({ success: false, message: `Failed to upload ${field}: ${e.message}` });
@@ -951,7 +951,7 @@ exports.updateDeclinedFields = async (req, res) => {
 
     db.query(sql, values, (err2, result2) => {
       if (err2) {
-        console.error("❌ Error updating declined fields:", err2);
+        // Error updating declined fields
         return res
           .status(500)
           .json({

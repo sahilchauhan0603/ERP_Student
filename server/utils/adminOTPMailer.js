@@ -43,7 +43,7 @@ async function sendAdminOtpMail(to, otp) {
     await transporter.sendMail(mailOptions);
     return true;
   } catch (err) {
-    console.error('Admin OTP email error:', err);
+    // Admin OTP email error
     return false;
   }
 }

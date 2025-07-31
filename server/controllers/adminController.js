@@ -157,7 +157,7 @@ exports.updateStudentStatus = (req, res) => {
     [status, declinedFieldsStr, studentId],
     (updateErr, updateResult) => {
       if (updateErr) {
-        console.error("Error updating student status:", updateErr);
+        // Error updating student status
         return res
           .status(500)
           .json({ message: "Database error", error: updateErr });
@@ -169,7 +169,7 @@ exports.updateStudentStatus = (req, res) => {
         [studentId],
         (selectErr, studentRows) => {
           if (selectErr) {
-            console.error("Error fetching student:", selectErr);
+            // Error fetching student
             return res
               .status(500)
               .json({ message: "Database error", error: selectErr });
@@ -289,7 +289,7 @@ exports.updateStudentStatus = (req, res) => {
               // Get updated student list
               db.query("SELECT * FROM students", (fetchErr, allStudents) => {
                 if (fetchErr) {
-                  console.error("Error fetching all students:", fetchErr);
+                  // Error fetching all students
                   return res
                     .status(500)
                     .json({ message: "Database error", error: fetchErr });
@@ -302,7 +302,7 @@ exports.updateStudentStatus = (req, res) => {
               });
             })
             .catch((emailErr) => {
-              console.error("Error sending email:", emailErr);
+              // Error sending email
               res.status(500).json({ message: "Email error", error: emailErr });
             });
         }
@@ -396,12 +396,12 @@ exports.searchStudents = (req, res) => {
 
   db.query(baseQuery, params, (err, students) => {
     if (err) {
-      console.error("Student query error:", err);
+      // Student query error
       return res.status(500).json({ message: "Database error", error: err });
     }
     db.query(countQuery, countParams, (err2, countResult) => {
       if (err2) {
-        console.error("Count query error:", err2);
+        // Count query error
         return res.status(500).json({ message: "Database error", error: err2 });
       }
       const totalPages = Math.ceil(countResult[0].total / pageSize);

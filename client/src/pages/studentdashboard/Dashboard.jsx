@@ -47,7 +47,7 @@ const StudentDetailsDashboard = () => {
           setFormData(response.data);
         }
       } catch (err) {
-        console.error("Failed to fetch student details:", err);
+        // Failed to fetch student details
         if (err.response?.status === 401 || err.response?.status === 403) {
           Swal.fire({
             icon: "error",
@@ -80,7 +80,7 @@ const StudentDetailsDashboard = () => {
     try {
       await logout('student');
     } catch (err) {
-      console.error("Logout failed:", err);
+      // Logout failed
       // Optionally show error
     }
   };
@@ -199,7 +199,7 @@ const StudentDetailsDashboard = () => {
         throw new Error(response.data.message || "Failed to update profile");
       }
     } catch (err) {
-      console.error("Failed to update declined fields:", err);
+      // Failed to update declined fields
       setSaveStatus((prev) => ({
         ...prev,
         final: {

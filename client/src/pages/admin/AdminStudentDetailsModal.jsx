@@ -60,7 +60,7 @@ export default function AdminStudentDetailsModal({
       try {
         return JSON.parse(fields);
       } catch (e) {
-        console.error('Error parsing declined fields:', e);
+        // Error parsing declined fields
         return [];
       }
     }

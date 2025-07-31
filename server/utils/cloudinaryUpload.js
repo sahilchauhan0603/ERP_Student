@@ -27,7 +27,7 @@ const uploadToCloudinary = (fileBuffer, fileName, folder = 'student_uploads') =>
         uploadOptions,
         (error, result) => {
           if (error) {
-            console.error('Cloudinary upload error:', error);
+            // Cloudinary upload error
             return reject(error);
           }
 
@@ -35,7 +35,7 @@ const uploadToCloudinary = (fileBuffer, fileName, folder = 'student_uploads') =>
         }
       ).end(fileBuffer);
     } catch (err) {
-      console.error('Error in uploadToCloudinary:', err);
+      // Error in uploadToCloudinary
       reject(err);
     }
   });

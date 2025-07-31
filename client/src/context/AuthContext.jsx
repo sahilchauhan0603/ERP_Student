@@ -11,61 +11,61 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const checkAuthStatus = async () => {
-    console.log('🔍 Checking authentication status...');
+    // Checking authentication status
     
     try {
       // Check admin authentication
-      console.log('🔍 Checking admin authentication...');
+      // Checking admin authentication
       const adminResponse = await axios.get(`${import.meta.env.VITE_API_URL}/admin/auth-check`, {
         withCredentials: true,
       });
-      console.log('✅ Admin auth response:', adminResponse.data);
+      // Admin auth response received
       if (adminResponse.data.authenticated) {
         setIsAuthenticated(true);
         setUserRole('admin');
-        console.log('✅ Admin authenticated');
+        // Admin authenticated
         return true;
       }
     } catch (adminError) {
-      console.log('❌ Admin not authenticated:', adminError.response?.status);
+      // Admin not authenticated
       // Admin not authenticated, try student
     }
 
     try {
       // Check student authentication
-      console.log('🔍 Checking student authentication...');
+      // Checking student authentication
       const studentResponse = await axios.get(`${import.meta.env.VITE_API_URL}/student/auth-check`, {
         withCredentials: true,
       });
-      console.log('✅ Student auth response:', studentResponse.data);
+      // Student auth response received
       if (studentResponse.data.authenticated) {
         setIsAuthenticated(true);
         setUserRole('student');
-        console.log('✅ Student authenticated');
+        // Student authenticated
         return true;
       }
     } catch (studentError) {
-      console.log('❌ Student not authenticated:', studentError.response?.status);
+      // Student not authenticated
       // Student not authenticated
     }
 
     // Neither admin nor student is authenticated
-    console.log('❌ No user authenticated');
+    // No user authenticated
     setIsAuthenticated(false);
     setUserRole(null);
     return false;
   };
 
   useEffect(() => {
-    console.log('🚀 AuthProvider mounted, checking auth status...');
+    // AuthProvider mounted, checking auth status
     checkAuthStatus().finally(() => {
-      console.log('✅ Auth check completed, setting loading to false');
+      // Auth check completed, setting loading to false
       setLoading(false);
     });
   }, []);
 
   const logout = async (role) => {
-    console.log('🚪 Logging out as:', role);
+    // Logging out as user
     try {
       if (role === 'admin') {
         await axios.post(`${import.meta.env.VITE_API_URL}/admin/logout`, {}, {
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
         });
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      // Logout error
     } finally {
       setIsAuthenticated(false);
       setUserRole(null);

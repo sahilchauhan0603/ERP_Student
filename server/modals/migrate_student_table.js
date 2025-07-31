@@ -4,9 +4,9 @@ const schema = require('./student');
 
 db.query(schema, (err, result) => {
   if (err) {
-    console.error('❌ Table creation failed:', err);
+    // Table creation failed
   } else {
-    console.log('✅ Students table created or already exists.');
+    // Students table created or already exists
   }
   process.exit();
 });

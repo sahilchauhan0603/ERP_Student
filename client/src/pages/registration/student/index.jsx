@@ -411,7 +411,7 @@ const StudentRegistration = () => {
         });
       }
     } catch (error) {
-      console.error("Registration error:", error);
+      // Registration error
       showModal({
         title: "Registration Failed",
         message:
@@ -607,9 +607,8 @@ const StudentRegistration = () => {
                   </div>
                   <button
                     onClick={() => (window.location.href = "/")}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 bg-white border border-gray-200 hover:bg-gray-50 text-black p-2 rounded-full shadow transition-all duration-300 hover:scale-110 group"
+                    className="absolute right-0 top-0 text-black transition-all duration-300 hover:scale-110 group"
                     title="Go to Homepage"
-                    style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
                   >
                     <FiInfo className="w-6 h-6" />
                     <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
