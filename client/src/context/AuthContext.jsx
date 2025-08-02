@@ -79,13 +79,17 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       // Logout error
     } finally {
-      setIsAuthenticated(false);
-      setUserRole(null);
+      // Navigate first, then update state to prevent unauthorized alert
       if (role === 'admin') {
         navigate('/admin');
       } else {
         navigate('/login');
       }
+      // Update state after navigation to prevent unauthorized alert
+      setTimeout(() => {
+        setIsAuthenticated(false);
+        setUserRole(null);
+      }, 100);
     }
   };
 

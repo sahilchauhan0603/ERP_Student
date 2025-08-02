@@ -595,8 +595,7 @@ const StudentRegistration = () => {
           onClose={modal.onClose}
         />
         <div className="max-w-6xl mx-auto">
-          <div className="bg-gradient-to-br from-white to-gray-50 p-1 rounded-2xl shadow-lg">
-            <div className="bg-white py-6 sm:py-8 px-4 sm:px-6 shadow-lg rounded-2xl border-2 border-gray-200">
+          <div className="bg-white py-6 sm:py-8 px-4 sm:px-6 shadow-lg rounded-2xl ">
               {/* Headings */}
               <div className="text-center mb-6 sm:mb-8">
                 <div className="relative mb-3 sm:mb-4">
@@ -719,7 +718,6 @@ const StudentRegistration = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

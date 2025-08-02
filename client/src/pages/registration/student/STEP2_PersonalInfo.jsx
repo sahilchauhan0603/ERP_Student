@@ -545,7 +545,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 <select
                   value={birthCountry}
                   onChange={handleBirthCountryChange}
-                  className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
+                  className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl border-gray-400 focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
                   required
                 >
                   {countries.map((country) => (
@@ -556,10 +556,10 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                   <select
                     value={birthState}
                     onChange={handleBirthStateChange}
-                    className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
+                    className="w-full sm:w-1/2 px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
                     required
                   >
-                    <option value="">State</option>
+                    <option value="">-- State --</option>
                     {indianStates.map((state) => (
                       <option key={state} value={state}>{state}</option>
                     ))}
@@ -569,10 +569,10 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                   <select
                     value={birthState}
                     onChange={handleBirthStateChange}
-                    className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
+                    className="w-full sm:w-1/2 px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
                     required
                   >
-                    <option value="">-- Select State --</option>
+                    <option value="">-- State --</option>
                     {usStates.map((state) => (
                       <option key={state} value={state}>{state}</option>
                     ))}
@@ -582,10 +582,10 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                   <select
                     value={birthState}
                     onChange={handleBirthStateChange}
-                    className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
+                    className="w-full sm:w-1/2 px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
                     required
                   >
-                    <option value="">-- Select Region --</option>
+                    <option value="">-- Region --</option>
                     {ukRegions.map((state) => (
                       <option key={state} value={state}>{state}</option>
                     ))}
@@ -595,10 +595,10 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                   <select
                     value={birthState}
                     onChange={handleBirthStateChange}
-                    className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
+                    className="w-full sm:w-1/2 px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
                     required
                   >
-                    <option value="">-- Select State --</option>
+                    <option value="">-- State --</option>
                     {ausStates.map((state) => (
                       <option key={state} value={state}>{state}</option>
                     ))}
@@ -610,7 +610,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                     value={birthOtherCity}
                     onChange={handleBirthOtherCityChange}
                     placeholder="City/State"
-                    className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 font-semibold"
+                    className="w-full sm:w-1/2 px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 font-semibold"
                     required
                   />
                 )}
@@ -714,7 +714,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 <select
                   value={emailDomain}
                   onChange={handleEmailDomainChange}
-                  className="flex-shrink-0 w-full sm:w-40 px-4 py-3 border-2 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400 text-base sm:text-base transition-all duration-300 truncate text-ellipsis"
+                  className="flex-shrink-0 w-full sm:w-40 px-4 py-3 border-2 border-gray-400 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400 text-base sm:text-base transition-all duration-300 truncate text-ellipsis"
                   style={{ minWidth: 0, maxWidth: 200 }}
                 >
                   {emailDomains.map((domain) => (

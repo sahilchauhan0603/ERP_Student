@@ -4,7 +4,7 @@ const cloudinary = require('../config/cloudinary');
 const uploadToCloudinary = (fileBuffer, fileName, folder = 'student_uploads') => {
   return new Promise((resolve, reject) => {
     try {
-      // Determine resource type based on file extension
+      // Determine file type
       const fileExtension = fileName.split('.').pop().toLowerCase();
       const isPDF = fileExtension === 'pdf';
       const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension);
@@ -12,30 +12,33 @@ const uploadToCloudinary = (fileBuffer, fileName, folder = 'student_uploads') =>
       const uploadOptions = {
         folder,
         public_id: fileName,
-        resource_type: isPDF ? 'raw' : 'image', // PDFs as raw, images as image
-        timeout: 60000, // 60 seconds timeout
-        access_mode: 'public' // Ensure all files are publicly accessible
+        resource_type: isPDF ? 'raw' : 'image',
+        timeout: 60000,
+        access_mode: 'public'
       };
 
-      // For PDFs, ensure they're uploaded as raw files with proper URL structure
       if (isPDF) {
         uploadOptions.format = 'pdf';
-        uploadOptions.flags = 'attachment';
       }
 
-      cloudinary.uploader.upload_stream(
+      const uploadStream = cloudinary.uploader.upload_stream(
         uploadOptions,
         (error, result) => {
           if (error) {
-            // Cloudinary upload error
             return reject(error);
           }
 
-          resolve(result.secure_url);
+          if (isPDF) {
+            const url = `https://res.cloudinary.com/${cloudinary.config().cloud_name}/raw/upload/${result.public_id}.${result.format}`;
+            resolve(url);
+          } else {
+            resolve(result.secure_url);
+          }
         }
-      ).end(fileBuffer);
+      );
+
+      uploadStream.end(fileBuffer);
     } catch (err) {
-      // Error in uploadToCloudinary
       reject(err);
     }
   });
