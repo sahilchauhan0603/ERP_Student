@@ -218,6 +218,56 @@ export default function AdminStudentDetailsModal({
     );
   };
 
+  // Check if all fields across all sections have been verified
+  const isAllFieldsVerified = () => {
+    const allSections = ["personal", "academic", "parent", "documents"];
+    return allSections.every(section => isSectionVerified(section));
+  };
+
+  // Get count of verified fields for progress tracking
+  const getVerificationProgress = () => {
+    const sectionFields = {
+      personal: [
+        "firstName", "middleName", "lastName", "email", "mobile", "dob",
+        "gender", "category", "subCategory", "region", "currentAddress",
+        "permanentAddress", "course", "examRoll", "examRank", "abcId"
+      ],
+      academic: [
+        "classX_institute", "classX_board", "classX_year", "classX_aggregate",
+        "classX_pcm", "classX_isDiplomaOrPolytechnic", "classXII_institute",
+        "classXII_board", "classXII_year", "classXII_aggregate", "classXII_pcm",
+        "otherQualification_institute", "otherQualification_board",
+        "otherQualification_year", "otherQualification_aggregate",
+        "otherQualification_pcm", "academicAchievements", "coCurricularAchievements"
+      ],
+      parent: [
+        "father_name", "father_mobile", "father_email", "mother_name",
+        "mother_mobile", "mother_email", "family_income"
+      ],
+      documents: [
+        "photo", "ipuRegistration", "allotmentLetter", "examAdmitCard",
+        "examScoreCard", "marksheet10", "passing10", "marksheet12", "passing12",
+        "aadhar", "characterCertificate", "medicalCertificate", "migrationCertificate",
+        "categoryCertificate", "specialCategoryCertificate", "academicFeeReceipt",
+        "collegeFeeReceipt", "parentSignature"
+      ]
+    };
+
+    let totalFields = 0;
+    let verifiedFields = 0;
+
+    Object.entries(sectionFields).forEach(([section, fields]) => {
+      totalFields += fields.length;
+      fields.forEach(field => {
+        if (verifications[section]?.[field] !== undefined) {
+          verifiedFields++;
+        }
+      });
+    });
+
+    return { verifiedFields, totalFields, percentage: Math.round((verifiedFields / totalFields) * 100) };
+  };
+
   const handleSelectAll = (section) => {
     const sectionFields = {
       personal: [
@@ -391,6 +441,19 @@ export default function AdminStudentDetailsModal({
   };
 
   const handleDone = async () => {
+    // Check if all fields are verified before proceeding
+    if (!isAllFieldsVerified()) {
+      const progress = getVerificationProgress();
+      Swal.fire({
+        icon: "warning",
+        title: "Incomplete Review",
+        text: `Please review all fields before proceeding. You have verified ${progress.verifiedFields} out of ${progress.totalFields} fields.`,
+        confirmButtonText: "Continue Review",
+        confirmButtonColor: "#3085d6",
+      });
+      return;
+    }
+
     setActionLoading(true);
     const declinedFields = getDeclinedFields();
     const status = declinedFields.length > 0 ? "declined" : "approved";
@@ -487,7 +550,9 @@ export default function AdminStudentDetailsModal({
               ? "border-green-200 bg-green-50"
               : verifiedStatus === false
                 ? "border-red-200 bg-red-50"
-                : "border-gray-200 bg-white hover:bg-gray-50"
+                : verifiedStatus === undefined && tableType === "pending"
+                  ? "border-orange-300 bg-orange-50"
+                  : "border-gray-200 bg-white hover:bg-gray-50"
           }`}
       >
         <div className="flex justify-between items-start">
@@ -507,6 +572,11 @@ export default function AdminStudentDetailsModal({
               )}
               {verifiedStatus === false && (
                 <FiAlertCircle className="ml-2 text-red-500" />
+              )}
+              {verifiedStatus === undefined && tableType === "pending" && (
+                <span className="ml-2 px-2 py-0.5 text-xs bg-orange-200 text-orange-800 rounded-full">
+                  Pending Review
+                </span>
               )}
             </h4>
             <div className="mt-1 text-gray-600 text-sm">
@@ -1110,44 +1180,39 @@ export default function AdminStudentDetailsModal({
           </div>
         </div>
 
-        {/* Progress bar for pending review */}
+                {/* Review Progress for pending review */}
         {tableType === "pending" && (
           <div className="px-6 pt-4">
-            <div className="flex items-center justify-between mb-2">
-              {sectionDefs.map((section, index) => (
-                <div key={index} className="flex flex-col items-center">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${sectionCompleted[index]
-                        ? "bg-green-100 text-green-600"
-                        : activeTab === index
-                          ? "bg-blue-100 text-blue-600"
-                          : "bg-gray-100 text-gray-400"
-                      }`}
-                  >
-                    {sectionCompleted[index] ? <FiCheckCircle /> : index + 1}
+            {(() => {
+              const progress = getVerificationProgress();
+              const allVerified = isAllFieldsVerified();
+              return (
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <FiCheckCircle className={`mr-2 ${allVerified ? 'text-green-600' : 'text-blue-600'}`} />
+                      <span className="text-sm font-medium text-gray-700">
+                        Review Progress: {progress.verifiedFields}/{progress.totalFields} fields verified
+                      </span>
+                    </div>
+                    <span className={`text-sm font-bold ${allVerified ? 'text-green-600' : 'text-blue-600'}`}>
+                      {progress.percentage}%
+                    </span>
                   </div>
-                  <span
-                    className={`text-xs mt-1 ${activeTab === index
-                        ? "font-medium text-blue-600"
-                        : "text-gray-500"
-                      }`}
-                  >
-                    {section.label}
-                  </span>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div
+                      className={`h-2 rounded-full ${allVerified ? 'bg-green-500' : 'bg-blue-500'}`}
+                      style={{ width: `${progress.percentage}%` }}
+                    ></div>
+                  </div>
+                  {!allVerified && (
+                    <p className="text-xs text-gray-600 mt-1">
+                      Please review all fields before completing the review
+                    </p>
+                  )}
                 </div>
-              ))}
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-1.5">
-              <div
-                className="bg-blue-600 h-1.5 rounded-full"
-                style={{
-                  width: `${((activeTab + (sectionCompleted[activeTab] ? 1 : 0)) /
-                      sectionDefs.length) *
-                    100
-                    }%`,
-                }}
-              ></div>
-            </div>
+              );
+            })()}
           </div>
         )}
 
@@ -1244,13 +1309,32 @@ export default function AdminStudentDetailsModal({
                   </button>
                 ) : (
                   <div className="flex space-x-3">
-                    <button
-                      onClick={handleDone}
-                      disabled={actionLoading}
-                      className="flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50"
-                    >
-                      Done
-                    </button>
+                    {(() => {
+                      const progress = getVerificationProgress();
+                      const allVerified = isAllFieldsVerified();
+                      return (
+                        <>
+                          <div className="flex items-center text-sm text-gray-600">
+                            <span className="mr-2">Review Progress:</span>
+                            <span className={`font-semibold ${allVerified ? 'text-green-600' : 'text-orange-600'}`}>
+                              {progress.verifiedFields}/{progress.totalFields} ({progress.percentage}%)
+                            </span>
+                          </div>
+                          <button
+                            onClick={handleDone}
+                            disabled={actionLoading || !allVerified}
+                            className={`flex items-center px-6 py-2 rounded-md disabled:opacity-50 ${
+                              allVerified 
+                                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                                : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                            }`}
+                            title={!allVerified ? 'Please review all fields before proceeding' : 'Complete review'}
+                          >
+                            Done
+                          </button>
+                        </>
+                      );
+                    })()}
                   </div>
                 )}
               </div>

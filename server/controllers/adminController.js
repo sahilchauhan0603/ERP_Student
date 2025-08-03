@@ -212,7 +212,6 @@ exports.updateStudentStatus = (req, res) => {
                 </div>
               </div>
             `;
-            sendStatusEmail(email, emailSubject, emailHtml).catch(() => {});
           } else if (status === "declined") {
             const declinedArr = Array.isArray(declinedFields)
               ? declinedFields
@@ -256,7 +255,6 @@ exports.updateStudentStatus = (req, res) => {
                 </div>
               </div>
             `;
-            sendStatusEmail(email, emailSubject, emailHtml).catch(() => {});
           } else {
             emailSubject = "Your Registration Status Update";
             emailHtml = `
