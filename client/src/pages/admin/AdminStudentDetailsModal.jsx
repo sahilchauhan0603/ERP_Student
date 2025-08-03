@@ -18,6 +18,7 @@ import {
   FiUsers,
   FiCalendar,
   FiClock,
+  FiRefreshCw,
 } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { formatFamilyIncome } from "../../utils/formatters";
@@ -135,8 +136,12 @@ export default function AdminStudentDetailsModal({
         `${import.meta.env.VITE_API_URL}/admin/student-details/${student.id}`,
         { withCredentials: true }
       )
-      .then((res) => setDetails(res.data))
-      .catch(() => setDetails(null))
+      .then((res) => {
+        setDetails(res.data);
+      })
+      .catch((err) => {
+        setDetails(null);
+      })
       .finally(() => setLoading(false));
     setActiveTab(0);
     setVerifications({});
@@ -190,7 +195,7 @@ export default function AdminStudentDetailsModal({
         "mother_name",
         "mother_mobile",
         "mother_email",
-        "family_income",
+        "familyIncome",
       ],
       documents: [
         "photo",
@@ -242,7 +247,7 @@ export default function AdminStudentDetailsModal({
       ],
       parent: [
         "father_name", "father_mobile", "father_email", "mother_name",
-        "mother_mobile", "mother_email", "family_income"
+        "mother_mobile", "mother_email", "familyIncome"
       ],
       documents: [
         "photo", "ipuRegistration", "allotmentLetter", "examAdmitCard",
@@ -315,7 +320,7 @@ export default function AdminStudentDetailsModal({
         "mother_name",
         "mother_mobile",
         "mother_email",
-        "family_income",
+        "familyIncome",
       ],
       documents: [
         "photo",
@@ -582,9 +587,9 @@ export default function AdminStudentDetailsModal({
             <div className="mt-1 text-gray-600 text-sm">
               {isDocument && value ? (
                 (() => {
-                  // Check if the document is a PDF or image
-                  const isPDF = value && value.toLowerCase().includes('.pdf');
-                  const isImage = value && (value.toLowerCase().includes('.jpg') || value.toLowerCase().includes('.jpeg') || value.toLowerCase().includes('.png') || value.toLowerCase().includes('.gif') || value.toLowerCase().includes('.webp'));
+                  // Check if the document is a PDF or image with proper type checking
+                  const isPDF = value && typeof value === 'string' && value.toLowerCase().includes('.pdf');
+                  const isImage = value && typeof value === 'string' && (value.toLowerCase().includes('.jpg') || value.toLowerCase().includes('.jpeg') || value.toLowerCase().includes('.png') || value.toLowerCase().includes('.gif') || value.toLowerCase().includes('.webp'));
                   
                   return (
                     <a
@@ -1171,12 +1176,35 @@ export default function AdminStudentDetailsModal({
                 </div>
               </div>
             )}
-            <button
-              onClick={onClose}
-              className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
-            >
-              <FiX size={24} />
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => {
+                  setLoading(true);
+                  axios
+                    .get(
+                      `${import.meta.env.VITE_API_URL}/admin/student-details/${student.id}`,
+                      { withCredentials: true }
+                    )
+                    .then((res) => {
+                      setDetails(res.data);
+                    })
+                    .catch((err) => {
+                      // Error refreshing student details
+                    })
+                    .finally(() => setLoading(false));
+                }}
+                className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                title="Refresh student details"
+              >
+                <FiRefreshCw size={20} />
+              </button>
+              <button
+                onClick={onClose}
+                className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+              >
+                <FiX size={24} />
+              </button>
+            </div>
           </div>
         </div>
 

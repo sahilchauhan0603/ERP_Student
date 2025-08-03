@@ -7,6 +7,36 @@ import Swal from "sweetalert2";
 import { useAuth } from "../../context/AuthContext";
 
 const StudentDetailsDashboard = () => {
+  // Dropdown options from registration form
+  const courses = [
+    "B.Tech Computer Science Engineering (CSE)",
+    "B.Tech Information Technology Engineering (IT)",
+    "B.Tech Electronics and Communication Engineering (ECE)",
+    "B.Tech Electrical and Electronics Engineering (EEE)",
+    "B.Tech Artificial Intelligence and Data Science Engineering (AI-DS)",
+    "B.Tech Computer Science Engineering with specialization in Data Science (CSE-DS)",
+    "LE-B.Tech Computer Science Engineering (CSE)",
+    "LE-B.Tech Information Technology Engineering (IT)",
+    "LE-B.Tech Electronics and Communication Engineering (ECE)",
+    "LE-B.Tech Electrical and Electronics Engineering (EEE)",
+    "BBA",
+    "MBA",
+  ];
+
+  const genderOptions = ["Male", "Female", "Other"];
+  const categoryOptions = ["SC", "ST", "OBC", "GEN", "PwD", "EWS"];
+  const subCategoryOptions = ["Kashmiri Migrant", "Defence", "J&K (PMSSS)", "None"];
+  const regionOptions = ["Delhi", "Outside Delhi"];
+  
+  // Academic dropdown options
+  const boardOptions = [
+    "CBSE", "ICSE", "IB", "State Board", "Other"
+  ];
+  
+  // Generate year options (from 1950 to current year + 1)
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: currentYear - 1950 + 2 }, (_, i) => (1950 + i).toString());
+
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,7 +46,7 @@ const StudentDetailsDashboard = () => {
   const [formData, setFormData] = useState({});
   const [declinedFields, setDeclinedFields] = useState([]);
   const [updatedFields, setUpdatedFields] = useState([]);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
   const [saveStatus, setSaveStatus] = useState({
     final: { loading: false, error: null, success: false },
   });
@@ -34,8 +64,17 @@ const StudentDetailsDashboard = () => {
           { withCredentials: true }
         );
         if (response.data.success && response.data.data) {
+          // Format the date of birth to YYYY-MM-DD for the date input
+          const formattedData = { ...response.data.data };
+          if (formattedData.personal && formattedData.personal.dob) {
+            const dobDate = new Date(formattedData.personal.dob);
+            if (!isNaN(dobDate.getTime())) {
+              formattedData.personal.dob = dobDate.toISOString().split('T')[0];
+            }
+          }
+          
           setDetails(response.data.data);
-          setFormData(response.data.data);
+          setFormData(formattedData);
           if (response.data.data.declinedFields) {
             const fields = Array.isArray(response.data.data.declinedFields)
               ? response.data.data.declinedFields
@@ -43,8 +82,17 @@ const StudentDetailsDashboard = () => {
             setDeclinedFields(fields);
           }
         } else {
+          // Format the date of birth for direct response data
+          const formattedData = { ...response.data };
+          if (formattedData.personal && formattedData.personal.dob) {
+            const dobDate = new Date(formattedData.personal.dob);
+            if (!isNaN(dobDate.getTime())) {
+              formattedData.personal.dob = dobDate.toISOString().split('T')[0];
+            }
+          }
+          
           setDetails(response.data);
-          setFormData(response.data);
+          setFormData(formattedData);
         }
       } catch (err) {
         // Failed to fetch student details
@@ -181,20 +229,79 @@ const StudentDetailsDashboard = () => {
         config
       );
       if (response.data.success) {
+        // Update the formData with the server response data
+        // This ensures we have the Cloudinary URLs instead of File objects
+        const updatedFormData = { ...formData };
+        
+        // Update documents with Cloudinary URLs from server response
+        if (response.data.updatedData) {
+          // Use the updated data from server which contains Cloudinary URLs
+          const serverData = response.data.updatedData;
+          
+          // Update documents with the new Cloudinary URLs
+          if (serverData.documents) {
+            if (!updatedFormData.documents) updatedFormData.documents = {};
+            Object.keys(serverData.documents).forEach(field => {
+              if (serverData.documents[field] && !serverData.documents[field].startsWith('blob:')) {
+                updatedFormData.documents[field] = serverData.documents[field];
+              }
+            });
+          }
+          
+          // Update other sections if they were modified
+          ['personal', 'academic', 'parent'].forEach(section => {
+            if (serverData[section]) {
+              updatedFormData[section] = { ...updatedFormData[section], ...serverData[section] };
+            }
+          });
+        }
+        
         setDetails((prev) => ({
           ...prev,
-          ...formData,
+          ...updatedFormData,
           status: "pending",
           declinedFields: response.data.declinedFields || [],
         }));
+        setFormData(updatedFormData);
         setDeclinedFields(response.data.declinedFields || []);
         setEditMode(false);
-        setShowSuccessModal(true);
         setSaveStatus((prev) => ({
           ...prev,
           final: { loading: false, success: true },
         }));
         setUpdatedDocuments({});
+        
+        // Show success SweetAlert
+        Swal.fire({
+          icon: "success",
+          title: "Profile Submitted for Review! 🎉",
+          html: `
+            <div class="text-center">
+              <div class="mb-4">
+                <svg class="mx-auto h-16 w-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-2">Profile Update Successful!</h3>
+              <p class="text-gray-600 mb-4">
+                Your profile has been successfully submitted for review. You'll be notified once the changes are approved.
+              </p>
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+                <p class="font-medium">What's Next?</p>
+                <ul class="mt-1 space-y-1">
+                  <li>• Your profile is under review</li>
+                  <li>• You'll be notified once approved</li>
+                  <li>• Check your email for updates</li>
+                </ul>
+              </div>
+            </div>
+          `,
+          confirmButtonText: "Close",
+          confirmButtonColor: "#3085d6",
+          allowOutsideClick: false,
+        }).then(() => {
+          window.location.reload();
+        });
       } else {
         throw new Error(response.data.message || "Failed to update profile");
       }
@@ -210,49 +317,7 @@ const StudentDetailsDashboard = () => {
     }
   };
 
-  const SuccessModal = () => (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-      <div className="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
-        <div className="mt-3 text-center">
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-            <svg
-              className="h-6 w-6 text-green-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mt-2">
-            Profile Submitted for Review
-          </h3>
-          <div className="mt-2 px-7 py-3">
-            <p className="text-sm text-gray-500 dark:text-gray-300">
-              Your profile has been successfully submitted for review. You'll be
-              notified once the changes are approved.
-            </p>
-          </div>
-          <div className="items-center justify-center mt-4">
-            <button
-              className="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-              onClick={() => {
-                setShowSuccessModal(false);
-                window.location.reload();
-              }}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+
 
   // Removed LogoutModal component since we now use SweetAlert
 
@@ -316,11 +381,12 @@ const StudentDetailsDashboard = () => {
                 const file = e.target.files[0];
                 if (file) {
                   setUpdatedDocuments((prev) => ({ ...prev, [field]: file }));
+                  // Store the file object for upload, not the blob URL
                   setFormData((prev) => ({
                     ...prev,
                     documents: {
                       ...prev.documents,
-                      [field]: URL.createObjectURL(file),
+                      [field]: file, // Store the file object instead of blob URL
                     },
                   }));
                   const fieldPath = `documents.${field}`;
@@ -331,15 +397,28 @@ const StudentDetailsDashboard = () => {
               }}
               className="ml-2"
             />
-            {formData.documents?.[field] && (
-              <a
-                href={formData.documents[field]}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ml-2 text-blue-600 underline text-xs"
-              >
-                Preview
-              </a>
+            {/* Show preview of existing document or newly selected file */}
+            {(formData.documents?.[field] || value) && (
+              <div className="mt-2">
+                <a
+                  href={typeof formData.documents?.[field] === 'string' 
+                    ? formData.documents[field] 
+                    : formData.documents?.[field] instanceof File 
+                      ? URL.createObjectURL(formData.documents[field])
+                      : value
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-2 text-blue-600 underline text-xs"
+                >
+                  Preview
+                </a>
+                {formData.documents?.[field] instanceof File && (
+                  <span className="ml-2 text-xs text-green-600">
+                    (New file selected)
+                  </span>
+                )}
+              </div>
             )}
           </td>
         </tr>
@@ -347,50 +426,178 @@ const StudentDetailsDashboard = () => {
     }
 
     if (isEditable && !isDocument) {
+      // Check if this field should use a dropdown
+      const shouldUseDropdown = () => {
+        if (section === "personal") {
+          return ["gender", "course", "category", "subCategory", "region"].includes(field);
+        }
+        if (section === "academic") {
+          return ["board", "year"].includes(field);
+        }
+        return false;
+      };
+
+      // Check if this field should use a date picker
+      const shouldUseDatePicker = () => {
+        return field === "dob" && section === "personal";
+      };
+
+      const getDropdownOptions = () => {
+        switch (field) {
+          case "gender":
+            return genderOptions;
+          case "course":
+            return courses;
+          case "category":
+            return categoryOptions;
+          case "subCategory":
+            return subCategoryOptions;
+          case "region":
+            return regionOptions;
+          case "board":
+            return boardOptions;
+          case "year":
+            return yearOptions;
+          default:
+            return [];
+        }
+      };
+
+      const dropdownOptions = getDropdownOptions();
+      const isDropdownField = shouldUseDropdown();
+      const isDateField = shouldUseDatePicker();
+
       return (
         <tr className="border-b last:border-b-0">
           <td className="py-2 px-6 text-red-600 font-semibold w-1/3 text-left align-top">
             {label}:
           </td>
           <td className="py-2 px-6">
-            <input
-              type="text"
-              value={localValue}
-              onChange={(e) => setLocalValue(e.target.value)}
-              onBlur={(e) => {
-                const newValue = e.target.value;
-                if (subSection) {
-                  setFormData((prev) => ({
-                    ...prev,
-                    [section]: {
-                      ...prev[section],
-                      [subSection]: {
-                        ...prev[section]?.[subSection],
+            {isDropdownField ? (
+              <select
+                value={localValue}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  setLocalValue(newValue);
+                  if (subSection) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      [section]: {
+                        ...prev[section],
+                        [subSection]: {
+                          ...prev[section]?.[subSection],
+                          [field]: newValue,
+                        },
+                      },
+                    }));
+                  } else {
+                    setFormData((prev) => ({
+                      ...prev,
+                      [section]: {
+                        ...prev[section],
                         [field]: newValue,
                       },
-                    },
-                  }));
-                } else {
-                  setFormData((prev) => ({
-                    ...prev,
-                    [section]: {
-                      ...prev[section],
-                      [field]: newValue,
-                    },
-                  }));
-                }
-                // Track updated fields
-                const fieldPath = subSection
-                  ? `${section}.${subSection}.${field}`
-                  : `${section}.${field}`;
-                if (declinedFields.includes(fieldPath)) {
-                  if (!updatedFields.includes(fieldPath)) {
-                    setUpdatedFields((prev) => [...prev, fieldPath]);
+                    }));
                   }
-                }
-              }}
-              className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
-            />
+                  // Track updated fields
+                  const fieldPath = subSection
+                    ? `${section}.${subSection}.${field}`
+                    : `${section}.${field}`;
+                  if (declinedFields.includes(fieldPath)) {
+                    if (!updatedFields.includes(fieldPath)) {
+                      setUpdatedFields((prev) => [...prev, fieldPath]);
+                    }
+                  }
+                }}
+                className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
+              >
+                <option value="">Select {label}</option>
+                {dropdownOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            ) : isDateField ? (
+              <input
+                type="date"
+                value={localValue}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  setLocalValue(newValue);
+                  if (subSection) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      [section]: {
+                        ...prev[section],
+                        [subSection]: {
+                          ...prev[section]?.[subSection],
+                          [field]: newValue,
+                        },
+                      },
+                    }));
+                  } else {
+                    setFormData((prev) => ({
+                      ...prev,
+                      [section]: {
+                        ...prev[section],
+                        [field]: newValue,
+                      },
+                    }));
+                  }
+                  // Track updated fields
+                  const fieldPath = subSection
+                    ? `${section}.${subSection}.${field}`
+                    : `${section}.${field}`;
+                  if (declinedFields.includes(fieldPath)) {
+                    if (!updatedFields.includes(fieldPath)) {
+                      setUpdatedFields((prev) => [...prev, fieldPath]);
+                    }
+                  }
+                }}
+                className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
+                max={new Date().toISOString().split('T')[0]} // Prevent future dates
+              />
+            ) : (
+              <input
+                type="text"
+                value={localValue}
+                onChange={(e) => setLocalValue(e.target.value)}
+                onBlur={(e) => {
+                  const newValue = e.target.value;
+                  if (subSection) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      [section]: {
+                        ...prev[section],
+                        [subSection]: {
+                          ...prev[section]?.[subSection],
+                          [field]: newValue,
+                        },
+                      },
+                    }));
+                  } else {
+                    setFormData((prev) => ({
+                      ...prev,
+                      [section]: {
+                        ...prev[section],
+                        [field]: newValue,
+                      },
+                    }));
+                  }
+                  // Track updated fields
+                  const fieldPath = subSection
+                    ? `${section}.${subSection}.${field}`
+                    : `${section}.${field}`;
+                  if (declinedFields.includes(fieldPath)) {
+                    if (!updatedFields.includes(fieldPath)) {
+                      setUpdatedFields((prev) => [...prev, fieldPath]);
+                    }
+                  }
+                }}
+                className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
+              />
+            )}
           </td>
         </tr>
       );
@@ -428,12 +635,12 @@ const StudentDetailsDashboard = () => {
     onCancelNewFile,
   }) => {
     // Check if the document is a PDF or image
-    const isPDF = url && url.toLowerCase().includes('.pdf');
-    const isImage = url && (url.toLowerCase().includes('.jpg') || url.toLowerCase().includes('.jpeg') || url.toLowerCase().includes('.png') || url.toLowerCase().includes('.gif') || url.toLowerCase().includes('.webp'));
+    const isPDF = url && typeof url === 'string' && url.toLowerCase().includes('.pdf');
+    const isImage = url && typeof url === 'string' && (url.toLowerCase().includes('.jpg') || url.toLowerCase().includes('.jpeg') || url.toLowerCase().includes('.png') || url.toLowerCase().includes('.gif') || url.toLowerCase().includes('.webp'));
 
     // For previous document
-    const prevIsPDF = previousUrl && previousUrl.toLowerCase().includes('.pdf');
-    const prevIsImage = previousUrl && (previousUrl.toLowerCase().includes('.jpg') || previousUrl.toLowerCase().includes('.jpeg') || previousUrl.toLowerCase().includes('.png') || previousUrl.toLowerCase().includes('.gif') || previousUrl.toLowerCase().includes('.webp'));
+    const prevIsPDF = previousUrl && typeof previousUrl === 'string' && previousUrl.toLowerCase().includes('.pdf');
+    const prevIsImage = previousUrl && typeof previousUrl === 'string' && (previousUrl.toLowerCase().includes('.jpg') || previousUrl.toLowerCase().includes('.jpeg') || previousUrl.toLowerCase().includes('.png') || previousUrl.toLowerCase().includes('.gif') || previousUrl.toLowerCase().includes('.webp'));
 
     // For new file
     const newFileUrl = newFile ? URL.createObjectURL(newFile) : null;
@@ -654,7 +861,7 @@ const StudentDetailsDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50">
               {/* Removed LogoutModal rendering since we now use SweetAlert */}
-      {showSuccessModal && <SuccessModal />}
+      
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -1020,11 +1227,14 @@ const StudentDetailsDashboard = () => {
                   />
                   <DetailItem
                     label="Category"
-                    value={`${formData.personal?.category || ""}${formData.personal?.subCategory
-                        ? ` (${formData.personal.subCategory})`
-                        : ""
-                      }`}
+                    value={formData.personal?.category || ""}
                     field="category"
+                    section="personal"
+                  />
+                  <DetailItem
+                    label="Sub Category"
+                    value={formData.personal?.subCategory || ""}
+                    field="subCategory"
                     section="personal"
                   />
                   <DetailItem
@@ -1463,7 +1673,7 @@ const StudentDetailsDashboard = () => {
                           ...prev,
                           documents: {
                             ...prev.documents,
-                            [docField]: URL.createObjectURL(file),
+                            [docField]: file, // Store file object, not blob URL
                           },
                         }));
                         const fieldPath = `documents.${docField}`;

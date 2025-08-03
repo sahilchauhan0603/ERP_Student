@@ -994,11 +994,25 @@ exports.updateDeclinedFields = async (req, res) => {
         }
       );
 
-      return res.json({
-        success: true,
-        message: "Declined fields updated, profile marked pending for review",
-        updatedFields: updatableFields,
-        declinedFields: updatedDeclinedFields,
+      // Fetch updated student data to return the new document URLs
+      db.query("SELECT * FROM students WHERE id = ?", [studentId], (err4, updatedStudent) => {
+        if (err4) {
+          return res.json({
+            success: true,
+            message: "Declined fields updated, profile marked pending for review",
+            updatedFields: updatableFields,
+            declinedFields: updatedDeclinedFields,
+          });
+        }
+        
+        const studentData = updatedStudent[0];
+        return res.json({
+          success: true,
+          message: "Declined fields updated, profile marked pending for review",
+          updatedFields: updatableFields,
+          declinedFields: updatedDeclinedFields,
+          updatedData: studentData, // Include the updated student data with Cloudinary URLs
+        });
       });
     });
   });
