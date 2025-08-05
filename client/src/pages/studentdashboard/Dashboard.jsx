@@ -333,14 +333,15 @@ const StudentDetailsDashboard = () => {
   };
 
   const DetailCard = ({ title, children, section }) => (
-    <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-4 w-full overflow-x-auto">
+    <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-4 w-full">
       <div className="px-4 py-3 bg-blue-50 border-b border-blue-200 flex items-center">
         <h3 className="text-lg font-semibold text-blue-800">{title}</h3>
       </div>
-      <div className="px-0 py-0">
-        <table className="w-full table-fixed">
-          <tbody>{children}</tbody>
-        </table>
+      <div className="px-0 py-0 relative">
+        <div className="w-full">
+          {children}
+        </div>
+        <div className="hidden sm:block absolute top-0 bottom-0 left-1/3 w-px bg-gray-200"></div>
       </div>
     </div>
   );
@@ -369,59 +370,61 @@ const StudentDetailsDashboard = () => {
 
     if (isEditable && isDocument) {
       return (
-        <tr className="border-b last:border-b-0">
-          <td className="py-2 px-6 text-red-600 font-semibold w-1/3 text-left align-top">
-            {label}:
-          </td>
-          <td className="py-2 px-6">
-            <input
-              type="file"
-              accept="image/*,application/pdf"
-              onChange={(e) => {
-                const file = e.target.files[0];
-                if (file) {
-                  setUpdatedDocuments((prev) => ({ ...prev, [field]: file }));
-                  // Store the file object for upload, not the blob URL
-                  setFormData((prev) => ({
-                    ...prev,
-                    documents: {
-                      ...prev.documents,
-                      [field]: file, // Store the file object instead of blob URL
-                    },
-                  }));
-                  const fieldPath = `documents.${field}`;
-                  setUpdatedFields((prev) =>
-                    prev.includes(fieldPath) ? prev : [...prev, fieldPath]
-                  );
-                }
-              }}
-              className="ml-2"
-            />
-            {/* Show preview of existing document or newly selected file */}
-            {(formData.documents?.[field] || value) && (
-              <div className="mt-2">
-                <a
-                  href={typeof formData.documents?.[field] === 'string' 
-                    ? formData.documents[field] 
-                    : formData.documents?.[field] instanceof File 
-                      ? URL.createObjectURL(formData.documents[field])
-                      : value
+        <div className="border-b last:border-b-0 p-4">
+          <div className="flex flex-col sm:flex-row sm:items-start">
+            <div className="text-red-600 font-semibold text-sm sm:text-base min-w-0 flex-shrink-0 sm:w-1/3 sm:pr-4">
+              {label}:
+            </div>
+            <div className="flex-1 min-w-0 sm:pl-4">
+              <input
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setUpdatedDocuments((prev) => ({ ...prev, [field]: file }));
+                    // Store the file object for upload, not the blob URL
+                    setFormData((prev) => ({
+                      ...prev,
+                      documents: {
+                        ...prev.documents,
+                        [field]: file, // Store the file object instead of blob URL
+                      },
+                    }));
+                    const fieldPath = `documents.${field}`;
+                    setUpdatedFields((prev) =>
+                      prev.includes(fieldPath) ? prev : [...prev, fieldPath]
+                    );
                   }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ml-2 text-blue-600 underline text-xs"
-                >
-                  Preview
-                </a>
-                {formData.documents?.[field] instanceof File && (
-                  <span className="ml-2 text-xs text-green-600">
-                    (New file selected)
-                  </span>
-                )}
-              </div>
-            )}
-          </td>
-        </tr>
+                }}
+                className="w-full"
+              />
+              {/* Show preview of existing document or newly selected file */}
+              {(formData.documents?.[field] || value) && (
+                <div className="mt-2">
+                  <a
+                    href={typeof formData.documents?.[field] === 'string' 
+                      ? formData.documents[field] 
+                      : formData.documents?.[field] instanceof File 
+                        ? URL.createObjectURL(formData.documents[field])
+                        : value
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline text-xs"
+                  >
+                    Preview
+                  </a>
+                  {formData.documents?.[field] instanceof File && (
+                    <span className="ml-2 text-xs text-green-600">
+                      (New file selected)
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       );
     }
 
@@ -468,157 +471,160 @@ const StudentDetailsDashboard = () => {
       const isDateField = shouldUseDatePicker();
 
       return (
-        <tr className="border-b last:border-b-0">
-          <td className="py-2 px-6 text-red-600 font-semibold w-1/3 text-left align-top">
-            {label}:
-          </td>
-          <td className="py-2 px-6">
-            {isDropdownField ? (
-              <select
-                value={localValue}
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  setLocalValue(newValue);
-                  if (subSection) {
-                    setFormData((prev) => ({
-                      ...prev,
-                      [section]: {
-                        ...prev[section],
-                        [subSection]: {
-                          ...prev[section]?.[subSection],
+        <div className="border-b last:border-b-0 p-4">
+          <div className="flex flex-col sm:flex-row sm:items-start">
+            <div className="text-red-600 font-semibold text-sm sm:text-base min-w-0 flex-shrink-0 sm:w-1/3 sm:pr-4">
+              {label}:
+            </div>
+            <div className="flex-1 min-w-0 sm:pl-4">
+              {isDropdownField ? (
+                <select
+                  value={localValue}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setLocalValue(newValue);
+                    if (subSection) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        [section]: {
+                          ...prev[section],
+                          [subSection]: {
+                            ...prev[section]?.[subSection],
+                            [field]: newValue,
+                          },
+                        },
+                      }));
+                    } else {
+                      setFormData((prev) => ({
+                        ...prev,
+                        [section]: {
+                          ...prev[section],
                           [field]: newValue,
                         },
-                      },
-                    }));
-                  } else {
-                    setFormData((prev) => ({
-                      ...prev,
-                      [section]: {
-                        ...prev[section],
-                        [field]: newValue,
-                      },
-                    }));
-                  }
-                  // Track updated fields
-                  const fieldPath = subSection
-                    ? `${section}.${subSection}.${field}`
-                    : `${section}.${field}`;
-                  if (declinedFields.includes(fieldPath)) {
-                    if (!updatedFields.includes(fieldPath)) {
-                      setUpdatedFields((prev) => [...prev, fieldPath]);
+                      }));
                     }
-                  }
-                }}
-                className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
-              >
-                <option value="">Select {label}</option>
-                {dropdownOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            ) : isDateField ? (
-              <input
-                type="date"
-                value={localValue}
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  setLocalValue(newValue);
-                  if (subSection) {
-                    setFormData((prev) => ({
-                      ...prev,
-                      [section]: {
-                        ...prev[section],
-                        [subSection]: {
-                          ...prev[section]?.[subSection],
+                    // Track updated fields
+                    const fieldPath = subSection
+                      ? `${section}.${subSection}.${field}`
+                      : `${section}.${field}`;
+                    if (declinedFields.includes(fieldPath)) {
+                      if (!updatedFields.includes(fieldPath)) {
+                        setUpdatedFields((prev) => [...prev, fieldPath]);
+                      }
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
+                >
+                  <option value="">Select {label}</option>
+                  {dropdownOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              ) : isDateField ? (
+                <input
+                  type="date"
+                  value={localValue}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setLocalValue(newValue);
+                    if (subSection) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        [section]: {
+                          ...prev[section],
+                          [subSection]: {
+                            ...prev[section]?.[subSection],
+                            [field]: newValue,
+                          },
+                        },
+                      }));
+                    } else {
+                      setFormData((prev) => ({
+                        ...prev,
+                        [section]: {
+                          ...prev[section],
                           [field]: newValue,
                         },
-                      },
-                    }));
-                  } else {
-                    setFormData((prev) => ({
-                      ...prev,
-                      [section]: {
-                        ...prev[section],
-                        [field]: newValue,
-                      },
-                    }));
-                  }
-                  // Track updated fields
-                  const fieldPath = subSection
-                    ? `${section}.${subSection}.${field}`
-                    : `${section}.${field}`;
-                  if (declinedFields.includes(fieldPath)) {
-                    if (!updatedFields.includes(fieldPath)) {
-                      setUpdatedFields((prev) => [...prev, fieldPath]);
+                      }));
                     }
-                  }
-                }}
-                className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
-                max={new Date().toISOString().split('T')[0]} // Prevent future dates
-              />
-            ) : (
-              <input
-                type="text"
-                value={localValue}
-                onChange={(e) => setLocalValue(e.target.value)}
-                onBlur={(e) => {
-                  const newValue = e.target.value;
-                  if (subSection) {
-                    setFormData((prev) => ({
-                      ...prev,
-                      [section]: {
-                        ...prev[section],
-                        [subSection]: {
-                          ...prev[section]?.[subSection],
+                    // Track updated fields
+                    const fieldPath = subSection
+                      ? `${section}.${subSection}.${field}`
+                      : `${section}.${field}`;
+                    if (declinedFields.includes(fieldPath)) {
+                      if (!updatedFields.includes(fieldPath)) {
+                        setUpdatedFields((prev) => [...prev, fieldPath]);
+                      }
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
+                  max={new Date().toISOString().split('T')[0]} // Prevent future dates
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={localValue}
+                  onChange={(e) => setLocalValue(e.target.value)}
+                  onBlur={(e) => {
+                    const newValue = e.target.value;
+                    if (subSection) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        [section]: {
+                          ...prev[section],
+                          [subSection]: {
+                            ...prev[section]?.[subSection],
+                            [field]: newValue,
+                          },
+                        },
+                      }));
+                    } else {
+                      setFormData((prev) => ({
+                        ...prev,
+                        [section]: {
+                          ...prev[section],
                           [field]: newValue,
                         },
-                      },
-                    }));
-                  } else {
-                    setFormData((prev) => ({
-                      ...prev,
-                      [section]: {
-                        ...prev[section],
-                        [field]: newValue,
-                      },
-                    }));
-                  }
-                  // Track updated fields
-                  const fieldPath = subSection
-                    ? `${section}.${subSection}.${field}`
-                    : `${section}.${field}`;
-                  if (declinedFields.includes(fieldPath)) {
-                    if (!updatedFields.includes(fieldPath)) {
-                      setUpdatedFields((prev) => [...prev, fieldPath]);
+                      }));
                     }
-                  }
-                }}
-                className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
-              />
-            )}
-          </td>
-        </tr>
+                    // Track updated fields
+                    const fieldPath = subSection
+                      ? `${section}.${subSection}.${field}`
+                      : `${section}.${field}`;
+                    if (declinedFields.includes(fieldPath)) {
+                      if (!updatedFields.includes(fieldPath)) {
+                        setUpdatedFields((prev) => [...prev, fieldPath]);
+                      }
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
+                />
+              )}
+            </div>
+          </div>
+        </div>
       );
     }
 
     return (
-      <tr className="border-b last:border-b-0">
-        <td
-          className={`py-2 px-4 text-gray-600 font-medium align-top border-r border-gray-200 break-words max-w-[120px] ${isDeclined ? "text-red-600" : ""
-            }`}
-        >
-          {label}:
-        </td>
-        <td
-          className={`py-2 px-4 text-gray-900 font-semibold align-top break-words max-w-[220px] ${isDeclined ? "text-red-600" : ""
-            }`}
-          style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
-        >
-          {displayValue || <span className="text-gray-400 italic">N/A</span>}
-        </td>
-      </tr>
+      <div className="border-b last:border-b-0 p-4">
+        <div className="flex flex-col sm:flex-row sm:items-start">
+          <div
+            className={`text-gray-600 font-medium text-sm sm:text-base min-w-0 flex-shrink-0 sm:w-1/3 sm:pr-4 ${isDeclined ? "text-red-600" : ""
+              }`}
+          >
+            {label}:
+          </div>
+          <div
+            className={`text-gray-900 font-semibold text-sm sm:text-base flex-1 min-w-0 break-words sm:pl-4 ${isDeclined ? "text-red-600" : ""
+              }`}
+          >
+            {displayValue || <span className="text-gray-400 italic">N/A</span>}
+          </div>
+        </div>
+      </div>
     );
   };
 
@@ -859,11 +865,11 @@ const StudentDetailsDashboard = () => {
     hasTenth && hasTwelfth ? ((tenth + twelfth) / 2).toFixed(2) : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50 overflow-x-hidden">
               {/* Removed LogoutModal rendering since we now use SweetAlert */}
       
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-8 w-full">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
@@ -1047,7 +1053,7 @@ const StudentDetailsDashboard = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full">
           <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border-t-4 border-blue-400">
             <div className="flex items-center">
               <div className="p-3 rounded-lg bg-blue-100 text-blue-600 mr-4">
@@ -1142,7 +1148,7 @@ const StudentDetailsDashboard = () => {
 
         {/* Main Content Tabs */}
         <Tab.Group selectedIndex={activeTab} onChange={setActiveTab}>
-          <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/10 p-1 mb-6">
+          <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/10 p-1 mb-6 w-full">
             {["Personal", "Parent", "Academic", "Documents"].map((category) => {
               const sectionKey = category.toLowerCase();
               const hasDeclinedFields = declinedSections.has(sectionKey);
@@ -1187,7 +1193,7 @@ const StudentDetailsDashboard = () => {
               className="rounded-xl p-2 bg-white shadow"
               style={{ minHeight: 0, background: "#fff" }}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3 w-full">
                 <DetailCard title="Basic Information" section="personal">
                   <DetailItem
                     label="First Name"
@@ -1315,7 +1321,7 @@ const StudentDetailsDashboard = () => {
 
             {/* Parent Information Tab */}
             <Tab.Panel className="rounded-xl bg-white p-2 shadow">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                 <DetailCard title="Father's Details" section="parent">
                   <DetailItem
                     label="Name"
@@ -1468,7 +1474,7 @@ const StudentDetailsDashboard = () => {
 
             {/* Academic Information Tab */}
             <Tab.Panel className="rounded-xl bg-white p-2 shadow">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                 <DetailCard title="Class X Details" section="academic">
                   <DetailItem
                     label="Institute"
@@ -1553,7 +1559,7 @@ const StudentDetailsDashboard = () => {
                 </DetailCard>
 
                 {details.academic?.otherQualification?.institute && (
-                  <DetailCard title="Other Qualification" section="academic">
+                  <DetailCard title="Other Qualification" section="academic" className="w-full">
                     <DetailItem
                       label="Institute"
                       value={formData.academic.otherQualification.institute}
@@ -1593,7 +1599,7 @@ const StudentDetailsDashboard = () => {
                 )}
 
                 {details.academic?.academicAchievements?.length > 0 && (
-                  <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-4 w-full overflow-x-auto">
+                  <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-4 w-full">
                     <div className="px-4 py-3 bg-blue-50 border-b border-blue-200 flex items-center">
                       <h3 className="text-lg font-semibold text-blue-800">
                         Academic Achievements
@@ -1621,7 +1627,7 @@ const StudentDetailsDashboard = () => {
                 )}
 
                 {details.academic?.coCurricularAchievements?.length > 0 && (
-                  <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-4 w-full overflow-x-auto">
+                  <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-4 w-full">
                     <div className="px-4 py-3 bg-blue-50 border-b border-blue-200 flex items-center">
                       <h3 className="text-lg font-semibold text-blue-800">
                         Co-Curricular Achievements
@@ -1652,7 +1658,7 @@ const StudentDetailsDashboard = () => {
 
             {/* Documents Tab */}
             <Tab.Panel className="rounded-xl bg-white p-6 shadow">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
                 {Object.entries(details.documents || {}).map(([field, url]) => (
                   <DocumentCard
                     key={field}
