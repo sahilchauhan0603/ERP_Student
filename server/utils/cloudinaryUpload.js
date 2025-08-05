@@ -7,7 +7,6 @@ const uploadToCloudinary = (fileBuffer, fileName, folder = 'student_uploads') =>
       // Determine file type
       const fileExtension = fileName.split('.').pop().toLowerCase();
       const isPDF = fileExtension === 'pdf';
-      const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension);
 
       const uploadOptions = {
         folder,
@@ -27,13 +26,8 @@ const uploadToCloudinary = (fileBuffer, fileName, folder = 'student_uploads') =>
           if (error) {
             return reject(error);
           }
-
-          if (isPDF) {
-            const url = `https://res.cloudinary.com/${cloudinary.config().cloud_name}/raw/upload/${result.public_id}.${result.format}`;
-            resolve(url);
-          } else {
-            resolve(result.secure_url);
-          }
+          // Always use result.secure_url for all file types
+          resolve(result.secure_url);
         }
       );
 

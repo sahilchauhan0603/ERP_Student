@@ -27,12 +27,12 @@ const StudentDetailsDashboard = () => {
   const categoryOptions = ["SC", "ST", "OBC", "GEN", "PwD", "EWS"];
   const subCategoryOptions = ["Kashmiri Migrant", "Defence", "J&K (PMSSS)", "None"];
   const regionOptions = ["Delhi", "Outside Delhi"];
-  
+
   // Academic dropdown options
   const boardOptions = [
     "CBSE", "ICSE", "IB", "State Board", "Other"
   ];
-  
+
   // Generate year options (from 1950 to current year + 1)
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: currentYear - 1950 + 2 }, (_, i) => (1950 + i).toString());
@@ -72,7 +72,7 @@ const StudentDetailsDashboard = () => {
               formattedData.personal.dob = dobDate.toISOString().split('T')[0];
             }
           }
-          
+
           setDetails(response.data.data);
           setFormData(formattedData);
           if (response.data.data.declinedFields) {
@@ -90,7 +90,7 @@ const StudentDetailsDashboard = () => {
               formattedData.personal.dob = dobDate.toISOString().split('T')[0];
             }
           }
-          
+
           setDetails(response.data);
           setFormData(formattedData);
         }
@@ -206,13 +206,17 @@ const StudentDetailsDashboard = () => {
         if (!updateData[section]) updateData[section] = {};
         updateData[section][field] = formData[section]?.[field];
       });
+
+      // Ensure documents object exists in updateData
+      if (!updateData.documents) updateData.documents = {};
+
       // Prepare FormData if there are updated documents
       let dataToSend = { data: updateData };
       if (Object.keys(updatedDocuments).length > 0) {
         const formDataObj = new FormData();
         formDataObj.append("data", JSON.stringify(updateData));
         Object.entries(updatedDocuments).forEach(([field, file]) => {
-          formDataObj.append(field, file);
+          formDataObj.append(`documents.${field}`, file);
         });
         dataToSend = formDataObj;
       }
@@ -232,12 +236,12 @@ const StudentDetailsDashboard = () => {
         // Update the formData with the server response data
         // This ensures we have the Cloudinary URLs instead of File objects
         const updatedFormData = { ...formData };
-        
+
         // Update documents with Cloudinary URLs from server response
         if (response.data.updatedData) {
           // Use the updated data from server which contains Cloudinary URLs
           const serverData = response.data.updatedData;
-          
+
           // Update documents with the new Cloudinary URLs
           if (serverData.documents) {
             if (!updatedFormData.documents) updatedFormData.documents = {};
@@ -247,7 +251,7 @@ const StudentDetailsDashboard = () => {
               }
             });
           }
-          
+
           // Update other sections if they were modified
           ['personal', 'academic', 'parent'].forEach(section => {
             if (serverData[section]) {
@@ -255,7 +259,7 @@ const StudentDetailsDashboard = () => {
             }
           });
         }
-        
+
         setDetails((prev) => ({
           ...prev,
           ...updatedFormData,
@@ -270,7 +274,7 @@ const StudentDetailsDashboard = () => {
           final: { loading: false, success: true },
         }));
         setUpdatedDocuments({});
-        
+
         // Show success SweetAlert
         Swal.fire({
           icon: "success",
@@ -403,9 +407,9 @@ const StudentDetailsDashboard = () => {
               {(formData.documents?.[field] || value) && (
                 <div className="mt-2">
                   <a
-                    href={typeof formData.documents?.[field] === 'string' 
-                      ? formData.documents[field] 
-                      : formData.documents?.[field] instanceof File 
+                    href={typeof formData.documents?.[field] === 'string'
+                      ? formData.documents[field]
+                      : formData.documents?.[field] instanceof File
                         ? URL.createObjectURL(formData.documents[field])
                         : value
                     }
@@ -866,8 +870,8 @@ const StudentDetailsDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50 overflow-x-hidden">
-              {/* Removed LogoutModal rendering since we now use SweetAlert */}
-      
+      {/* Removed LogoutModal rendering since we now use SweetAlert */}
+
 
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-8 w-full">
         {/* Header */}
@@ -888,8 +892,8 @@ const StudentDetailsDashboard = () => {
               <button
                 onClick={handleEditToggle}
                 className={`px-4 py-2 rounded-lg transition-all shadow-sm ${editMode
-                    ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                    : "bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700"
+                  ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                  : "bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700"
                   }`}
               >
                 {editMode ? "Cancel Editing" : "Update Profile"}
@@ -920,10 +924,10 @@ const StudentDetailsDashboard = () => {
         {/* Student Profile Summary */}
         <div
           className={`rounded-xl shadow-lg overflow-hidden mb-8 ${details.personal?.status === "declined"
-              ? "bg-gradient-to-r from-red-500 to-red-600"
-              : details.personal?.status === "approved"
-                ? "bg-gradient-to-r from-green-500 to-green-600"
-                : "bg-gradient-to-r from-orange-400 to-yellow-400"
+            ? "bg-gradient-to-r from-red-500 to-red-600"
+            : details.personal?.status === "approved"
+              ? "bg-gradient-to-r from-green-500 to-green-600"
+              : "bg-gradient-to-r from-orange-400 to-yellow-400"
             }`}
         >
           <div className="p-6 flex flex-col md:flex-row items-center">
@@ -992,10 +996,10 @@ const StudentDetailsDashboard = () => {
                 )}
                 <span
                   className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${details.personal?.status === "approved"
-                      ? "bg-green-100 text-green-800"
-                      : details.personal?.status === "declined"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-orange-100 text-orange-800"
+                    ? "bg-green-100 text-green-800"
+                    : details.personal?.status === "declined"
+                      ? "bg-red-100 text-red-800"
+                      : "bg-orange-100 text-orange-800"
                     }`}
                 >
                   {details.personal?.status?.toUpperCase() || "PENDING"}
@@ -1724,8 +1728,8 @@ const StudentDetailsDashboard = () => {
                 !allDeclinedFieldsUpdated() || saveStatus.final?.loading
               }
               className={`px-6 py-3 text-white font-medium rounded-lg transition-all shadow-lg flex items-center gap-2 ${allDeclinedFieldsUpdated()
-                  ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
-                  : "bg-gray-400 cursor-not-allowed"
+                ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                : "bg-gray-400 cursor-not-allowed"
                 }`}
             >
               {saveStatus.final?.loading ? (

@@ -887,40 +887,55 @@ exports.updateDeclinedFields = async (req, res) => {
       });
     }
 
-    // In updateDeclinedFields, flatten data before matching
-    const flatData = flattenObject(data);
-    const updatableFields = Object.keys(flatData).filter((field) =>
-      declinedFields.includes(normalizeDeclinedField(field))
-    );
-    if (updatableFields.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No declined fields specified for update",
-      });
-    }
+    // Ensure data.documents exists
+    if (!data.documents) data.documents = {};
 
     // Handle file uploads (if any)
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const field = file.fieldname;
         
-        if (declinedFields.includes(`documents.${field}`)) {
+        // Check if this is a document field and if it's in declined fields
+        if (field.startsWith('documents.') && declinedFields.includes(field)) {
+          const docField = field.replace('documents.', '');
           // Upload to Cloudinary
           try {
             const url = await uploadToCloudinary(
               file.buffer,
-              `${field}_${Date.now()}_${file.originalname}`
+              `${docField}_${Date.now()}_${file.originalname}`
             );
-            if (!data.documents) data.documents = {};
-            data.documents[field] = url;
+            data.documents[docField] = url;
           } catch (e) {
             // Failed to upload field
             return res
               .status(500)
-              .json({ success: false, message: `Failed to upload ${field}: ${e.message}` });
+              .json({ success: false, message: `Failed to upload ${docField}: ${e.message}` });
           }
         }
       }
+    }
+
+    // Now flatten data after processing files
+    const flatData = flattenObject(data);
+    console.log('Declined fields:', declinedFields);
+    console.log('Flattened data keys:', Object.keys(flatData));
+    console.log('Data documents:', data.documents);
+    
+    const updatableFields = Object.keys(flatData).filter((field) =>
+      declinedFields.includes(normalizeDeclinedField(field))
+    );
+    console.log('Updatable fields:', updatableFields);
+    
+    if (updatableFields.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No declined fields specified for update",
+        debug: {
+          declinedFields,
+          flatDataKeys: Object.keys(flatData),
+          dataDocuments: data.documents
+        }
+      });
     }
 
     // Prepare updates for SQL
