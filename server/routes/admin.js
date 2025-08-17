@@ -1,48 +1,84 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const adminController = require('../controllers/adminController');
-const { authenticate, authorizeRole } = require('../middleware/auth');
-const { otpLimiter } = require('../controllers/adminController');
+const adminController = require("../controllers/adminController");
+const { authenticate, authorizeRole } = require("../middleware/auth");
+const { otpLimiter } = require("../controllers/adminController");
 
 // Simple auth check endpoint (no authentication required)
-router.get('/auth-check', (req, res) => {
+router.get("/auth-check", (req, res) => {
   const token = req.cookies && req.cookies.token;
   if (!token) {
     return res.status(401).json({ authenticated: false });
   }
-  
-  const { verifyToken } = require('../utils/jwt');
+
+  const { verifyToken } = require("../utils/jwt");
   const payload = verifyToken(token);
-  if (!payload || payload.role !== 'admin') {
+  if (!payload || payload.role !== "admin") {
     return res.status(401).json({ authenticated: false });
   }
-  
-  res.json({ authenticated: true, role: 'admin' });
+
+  res.json({ authenticated: true, role: "admin" });
 });
 
-// Admin dashboard stats
-router.get('/stats', authenticate, authorizeRole('admin'), adminController.getStudentStats);
+// Dashboard stats Route
+router.get(
+  "/stats",
+  authenticate,
+  authorizeRole("admin"),
+  adminController.getStudentStats
+);
 
-// Admin endpoints
-router.get('/list', authenticate, authorizeRole('admin'), adminController.listAllStudents);
+// This route is not required currently
+router.get(
+  "/list",
+  authenticate,
+  authorizeRole("admin"),
+  adminController.listAllStudents
+);
 
-router.post('/verify-student', authenticate, authorizeRole('admin'), adminController.updateStudentStatus);
+// Update student status Route (approve/decline)
+router.post(
+  "/verify-student",
+  authenticate,
+  authorizeRole("admin"),
+  adminController.updateStudentStatus
+);
 
 // Admin OTP login endpoints
-router.post('/send-otp', otpLimiter, adminController.sendAdminOtp);
-router.post('/verify-otp', otpLimiter, adminController.verifyAdminOtp);
-router.post('/logout', adminController.logout);
+router.post("/send-otp", otpLimiter, adminController.sendAdminOtp);
+router.post("/verify-otp", otpLimiter, adminController.verifyAdminOtp);
+router.post("/logout", adminController.logout);
 
-// Filtered students by status
-router.get('/list/:status', authenticate, authorizeRole('admin'), adminController.listStudentsByStatus);
+// Filtered students by status -> Pending/Approved/Declined Table
+router.get(
+  "/list/:status",
+  authenticate,
+  authorizeRole("admin"),
+  adminController.listStudentsByStatus
+);
 
-// Search students by name or email
-router.get('/search', authenticate, authorizeRole('admin'), adminController.searchStudents);
+// Search students by name/email/gender/course/id -> Search Bars
+router.get(
+  "/search",
+  authenticate,
+  authorizeRole("admin"),
+  adminController.searchStudents
+);
 
-// Get full details of a student (all registration sections)
-router.get('/student-details/:studentId', authenticate, authorizeRole('admin'), adminController.getStudentFullDetails);
+// Get full details of a student (all registration sections) -> AllStudents table
+router.get(
+  "/student-details/:studentId",
+  authenticate,
+  authorizeRole("admin"),
+  adminController.getStudentFullDetails
+);
 
-// Admin profile endpoint
-router.get('/me', authenticate, authorizeRole('admin'), adminController.getAdminProfile);
+// Admin profile endpoint -> for getting the email of the logged in user
+router.get(
+  "/me",
+  authenticate,
+  authorizeRole("admin"),
+  adminController.getAdminProfile
+);
 
 module.exports = router;

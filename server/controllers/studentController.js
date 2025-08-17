@@ -9,15 +9,13 @@ const { signToken } = require("../utils/jwt");
 const rateLimit = require("express-rate-limit");
 
 const otpLimiter = rateLimit({
-  windowMs: 30 * 60 * 1000, // 10 minutes
-  max: 15, // limit each IP to 5 requests per windowMs
+  windowMs: 30 * 60 * 1000, // 30 minutes
+  max: 15, // limit each IP to 15 requests per windowMs
   message: { message: "Too many OTP requests, please try again later." },
   standardHeaders: true,
   legacyHeaders: false,
 });
 module.exports.otpLimiter = otpLimiter;
-
-// const Student = require('../modals/student');
 
 // --- Student Profile ---
 exports.getStudentProfile = (req, res) => {
@@ -145,6 +143,15 @@ exports.sendLoginOtp = async (req, res) => {
   );
 };
 
+exports.logout = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
+  res.json({ message: "Logged out successfully" });
+};
+
 // List of all document fields
 const docFields = [
   "photo",
@@ -166,10 +173,8 @@ const docFields = [
   "collegeFeeReceipt",
   "parentSignature",
 ];
-
 exports.registerStudent = async (req, res) => {
   try {
-
     // Parse JSON fields for achievements
     let academicAchievements =
       req.body["academicAchievements"] ||
@@ -289,78 +294,89 @@ exports.registerStudent = async (req, res) => {
     };
 
     // Check for duplicate email or abcId
-    const duplicateCheckSql = "SELECT id FROM students WHERE email = ? OR abcId = ? LIMIT 1";
-    db.query(duplicateCheckSql, [student.email, student.abcId], (dupErr, dupResults) => {
-      if (dupErr) {
-        // Database duplicate check error
-        return res.status(500).json({ message: "Database error", error: dupErr });
-      }
-      if (dupResults && dupResults.length > 0) {
-        return res.status(400).json({ message: "A user with this email or ABC ID already exists. Please enter a valid email and ABC ID." });
-      }
-
-      // Calculate batch based on created_at and course
-      function calculateBatch(createdAt, course) {
-        const year = new Date(createdAt).getFullYear();
-        let endYear;
-        
-        // Safety check for course parameter
-        if (!course || typeof course !== 'string') {
-          endYear = year + 4; // Default to 4 years
-        } else if (
-          course.startsWith("B.Tech") ||
-          course.startsWith("LE-B.Tech")
-        ) {
-          endYear = year + 4;
-        } else if (course === "BBA" || course === "MBA") {
-          endYear = year + 3;
-        } else {
-          endYear = year + 3;
+    const duplicateCheckSql =
+      "SELECT id FROM students WHERE email = ? OR abcId = ? LIMIT 1";
+    db.query(
+      duplicateCheckSql,
+      [student.email, student.abcId],
+      (dupErr, dupResults) => {
+        if (dupErr) {
+          // Database duplicate check error
+          return res
+            .status(500)
+            .json({ message: "Database error", error: dupErr });
         }
-        return `${year}-${endYear}`;
-      }
-
-      // Use current date for created_at (will match DB default)
-      const createdAt = new Date();
-      student.batch = calculateBatch(createdAt, student.course);
-      student.created_at = createdAt;
-
-      // Insert into DB
-      
-      const sql = "INSERT INTO students SET ?";
-      db.query(sql, student, async (err, result) => {
-        if (err) {
-          // Database insert error
-          return res.status(500).json({ message: "Database error", error: err });
-        }
-
-        
-        // Send confirmation email to the student
-        try {
-          const studentName = `${student.firstName} ${student.lastName}`;
-          const emailHtml = sendRegistrationEmail(student.email, studentName, result.insertId);
-          
-          await sendEmail({
-            to: student.email,
-            subject: "Registration Confirmation - Welcome to BPIT! 🎓",
-            html: emailHtml
+        if (dupResults && dupResults.length > 0) {
+          return res.status(400).json({
+            message:
+              "A user with this email or ABC ID already exists. Please enter a valid email and ABC ID.",
           });
-          
-
-        } catch (emailError) {
-          // Failed to send confirmation email
-          // Don't fail the registration if email fails
         }
-        
-        res
-          .status(201)
-          .json({
+
+        // Calculate batch based on created_at and course
+        function calculateBatch(createdAt, course) {
+          const year = new Date(createdAt).getFullYear();
+          let endYear;
+
+          // Safety check for course parameter
+          if (!course || typeof course !== "string") {
+            endYear = year + 4; // Default to 4 years
+          } else if (
+            course.startsWith("B.Tech") ||
+            course.startsWith("LE-B.Tech")
+          ) {
+            endYear = year + 4;
+          } else if (course === "BBA" || course === "MBA") {
+            endYear = year + 3;
+          } else {
+            endYear = year + 3;
+          }
+          return `${year}-${endYear}`;
+        }
+
+        // Use current date for created_at (will match DB default)
+        const createdAt = new Date();
+        student.batch = calculateBatch(createdAt, student.course);
+        student.created_at = createdAt;
+
+        // Insert into DB
+
+        const sql = "INSERT INTO students SET ?";
+        db.query(sql, student, async (err, result) => {
+          if (err) {
+            // Database insert error
+            return res
+              .status(500)
+              .json({ message: "Database error", error: err });
+          }
+
+          // Send confirmation email to the student
+          try {
+            const studentName = `${student.firstName} ${student.lastName}`;
+            const emailHtml = sendRegistrationEmail(
+              student.email,
+              studentName,
+              result.insertId
+            );
+
+            await sendEmail({
+              to: student.email,
+              subject: "Registration Confirmation - Welcome to BPIT! 🎓",
+              html: emailHtml,
+            });
+          } catch (emailError) {
+            // Failed to send confirmation email
+            // Don't fail the registration if email fails
+          }
+
+          res.status(201).json({
             success: true,
             message: "Student registered successfully",
             studentId: result.insertId,
           });
-      });
-    });
+        });
+      }
+    );
   } catch (error) {
     // Register student error
     res.status(500).json({ message: "Server error", error });
@@ -831,7 +847,7 @@ exports.getStudentDetailsMe = (req, res) => {
   );
 };
 
-// PATCH /student/students/me/update-declined
+// update declined fields
 exports.updateDeclinedFields = async (req, res) => {
   const studentId = req.user && req.user.id;
   let data;
@@ -894,10 +910,10 @@ exports.updateDeclinedFields = async (req, res) => {
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const field = file.fieldname;
-        
+
         // Check if this is a document field and if it's in declined fields
-        if (field.startsWith('documents.') && declinedFields.includes(field)) {
-          const docField = field.replace('documents.', '');
+        if (field.startsWith("documents.") && declinedFields.includes(field)) {
+          const docField = field.replace("documents.", "");
           // Upload to Cloudinary
           try {
             const url = await uploadToCloudinary(
@@ -907,9 +923,10 @@ exports.updateDeclinedFields = async (req, res) => {
             data.documents[docField] = url;
           } catch (e) {
             // Failed to upload field
-            return res
-              .status(500)
-              .json({ success: false, message: `Failed to upload ${docField}: ${e.message}` });
+            return res.status(500).json({
+              success: false,
+              message: `Failed to upload ${docField}: ${e.message}`,
+            });
           }
         }
       }
@@ -917,15 +934,15 @@ exports.updateDeclinedFields = async (req, res) => {
 
     // Now flatten data after processing files
     const flatData = flattenObject(data);
-    console.log('Declined fields:', declinedFields);
-    console.log('Flattened data keys:', Object.keys(flatData));
-    console.log('Data documents:', data.documents);
-    
+    console.log("Declined fields:", declinedFields);
+    console.log("Flattened data keys:", Object.keys(flatData));
+    console.log("Data documents:", data.documents);
+
     const updatableFields = Object.keys(flatData).filter((field) =>
       declinedFields.includes(normalizeDeclinedField(field))
     );
-    console.log('Updatable fields:', updatableFields);
-    
+    console.log("Updatable fields:", updatableFields);
+
     if (updatableFields.length === 0) {
       return res.status(400).json({
         success: false,
@@ -933,8 +950,8 @@ exports.updateDeclinedFields = async (req, res) => {
         debug: {
           declinedFields,
           flatDataKeys: Object.keys(flatData),
-          dataDocuments: data.documents
-        }
+          dataDocuments: data.documents,
+        },
       });
     }
 
@@ -967,12 +984,10 @@ exports.updateDeclinedFields = async (req, res) => {
     db.query(sql, values, (err2, result2) => {
       if (err2) {
         // Error updating declined fields
-        return res
-          .status(500)
-          .json({
-            success: false,
-            message: "Failed to update declined fields",
-          });
+        return res.status(500).json({
+          success: false,
+          message: "Failed to update declined fields",
+        });
       }
 
       // Send email to student notifying profile update and resubmission
@@ -1010,53 +1025,66 @@ exports.updateDeclinedFields = async (req, res) => {
       );
 
       // Fetch updated student data to return the new document URLs
-      db.query("SELECT * FROM students WHERE id = ?", [studentId], (err4, updatedStudent) => {
-        if (err4) {
+      db.query(
+        "SELECT * FROM students WHERE id = ?",
+        [studentId],
+        (err4, updatedStudent) => {
+          if (err4) {
+            return res.json({
+              success: true,
+              message:
+                "Declined fields updated, profile marked pending for review",
+              updatedFields: updatableFields,
+              declinedFields: updatedDeclinedFields,
+            });
+          }
+
+          const studentData = updatedStudent[0];
           return res.json({
             success: true,
-            message: "Declined fields updated, profile marked pending for review",
+            message:
+              "Declined fields updated, profile marked pending for review",
             updatedFields: updatableFields,
             declinedFields: updatedDeclinedFields,
+            updatedData: studentData, // Include the updated student data with Cloudinary URLs
           });
         }
-        
-        const studentData = updatedStudent[0];
-        return res.json({
-          success: true,
-          message: "Declined fields updated, profile marked pending for review",
-          updatedFields: updatableFields,
-          declinedFields: updatedDeclinedFields,
-          updatedData: studentData, // Include the updated student data with Cloudinary URLs
-        });
-      });
+      );
     });
   });
-};
-
-exports.logout = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-  });
-  res.json({ message: "Logged out successfully" });
 };
 
 // Real-time uniqueness check endpoints
 exports.checkEmailExists = (req, res) => {
   const { email } = req.query;
-  if (!email) return res.status(400).json({ exists: false, message: "Email is required" });
-  db.query("SELECT id FROM students WHERE email = ?", [email], (err, results) => {
-    if (err) return res.status(500).json({ exists: false, message: "DB error" });
-    res.json({ exists: results.length > 0 });
-  });
+  if (!email)
+    return res
+      .status(400)
+      .json({ exists: false, message: "Email is required" });
+  db.query(
+    "SELECT id FROM students WHERE email = ?",
+    [email],
+    (err, results) => {
+      if (err)
+        return res.status(500).json({ exists: false, message: "DB error" });
+      res.json({ exists: results.length > 0 });
+    }
+  );
 };
 
 exports.checkAbcIdExists = (req, res) => {
   const { abcId } = req.query;
-  if (!abcId) return res.status(400).json({ exists: false, message: "ABC ID is required" });
-  db.query("SELECT id FROM students WHERE abcId = ?", [abcId], (err, results) => {
-    if (err) return res.status(500).json({ exists: false, message: "DB error" });
-    res.json({ exists: results.length > 0 });
-  });
+  if (!abcId)
+    return res
+      .status(400)
+      .json({ exists: false, message: "ABC ID is required" });
+  db.query(
+    "SELECT id FROM students WHERE abcId = ?",
+    [abcId],
+    (err, results) => {
+      if (err)
+        return res.status(500).json({ exists: false, message: "DB error" });
+      res.json({ exists: results.length > 0 });
+    }
+  );
 };

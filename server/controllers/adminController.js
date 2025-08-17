@@ -1,4 +1,3 @@
-// All admin logic separated from student logic
 const sendStatusEmail = require("../utils/sendStatusEmail");
 const adminOTPMailer = require("../utils/adminOTPMailer");
 const { signToken } = require("../utils/jwt");
@@ -9,18 +8,15 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
 const rateLimit = require("express-rate-limit");
 
 const otpLimiter = rateLimit({
-  windowMs: 30 * 60 * 1000, // 10 minutes
-  max: 15, // limit each IP to 5 requests per windowMs
+  windowMs: 30 * 60 * 1000, // 30 minutes
+  max: 15,                  // limit each IP to 15 requests per windowMs
   message: { message: "Too many OTP requests, please try again later." },
   standardHeaders: true,
   legacyHeaders: false,
 });
 module.exports.otpLimiter = otpLimiter;
-
-// --- Admin Dashboard/Student Management ---
 const db = require("../config/db");
 
-// --- Admin OTP Login ---
 const adminOtpStore = {};
 
 exports.sendAdminOtp = async (req, res) => {
@@ -329,20 +325,24 @@ exports.listStudentsByStatus = (req, res) => {
   }
   dataQuery += " ORDER BY id DESC LIMIT ? OFFSET ?";
   params.push(limit, offset);
-  db.query(countQuery, batch ? [status, batch] : [status], (err, countResult) => {
-    if (err) return res.status(500).json({ message: "DB error", error: err });
-    const total = countResult[0].total;
-    const totalPages = Math.ceil(total / limit);
-    db.query(dataQuery, params, (err2, results) => {
-      if (err2)
-        return res.status(500).json({ message: "DB error", error: err2 });
-      const students = results.map((s) => ({
-        ...s,
-        declinedFields: s.declinedFields ? JSON.parse(s.declinedFields) : [],
-      }));
-      res.json({ students, totalPages });
-    });
-  });
+  db.query(
+    countQuery,
+    batch ? [status, batch] : [status],
+    (err, countResult) => {
+      if (err) return res.status(500).json({ message: "DB error", error: err });
+      const total = countResult[0].total;
+      const totalPages = Math.ceil(total / limit);
+      db.query(dataQuery, params, (err2, results) => {
+        if (err2)
+          return res.status(500).json({ message: "DB error", error: err2 });
+        const students = results.map((s) => ({
+          ...s,
+          declinedFields: s.declinedFields ? JSON.parse(s.declinedFields) : [],
+        }));
+        res.json({ students, totalPages });
+      });
+    }
+  );
 };
 
 exports.searchStudents = (req, res) => {
