@@ -24,7 +24,7 @@ export default function AIChatLauncher() {
         {open ? (
           <FaTimes className="w-6 h-6 transition-transform duration-300" />
         ) : (
-          <FaRobot className="w-7 h-7 transition-transform duration-300" />
+          <FaRobot className="w-6 h-6 transition-transform duration-300" />
         )}
         
         {/* Pulsing effect when not open */}
