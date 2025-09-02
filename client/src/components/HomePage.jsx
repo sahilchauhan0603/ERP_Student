@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FaRobot } from "react-icons/fa";
 import CustomModal from "./CustomModal";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -38,6 +39,19 @@ const HomePage = () => {
       localStorage.removeItem("showLoginPopup");
     }
   }, []);
+
+  // Chatbot popup state
+  const [showChatbot, setShowChatbot] = useState(false);
+  // Close chatbot on outside click
+  useEffect(() => {
+    if (!showChatbot) return;
+    function handleClick(e) {
+      const box = document.getElementById("ai-chatbot-popup");
+      if (box && !box.contains(e.target)) setShowChatbot(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showChatbot]);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoaded(true), 100);
@@ -115,7 +129,7 @@ const HomePage = () => {
       }}
     >
       {/* Social Media Bar - Fixed Right */}
-      <div className="fixed top-3/4 right-0 z-40 flex flex-col items-end gap-2 -translate-y-1/2 pr-1">
+      <div className="fixed top-3/5 right-0 z-40 flex flex-col items-end gap-2 -translate-y-1/2 pr-1">
         <a
           href="https://twitter.com/bpitindia"
           target="_blank"
@@ -161,6 +175,7 @@ const HomePage = () => {
         type="success"
         duration={3500}
       />
+
       {/* BPIT Official Header - Enhanced */}
       <header
         className="w-full bg-white border-t-4 border-b-4 border-red-500 shadow-lg flex flex-col md:flex-row items-center justify-between px-2 md:px-10 py-3 relative z-20"
@@ -269,6 +284,42 @@ const HomePage = () => {
           })}
         </motion.div>
       </main>
+
+      {/* Floating Chatbot Button */}
+      <button
+        onClick={() => setShowChatbot((v) => !v)}
+        className="fixed bottom-6 right-6 z-50 bg-gradient-to-br from-blue-600 to-red-500 hover:from-blue-700 hover:to-red-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 group flex items-center justify-center"
+        title="AI Chatbot"
+        style={{ boxShadow: "0 4px 24px 0 rgba(0,0,0,0.18)" }}
+      >
+        <FaRobot className="w-8 h-8" />
+        <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+          AI Chatbot
+        </div>
+      </button>
+
+      {/* Chatbot Popup */}
+      {showChatbot && (
+        <div
+          id="ai-chatbot-popup"
+          className="fixed bottom-24 right-6 z-50 w-80 max-w-xs bg-white border border-blue-300 rounded-xl shadow-2xl p-5 flex flex-col items-center animate-fadeIn"
+          style={{ boxShadow: "0 8px 32px 0 rgba(0,0,0,0.18)" }}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <FaRobot className="text-blue-600 text-2xl" />
+            <span className="font-bold text-lg text-blue-900">AI Chatbot</span>
+          </div>
+          <div className="text-gray-700 text-center text-base font-medium py-4">
+            AI chatbot coming soon for your help
+          </div>
+          <button
+            onClick={() => setShowChatbot(false)}
+            className="mt-2 px-4 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold shadow"
+          >
+            Close
+          </button>
+        </div>
+      )}
     </div>
   );
 };
