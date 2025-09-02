@@ -18,7 +18,7 @@ export default function AIChat({ onClose }) {
 
   const apiBase = useMemo(() => {
     // Prefer env override if provided (e.g., http://localhost:5000)
-    const envBase = typeof import.meta !== "undefined" && import.meta?.env?.VITE_BACKEND_URL;
+    const envBase = typeof import.meta !== "undefined" && import.meta?.env?.VITE_API_URL;
     if (envBase) return envBase;
     // Default to dev port 5000 when running locally
     if (typeof window !== "undefined" && window.location.hostname === "localhost") {
@@ -185,14 +185,14 @@ export default function AIChat({ onClose }) {
           <FaTimes />
         </button>
       </div>
-      
-      <div 
-        ref={containerRef} 
+
+      <div
+        ref={containerRef}
         className="px-4 py-3 h-96 overflow-y-auto bg-gradient-to-b from-gray-50 to-white scroll-smooth"
       >
         {messages.map((m, idx) => (
-          <div 
-            key={idx} 
+          <div
+            key={idx}
             className={`mb-3 flex ${m.role === "user" ? "justify-end" : "justify-start"} items-start gap-2`}
           >
             {m.role === "assistant" && (
@@ -200,12 +200,12 @@ export default function AIChat({ onClose }) {
                 <FaRobot className="text-white text-xs" />
               </div>
             )}
-            
+
             <div
-              className={`${m.role === "user" 
-                ? "bg-blue-600 text-white rounded-l-2xl rounded-tr-2xl" 
+              className={`${m.role === "user"
+                ? "bg-blue-600 text-white rounded-l-2xl rounded-tr-2xl"
                 : "bg-white text-gray-900 rounded-r-2xl rounded-tl-2xl"
-              } max-w-[80%] px-4 py-3 shadow border ${m.role === "user" ? "border-blue-600" : "border-gray-200"}`}
+                } max-w-[80%] px-4 py-3 shadow border ${m.role === "user" ? "border-blue-600" : "border-gray-200"}`}
             >
               {m.role === "assistant" ? (
                 <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: renderMarkdown(m.content) }} />
@@ -213,7 +213,7 @@ export default function AIChat({ onClose }) {
                 <span>{m.content}</span>
               )}
             </div>
-            
+
             {m.role === "user" && (
               <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r from-blue-600 to-red-500 flex items-center justify-center mt-2">
                 <FaUser className="text-white text-xs" />
@@ -221,10 +221,10 @@ export default function AIChat({ onClose }) {
             )}
           </div>
         ))}
-        
+
         {/* loading bubble removed to prevent duplicate assistant boxes */}
       </div>
-      
+
       <form onSubmit={(e) => { if (!isLoading) { sendMessage(e); } else { e.preventDefault(); } }} className="p-3 bg-white border-t border-gray-200 flex items-center gap-2">
         <input
           type="text"
@@ -236,7 +236,7 @@ export default function AIChat({ onClose }) {
         />
         <button
           type={isLoading ? "button" : "submit"}
-          onClick={isLoading ? (() => { try { stoppedRef.current = true; abortRef.current?.abort(); } catch (e) {} }) : undefined}
+          onClick={isLoading ? (() => { try { stoppedRef.current = true; abortRef.current?.abort(); } catch (e) { } }) : undefined}
           disabled={!isLoading && input.trim().length === 0}
           className={
             `bg-gradient-to-r from-blue-600 to-red-500 ` +
