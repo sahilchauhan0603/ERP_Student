@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import axios from "axios";
 import { FaPaperPlane, FaRobot, FaTimes, FaUser } from "react-icons/fa";
 
 const INITIAL_MESSAGE = {
@@ -16,17 +17,19 @@ export default function AIChat({ onClose }) {
   const [hasReceivedChunk, setHasReceivedChunk] = useState(false);
   const [dots, setDots] = useState(0);
 
-  const apiBase = useMemo(() => {
-    // Prefer env override if provided (e.g., http://localhost:5000)
-    const envBase = typeof import.meta !== "undefined" && import.meta?.env?.VITE_API_URL;
-    if (envBase) return envBase;
-    // Default to dev port 5000 when running locally
-    if (typeof window !== "undefined" && window.location.hostname === "localhost") {
-      return "http://localhost:5000";
-    }
-    // Same-origin in production
-    return "";
-  }, []);
+  // const apiBase = useMemo(() => {
+  //   // Prefer env override if provided (e.g., http://localhost:5000)
+  //   const envBase = typeof import.meta !== "undefined" && import.meta?.env?.VITE_API_URL;
+  //   if (envBase) return envBase;
+  //   // Default to dev port 5000 when running locally
+  //   if (typeof window !== "undefined" && window.location.hostname === "localhost") {
+  //     return "http://localhost:5000";
+  //   }
+  //   // Same-origin in production
+  //   return "";
+  // }, []);
+
+  const apiBase = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -86,71 +89,39 @@ export default function AIChat({ onClose }) {
     setDots(0);
     stoppedRef.current = false;
     try {
-      // Prefer streaming endpoint
       const controller = new AbortController();
-      const res = await fetch(`${apiBase}/api/ai/chat/stream`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ messages: newMessages.map(({ role, content }) => ({ role, content })) }),
-        signal: controller.signal,
-      });
       abortRef.current = controller;
-      if (!res.ok) throw new Error("Failed to reach AI service");
 
-      // Prepare a single placeholder for the assistant message
-      let assistantText = "Thinking";
-      let receivedFirstChunk = false;
-      setMessages((prev) => [...prev, { role: "assistant", content: assistantText }]);
+      // Add a single assistant placeholder that our dots animation will update
+      setMessages((prev) => [...prev, { role: "assistant", content: "Thinking" }]);
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
+      // Non-streaming request using axios
+      const { data } = await axios.post(
+        `${apiBase}/ai/chat`,
+        { messages: newMessages.map(({ role, content }) => ({ role, content })) },
+        { signal: controller.signal, withCredentials: true, headers: { "Content-Type": "application/json" } }
+      );
 
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const parts = buffer.split("\n\n");
-        buffer = parts.pop() || "";
-        for (const part of parts) {
-          if (part.startsWith(":")) continue; // comment/keep-alive
-          const lines = part.split("\n");
-          for (const line of lines) {
-            if (!line.startsWith("data:")) continue;
-            try {
-              const payload = JSON.parse(line.replace(/^data:\s*/, ""));
-              if (payload?.text) {
-                if (!receivedFirstChunk) {
-                  assistantText = payload.text;
-                  receivedFirstChunk = true;
-                  setHasReceivedChunk(true);
-                } else {
-                  assistantText += payload.text;
-                }
-                setMessages((prev) => {
-                  const copy = [...prev];
-                  // update last assistant message
-                  copy[copy.length - 1] = { role: "assistant", content: assistantText };
-                  return copy;
-                });
-              }
-            } catch (e) {
-              // ignore malformed chunks
-            }
-          }
+      const reply = data?.reply || data?.message || "Sorry, I couldn't generate a response.";
+      setHasReceivedChunk(true);
+      // Overwrite the placeholder bubble with the final reply
+      setMessages((prev) => {
+        const copy = [...prev];
+        if (copy.length > 0 && copy[copy.length - 1]?.role === "assistant") {
+          copy[copy.length - 1] = { role: "assistant", content: reply };
+        } else {
+          copy.push({ role: "assistant", content: reply });
         }
-      }
+        return copy;
+      });
 
     } catch (err) {
       // If user intentionally stopped, do not show error message
       if (err?.name === 'AbortError') {
         // Silent stop
       } else {
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: "There was an error contacting the AI service." },
-        ]);
+        const msg = err?.response?.data?.message || err?.message || "There was an error contacting the AI service.";
+        setMessages((prev) => [...prev, { role: "assistant", content: msg }]);
       }
     } finally {
       setIsLoading(false);
