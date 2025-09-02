@@ -14,6 +14,7 @@ import campusBackground from "../../../assets/images/BPIT.png";
 
 import { useEffect } from "react";
 import { FiInfo } from "react-icons/fi";
+import { FiHome } from "react-icons/fi";
 
 const StudentRegistration = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -138,7 +139,8 @@ const StudentRegistration = () => {
       setIncompleteFields(missing);
       showModal({
         title: "Incomplete Fields",
-        message: "Please fill all required fields before proceeding to the next section.",
+        message:
+          "Please fill all required fields before proceeding to the next section.",
         type: "error",
       });
       return;
@@ -219,8 +221,7 @@ const StudentRegistration = () => {
 
     // Other Qualification validation (if any field is filled)
     const oq = otherQualification;
-    const oqAny =
-      oq.institute || oq.board || oq.year || oq.aggregate || oq.pcm;
+    const oqAny = oq.institute || oq.board || oq.year || oq.aggregate || oq.pcm;
     if (oqAny) {
       if (!oq.institute) missing.push("otherQualification.institute");
       if (!oq.board) missing.push("otherQualification.board");
@@ -321,27 +322,37 @@ const StudentRegistration = () => {
         "personal.permanentAddress": formData.personal.permanentAddress,
         "personal.feeReimbursement": formData.personal.feeReimbursement,
         "personal.antiRaggingRef": formData.personal.antiRaggingRef,
-        
+
         // Academic fields
         "academic.classX.institute": formData.academic.classX.institute,
         "academic.classX.board": formData.academic.classX.board,
         "academic.classX.year": formData.academic.classX.year,
         "academic.classX.aggregate": formData.academic.classX.aggregate,
         "academic.classX.pcm": formData.academic.classX.pcm,
-        "academic.classX.isDiplomaOrPolytechnic": formData.academic.classX.isDiplomaOrPolytechnic,
+        "academic.classX.isDiplomaOrPolytechnic":
+          formData.academic.classX.isDiplomaOrPolytechnic,
         "academic.classXII.institute": formData.academic.classXII.institute,
         "academic.classXII.board": formData.academic.classXII.board,
         "academic.classXII.year": formData.academic.classXII.year,
         "academic.classXII.aggregate": formData.academic.classXII.aggregate,
         "academic.classXII.pcm": formData.academic.classXII.pcm,
-        "academic.otherQualification.institute": formData.academic.otherQualification.institute,
-        "academic.otherQualification.board": formData.academic.otherQualification.board,
-        "academic.otherQualification.year": formData.academic.otherQualification.year,
-        "academic.otherQualification.aggregate": formData.academic.otherQualification.aggregate,
-        "academic.otherQualification.pcm": formData.academic.otherQualification.pcm,
-        "academic.academicAchievements": JSON.stringify(formData.academic.academicAchievements),
-        "academic.coCurricularAchievements": JSON.stringify(formData.academic.coCurricularAchievements),
-        
+        "academic.otherQualification.institute":
+          formData.academic.otherQualification.institute,
+        "academic.otherQualification.board":
+          formData.academic.otherQualification.board,
+        "academic.otherQualification.year":
+          formData.academic.otherQualification.year,
+        "academic.otherQualification.aggregate":
+          formData.academic.otherQualification.aggregate,
+        "academic.otherQualification.pcm":
+          formData.academic.otherQualification.pcm,
+        "academic.academicAchievements": JSON.stringify(
+          formData.academic.academicAchievements
+        ),
+        "academic.coCurricularAchievements": JSON.stringify(
+          formData.academic.coCurricularAchievements
+        ),
+
         // Parents fields
         "parents.father.name": formData.parents.father.name,
         "parents.father.qualification": formData.parents.father.qualification,
@@ -360,9 +371,9 @@ const StudentRegistration = () => {
         "parents.mother.telephone": formData.parents.mother.telephone,
         "parents.mother.officeAddress": formData.parents.mother.officeAddress,
         "parents.familyIncome": formData.parents.familyIncome,
-        
+
         // Documents
-        ...documentsWithBase64
+        ...documentsWithBase64,
       };
 
       const response = await axios.post(
@@ -373,7 +384,7 @@ const StudentRegistration = () => {
 
       if (response.data.success) {
         setSubmitSuccess(true);
-        
+
         // Show success alert with SweetAlert2
         Swal.fire({
           title: "Registration Successful! 🎉",
@@ -406,7 +417,7 @@ const StudentRegistration = () => {
         }).then((result) => {
           if (result.isConfirmed) {
             // Redirect to homepage
-            window.location.href = '/';
+            window.location.href = "/";
           }
         });
       }
@@ -596,128 +607,171 @@ const StudentRegistration = () => {
         />
         <div className="max-w-6xl mx-auto">
           <div className="bg-white py-6 sm:py-8 px-4 sm:px-6 shadow-lg rounded-2xl ">
-              {/* Headings */}
-              <div className="text-center mb-6 sm:mb-8">
-                <div className="relative mb-3 sm:mb-4">
-                  <div className="flex justify-center items-center">
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
-                      Student Registration Portal
-                    </h1>
-                  </div>
-                  <button
-                    onClick={() => (window.location.href = "/")}
-                    className="absolute right-0 top-0 text-black transition-all duration-300 hover:scale-110 group"
-                    title="Go to Homepage"
-                  >
-                    <FiInfo className="w-6 h-6" />
-                    <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
-                      Go to Homepage
-                    </div>
-                  </button>
+            {/* Headings */}
+            <div className="text-center mb-6 sm:mb-8">
+              <div className="relative mb-3 sm:mb-4">
+                <div className="flex justify-center items-center">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
+                    Student Registration Portal
+                  </h1>
                 </div>
-                <p className="text-base sm:text-lg text-gray-700 font-medium">
-                  Official Registration System for New Students
-                </p>
-                <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">
-                  Complete all steps to register with BPIT
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="px-2 sm:px-0">
-                <ProgressBar steps={steps} currentStep={currentStep} />
-              </div>
-
-              {/* Step Content */}
-              <div className="mt-6 sm:mt-8">
-                {steps[currentStep].component}
-              </div>
-
-              <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
-                <button
-                  onClick={prevStep}
-                  disabled={currentStep === 0 || isSubmitting}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm sm:text-base"
+                {/* <button
+                  onClick={() => (window.location.href = "/")}
+                  className="absolute right-0 top-0 text-black transition-all duration-300 hover:scale-110 group"
+                  title="Go to Homepage"
                 >
-                  Previous
-                </button>
-
-                {currentStep < steps.length - 1 ? (
-                  currentStep !== 0 && (
-                    <button
-                      onClick={nextStep}
-                      disabled={isSubmitting}
-                      className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm sm:text-base"
-                    >
-                      Next
-                    </button>
-                  )
-                ) : (
-                  <button
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className={`px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
-                      isSubmitting 
-                        ? "bg-gray-500 cursor-not-allowed" 
-                        : "bg-gray-900 hover:bg-black"
-                    } text-white flex items-center justify-center min-w-32 sm:min-w-40`}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-3 w-3 sm:h-4 sm:w-4 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Processing...
-                      </>
-                    ) : (
-                      "Submit Registration"
-                    )}
-                  </button>
-                )}
+                  <FiInfo className="w-6 h-6" />
+                  <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                    Go to Homepage
+                  </div>
+                </button> */}
               </div>
+              <p className="text-base sm:text-lg text-gray-700 font-medium">
+                Official Registration System for New Students
+              </p>
+              <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">
+                Complete all steps to register with BPIT
+              </div>
+            </div>
 
-              {submitError && (
-                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-red-50 text-red-600 rounded-lg text-xs sm:text-sm border border-red-200">
-                  <div className="flex items-center">
-                    <svg className="h-4 w-4 sm:h-5 sm:w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    {submitError}
-                  </div>
-                </div>
-              )}
+            {/* Progress Bar */}
+            <div className="px-2 sm:px-0">
+              <ProgressBar steps={steps} currentStep={currentStep} />
+            </div>
 
-              {submitSuccess && (
-                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-green-50 text-green-600 rounded-lg text-xs sm:text-sm border border-green-200">
-                  <div className="flex items-center">
-                    <svg className="h-4 w-4 sm:h-5 sm:w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    Registration successful! You will receive a confirmation email shortly.
-                  </div>
-                </div>
+            {/* Step Content */}
+            <div className="mt-6 sm:mt-8">{steps[currentStep].component}</div>
+
+            <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
+              <button
+                onClick={prevStep}
+                disabled={currentStep === 0 || isSubmitting}
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm sm:text-base"
+              >
+                Previous
+              </button>
+
+              {currentStep < steps.length - 1 ? (
+                currentStep !== 0 && (
+                  <button
+                    onClick={nextStep}
+                    disabled={isSubmitting}
+                    className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm sm:text-base"
+                  >
+                    Next
+                  </button>
+                )
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className={`px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
+                    isSubmitting
+                      ? "bg-gray-500 cursor-not-allowed"
+                      : "bg-gray-900 hover:bg-black"
+                  } text-white flex items-center justify-center min-w-32 sm:min-w-40`}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <svg
+                        className="animate-spin -ml-1 mr-2 h-3 w-3 sm:h-4 sm:w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    "Submit Registration"
+                  )}
+                </button>
               )}
             </div>
+
+            {submitError && (
+              <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-red-50 text-red-600 rounded-lg text-xs sm:text-sm border border-red-200">
+                <div className="flex items-center">
+                  <svg
+                    className="h-4 w-4 sm:h-5 sm:w-5 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  {submitError}
+                </div>
+              </div>
+            )}
+
+            {submitSuccess && (
+              <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-green-50 text-green-600 rounded-lg text-xs sm:text-sm border border-green-200">
+                <div className="flex items-center">
+                  <svg
+                    className="h-4 w-4 sm:h-5 sm:w-5 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Registration successful! You will receive a confirmation email
+                  shortly.
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Persistent Home Navigation Button */}
+      <button
+        onClick={() => {
+          Swal.fire({
+            title: 'Do you want to leave this page?',
+            text: 'Your data will be lost.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, leave',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "/";
+            }
+          });
+        }}
+        className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 group"
+        // title="Go to Homepage"
+      >
+        <FiHome className="w-6 h-6" />
+        <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+          Go to Homepage
+        </div>
+      </button>
+    </div>
   );
 };
 

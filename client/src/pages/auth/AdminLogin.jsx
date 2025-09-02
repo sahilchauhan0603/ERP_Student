@@ -363,7 +363,7 @@ const AdminLogin = () => {
       <button
         onClick={() => window.location.href = '/'}
         className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 group"
-        title="Go to Homepage"
+        // title="Go to Homepage"
       >
         <FiHome className="w-6 h-6" />
         <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">

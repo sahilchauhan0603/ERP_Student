@@ -3,6 +3,7 @@ import { FaUserGraduate, FaChalkboardTeacher } from "react-icons/fa";
 import { BsPersonBadge } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { FiHome } from "react-icons/fi";
 import campusBackground from "../../assets/images/BPIT.png"; // Make sure this path is correct
 import bpitLogo from "../../assets/icons/BPIT-logo-transparent.png";
 
@@ -108,8 +109,6 @@ const RegistrationPage = () => {
 
       {/* Main Content */}
       <main className="flex-1 w-full flex flex-col items-center py-12 px-4">
-
-
         {/* Registration Cards */}
         <motion.div
           variants={containerVariants}
@@ -139,7 +138,7 @@ const RegistrationPage = () => {
                 Join as a student to access all campus resources
               </p>
               <motion.span
-                className="mt-2 text-blue-800 font-semibold inline-flex items-center text-sm"
+                className="mt-2 text-black font-extrabold inline-flex items-center text-sm"
                 whileHover={{ x: 5 }}
               >
                 Register now <span className="ml-1">→</span>
@@ -169,7 +168,7 @@ const RegistrationPage = () => {
                 Join as faculty to manage courses and students
               </p>
               <motion.span
-                className="mt-2 text-green-800 font-semibold inline-flex items-center text-sm"
+                className="mt-2 text-black font-extrabold inline-flex items-center text-sm"
                 whileHover={{ x: 5 }}
               >
                 Register now <span className="ml-1">→</span>
@@ -199,7 +198,7 @@ const RegistrationPage = () => {
                 Join as non-teaching staff to access admin features
               </p>
               <motion.span
-                className="mt-2 text-purple-800 font-semibold inline-flex items-center text-sm"
+                className="mt-2 text-black font-extrabold inline-flex items-center text-sm"
                 whileHover={{ x: 5 }}
               >
                 Register now <span className="ml-1">→</span>
@@ -208,6 +207,18 @@ const RegistrationPage = () => {
           </motion.div>
         </motion.div>
       </main>
+
+      {/* Persistent Home Navigation Button */}
+      <button
+        onClick={() => (window.location.href = "/")}
+        className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 group"
+        // title="Go to Homepage"
+      >
+        <FiHome className="w-6 h-6" />
+        <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+          Go to Homepage
+        </div>
+      </button>
     </div>
   );
 };
