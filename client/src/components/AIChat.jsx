@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
-import { FaPaperPlane, FaRobot, FaTimes, FaUser } from "react-icons/fa";
+import { FaPaperPlane, FaRobot, FaTimes, FaUser, FaRegCopy, FaThumbsUp, FaThumbsDown, FaRedoAlt, FaSmile, FaCheck, FaHeart } from "react-icons/fa";
 
 const INITIAL_MESSAGE = {
   role: "assistant",
@@ -16,25 +16,19 @@ export default function AIChat({ onClose }) {
   const stoppedRef = useRef(false);
   const [hasReceivedChunk, setHasReceivedChunk] = useState(false);
   const [dots, setDots] = useState(0);
-
-  // const apiBase = useMemo(() => {
-  //   // Prefer env override if provided (e.g., http://localhost:5000)
-  //   const envBase = typeof import.meta !== "undefined" && import.meta?.env?.VITE_API_URL;
-  //   if (envBase) return envBase;
-  //   // Default to dev port 5000 when running locally
-  //   if (typeof window !== "undefined" && window.location.hostname === "localhost") {
-  //     return "http://localhost:5000";
-  //   }
-  //   // Same-origin in production
-  //   return "";
-  // }, []);
+  const [lastUserMessage, setLastUserMessage] = useState("");
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const [feedbackStates, setFeedbackStates] = useState({});
 
   const apiBase = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     if (!containerRef.current) return;
-    containerRef.current.scrollTop = containerRef.current.scrollHeight;
-  }, [messages]);
+    if (isAtBottom) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, [messages, isAtBottom]);
 
   // Animate dynamic thinking dots before first chunk arrives
   useEffect(() => {
@@ -83,6 +77,7 @@ export default function AIChat({ onClose }) {
     if (!trimmed || isLoading) return;
     const newMessages = [...messages, { role: "user", content: trimmed }];
     setMessages(newMessages);
+    setLastUserMessage(trimmed);
     setInput("");
     setIsLoading(true);
     setHasReceivedChunk(false);
@@ -142,69 +137,224 @@ export default function AIChat({ onClose }) {
     }
   }
 
+  function handleCopy(text, messageIndex) {
+    try { 
+      navigator.clipboard.writeText(text);
+      // Show feedback that copy was successful
+      setFeedbackStates(prev => ({
+        ...prev,
+        [messageIndex]: { ...prev[messageIndex], copied: true }
+      }));
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        setFeedbackStates(prev => ({
+          ...prev,
+          [messageIndex]: { ...prev[messageIndex], copied: false }
+        }));
+      }, 2000);
+    } catch {}
+  }
+
+  function handleFeedback(messageIndex, type) {
+    // Update feedback state
+    setFeedbackStates(prev => ({
+      ...prev,
+      [messageIndex]: { 
+        ...prev[messageIndex], 
+        feedback: type,
+        // If clicking the same button again, toggle it off
+        feedbackActive: prev[messageIndex]?.feedback === type ? !prev[messageIndex]?.feedbackActive : true
+      }
+    }));
+    
+    // Log the feedback (you can send this to your backend)
+    console.log(`feedback:${type}`, messages[messageIndex].content);
+  }
+
+  function handleRetry() {
+    if (isLoading || !lastUserMessage) return;
+    setInput(lastUserMessage);
+    setTimeout(() => sendMessage({ preventDefault: () => {} }), 0);
+  }
+
+  const EMOJIS = [
+    "😀","😁","😂","🤣","😊","😍","😎","😇","😉","👍","🙏","🎉","🚀","✨","💡","🔥","💯","✅","❓","📌"
+  ];
+
   return (
     <div
-      className="fixed bottom-24 right-6 z-50 w-[24rem] max-w-[90vw] bg-white border border-blue-300 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-      style={{ boxShadow: "0 8px 32px 0 rgba(0,0,0,0.18)" }}
+      className="fixed bottom-24 right-6 z-50 w-[26rem] max-w-[90vw] bg-white border border-blue-200 rounded-2xl flex flex-col overflow-hidden transition-all duration-300"
+      style={{ 
+        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.07)",
+        background: "linear-gradient(to bottom, #ffffff, #f9fafb)",
+        height: "520px"
+      }}
     >
-      <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-red-500 text-white">
-        <div className="flex items-center gap-2">
-          <FaRobot />
-          <span className="font-semibold">AI Assistant</span>
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-blue-600 to-red-500 text-white">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-white/10 rounded-full">
+            <FaRobot className="text-lg" />
+          </div>
+          <div>
+            <span className="font-semibold text-lg">AI Assistant</span>
+            <div className="text-xs opacity-80 flex items-center gap-1">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span>Online</span>
+            </div>
+          </div>
         </div>
-        <button onClick={onClose} className="opacity-90 hover:opacity-100 transition-opacity">
-          <FaTimes />
+        <button 
+          onClick={onClose} 
+          className="opacity-80 hover:opacity-100 transition-all duration-200 p-1.5 hover:bg-white/10 rounded-full"
+        >
+          <FaTimes className="text-lg" />
         </button>
       </div>
-
+      
+      {/* Messages Container */}
       <div
         ref={containerRef}
-        className="px-4 py-3 h-96 overflow-y-auto bg-gradient-to-b from-gray-50 to-white scroll-smooth"
+        className="ai-scroll flex-1 px-5 py-4 h-72 overflow-y-auto bg-gradient-to-b from-gray-50 to-gray-100/30 scroll-smooth pr-2"
+        onScroll={(e) => {
+          const el = e.currentTarget;
+          const atBottom = el.scrollTop >= el.scrollHeight - el.clientHeight - 20;
+          setIsAtBottom(atBottom);
+        }}
       >
         {messages.map((m, idx) => (
           <div
             key={idx}
-            className={`mb-3 flex ${m.role === "user" ? "justify-end" : "justify-start"} items-start gap-2`}
+            className={`mb-4 flex ${m.role === "user" ? "justify-end" : "justify-start"} items-start gap-3 transition-all duration-300 ${idx === messages.length - 1 ? 'animate-fade-in' : ''}`}
           >
             {m.role === "assistant" && (
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r from-blue-600 to-red-500 flex items-center justify-center mt-2 ">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-red-500 flex items-center justify-center shadow-sm mt-1">
                 <FaRobot className="text-white text-xs" />
               </div>
             )}
 
             <div
               className={`${m.role === "user"
-                ? "bg-blue-600 text-white rounded-l-2xl rounded-tr-2xl"
-                : "bg-white text-gray-900 rounded-r-2xl rounded-tl-2xl"
-                } max-w-[80%] px-4 py-3 shadow border ${m.role === "user" ? "border-blue-600" : "border-gray-200"}`}
+                ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl rounded-tr-md"
+                : "bg-white text-gray-800 rounded-2xl rounded-tl-md border border-gray-100"
+                } max-w-[80%] px-4 py-3 shadow-sm transition-all duration-200 ${m.role === "user" ? "shadow-blue-200/50" : "shadow-gray-200"}`}
+              style={{ boxShadow: m.role === "user" ? "0 4px 12px rgba(37, 99, 235, 0.15)" : "0 4px 12px rgba(0, 0, 0, 0.05)" }}
             >
               {m.role === "assistant" ? (
                 <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: renderMarkdown(m.content) }} />
               ) : (
-                <span>{m.content}</span>
+                <span className="leading-relaxed">{m.content}</span>
+              )}
+              
+              {m.role === "assistant" && (
+                <div className="mt-3 flex items-center gap-3 text-gray-500 pt-2 border-t border-gray-100">
+                  <button 
+                    title={feedbackStates[idx]?.copied ? "Copied!" : "Copy response"} 
+                    onClick={() => handleCopy(m.content, idx)} 
+                    className={`p-1.5 rounded-full transition-all duration-300 ${feedbackStates[idx]?.copied ? 
+                      "text-green-600 scale-110 bg-green-100" : 
+                      "hover:bg-gray-100 hover:text-blue-600"}`}
+                  >
+                    {feedbackStates[idx]?.copied ? <FaCheck className="text-xs" /> : <FaRegCopy className="text-xs" />}
+                  </button>
+                  <button 
+                    title="Helpful response" 
+                    onClick={() => handleFeedback(idx, 'up')} 
+                    className={`p-1.5 rounded-full transition-all duration-300 ${feedbackStates[idx]?.feedback === 'up' && feedbackStates[idx]?.feedbackActive ? 
+                      "text-green-600 scale-110 bg-green-100" : 
+                      "hover:bg-gray-100 hover:text-green-600"}`}
+                  >
+                    <FaThumbsUp className="text-xs" />
+                  </button>
+                  <button 
+                    title="Not helpful" 
+                    onClick={() => handleFeedback(idx, 'down')} 
+                    className={`p-1.5 rounded-full transition-all duration-300 ${feedbackStates[idx]?.feedback === 'down' && feedbackStates[idx]?.feedbackActive ? 
+                      "text-red-600 scale-110 bg-red-100" : 
+                      "hover:bg-gray-100 hover:text-red-600"}`}
+                  >
+                    <FaThumbsDown className="text-xs" />
+                  </button>
+                  <button 
+                    title="Love this response" 
+                    onClick={() => handleFeedback(idx, 'love')} 
+                    className={`p-1.5 rounded-full transition-all duration-300 ${feedbackStates[idx]?.feedback === 'love' && feedbackStates[idx]?.feedbackActive ? 
+                      "text-pink-600 scale-110 bg-pink-100" : 
+                      "hover:bg-gray-100 hover:text-pink-600"}`}
+                  >
+                    <FaHeart className="text-xs" />
+                  </button>
+                  <button 
+                    title="Regenerate response" 
+                    onClick={handleRetry} 
+                    className="p-1.5 hover:bg-gray-100 rounded-full transition-colors duration-150 hover:text-blue-600"
+                  >
+                    <FaRedoAlt className="text-xs" />
+                  </button>
+                </div>
               )}
             </div>
 
             {m.role === "user" && (
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r from-blue-600 to-red-500 flex items-center justify-center mt-2">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-red-500 flex items-center justify-center shadow-sm mt-1">
                 <FaUser className="text-white text-xs" />
               </div>
             )}
           </div>
         ))}
 
-        {/* loading bubble removed to prevent duplicate assistant boxes */}
+        {/* No separate loading bubble; thinking text animates inside the placeholder bubble */}
       </div>
 
-      <form onSubmit={(e) => { if (!isLoading) { sendMessage(e); } else { e.preventDefault(); } }} className="p-3 bg-white border-t border-gray-200 flex items-center gap-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message…"
-          className="flex-1 border border-gray-300 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-200"
-          maxLength={1000}
-        />
+      {/* Input Area */}
+      <form 
+        id="ai-chat-form" 
+        onSubmit={(e) => { if (!isLoading) { sendMessage(e); } else { e.preventDefault(); } }} 
+        className="p-4 bg-white border-t border-gray-200 flex items-center gap-2 relative"
+      >
+        <div className="flex-1 relative">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (!isLoading && input.trim().length > 0) {
+                  sendMessage(e);
+                }
+              }
+            }}
+            placeholder="Type your message..."
+            className="w-full border border-gray-300 rounded-xl px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200 resize-none leading-relaxed"
+            rows={1}
+            style={{ minHeight: '44px', maxHeight: '140px', overflowY: 'auto' }}
+            maxLength={2000}
+          />
+          <button
+            type="button"
+            onClick={() => setShowEmoji((v) => !v)}
+            className="absolute right-5 top-1/2 transform -translate-y-1/2 text-yellow-400 hover:text-yellow-600 transition-colors duration-150"
+            title="Add emoji"
+          >
+            <FaSmile />
+          </button>
+        </div>
+        
+        {showEmoji && (
+          <div className="absolute bottom-16 left-4 bg-white border border-gray-200 rounded-xl shadow-lg p-3 grid grid-cols-5 gap-1 z-50">
+            {EMOJIS.map((e) => (
+              <button 
+                key={e} 
+                className="hover:bg-gray-100 rounded-lg p-2 transition-colors duration-150 text-lg" 
+                onClick={() => { setInput((v) => v + e); setShowEmoji(false); }}
+              >
+                {e}
+              </button>
+            ))}
+          </div>
+        )}
+        
         <button
           type={isLoading ? "button" : "submit"}
           onClick={isLoading ? (() => { try { stoppedRef.current = true; abortRef.current?.abort(); } catch (e) { } }) : undefined}
@@ -212,20 +362,53 @@ export default function AIChat({ onClose }) {
           className={
             `bg-gradient-to-r from-blue-600 to-red-500 ` +
             `hover:from-blue-700 hover:to-red-600 ` +
-            `disabled:bg-gray-300 disabled:text-black disabled:cursor-not-allowed ` +
-            `text-white rounded-xl px-3 py-2 flex items-center gap-2 transition-all duration-200`
+            `disabled:from-gray-300 disabled:to-gray-400 disabled:text-gray-500 disabled:cursor-not-allowed ` +
+            `text-white rounded-xl px-4 py-3 flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md`
           }
         >
           {isLoading ? (
             <span>Stop</span>
           ) : (
             <>
-              <FaPaperPlane />
-              <span className="hidden sm:inline">Send</span>
+              <FaPaperPlane className="text-sm" />
+              {/* <span className="hidden sm:inline">Send</span> */}
             </>
           )}
         </button>
       </form>
+
+      {/* Footer with Copyright */}
+      <div className="py-2 px-4 bg-gray-50 border-t border-gray-200 text-center">
+        <p className="text-xs text-gray-500">© CopyRight 2025. All Rights Reserved By BPIT CampusPro</p>
+      </div>
+
+      <style>{`
+        .ai-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        }
+        .ai-scroll::-webkit-scrollbar { 
+          width: 6px; 
+        }
+        .ai-scroll::-webkit-scrollbar-track { 
+          background: transparent; 
+          margin: 5px;
+        }
+        .ai-scroll::-webkit-scrollbar-thumb { 
+          background: rgba(0, 0, 0, 0.2); 
+          border-radius: 10px; 
+        }
+        .ai-scroll::-webkit-scrollbar-thumb:hover { 
+          background: rgba(0, 0, 0, 0.35); 
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(5px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
