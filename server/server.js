@@ -15,6 +15,7 @@ app.set('trust proxy', 1);
 const allowedOrigins = [
   'https://erp-student-sm4v.onrender.com',
   'http://localhost:3000',
+  'http://localhost:5173',
 ];
 
 // CORS middleware
@@ -57,6 +58,7 @@ app.use((err, req, res, next) => {
 // Student and admin routes
 app.use('/api/student', require('./routes/student'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/ai', require('./routes/ai'));
 
 // Test route
 app.get('/', (req, res) => {

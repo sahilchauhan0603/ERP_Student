@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { FiHome } from "react-icons/fi";
 import campusBackground from "../../assets/images/BPIT.png"; // Make sure this path is correct
 import bpitLogo from "../../assets/icons/BPIT-logo-transparent.png";
+import AIChatLauncher from "../../components/AIChatLauncher"; // adjust path as needed
 
 const RegistrationPage = () => {
   const [loaded, setLoaded] = useState(false);
@@ -211,14 +212,16 @@ const RegistrationPage = () => {
       {/* Persistent Home Navigation Button */}
       <button
         onClick={() => (window.location.href = "/")}
-        className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 group"
+        className="fixed bottom-6 right-24 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 group"
         // title="Go to Homepage"
       >
-        <FiHome className="w-6 h-6" />
+        <FiHome className="w-8 h-8" />
         <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
           Go to Homepage
         </div>
       </button>
+
+      <AIChatLauncher />
     </div>
   );
 };
