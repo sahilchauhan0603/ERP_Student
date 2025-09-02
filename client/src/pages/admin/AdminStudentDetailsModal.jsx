@@ -52,12 +52,19 @@ export default function AdminStudentDetailsModal({
     false,
     false,
   ]);
+  const [showMessage, setShowMessage] = useState(false);
+
+  const handleClick = () => {
+    setShowMessage(true);
+    // Hide the message after 2 seconds
+    setTimeout(() => setShowMessage(false), 2000);
+  };
 
   // Parse declined fields - handle both string and array formats
   const parseDeclinedFields = (fields) => {
     if (!fields) return [];
     if (Array.isArray(fields)) return fields;
-    if (typeof fields === 'string') {
+    if (typeof fields === "string") {
       try {
         return JSON.parse(fields);
       } catch (e) {
@@ -76,9 +83,9 @@ export default function AdminStudentDetailsModal({
   const getDeclinedSections = () => {
     const declinedSections = new Set();
     if (Array.isArray(declinedFields)) {
-      declinedFields.forEach(fieldPath => {
+      declinedFields.forEach((fieldPath) => {
         // Handle both formats: "section.field" and just "field"
-        const parts = fieldPath.split('.');
+        const parts = fieldPath.split(".");
         if (parts.length > 1) {
           // Format: "section.field"
           declinedSections.add(parts[0]);
@@ -88,28 +95,68 @@ export default function AdminStudentDetailsModal({
           // Check each section's fields to find where this field belongs
           const sectionFields = {
             personal: [
-              "firstName", "middleName", "lastName", "email", "mobile", "dob",
-              "gender", "category", "subCategory", "region", "currentAddress",
-              "permanentAddress", "course", "examRoll", "examRank", "abcId"
+              "firstName",
+              "middleName",
+              "lastName",
+              "email",
+              "mobile",
+              "dob",
+              "gender",
+              "category",
+              "subCategory",
+              "region",
+              "currentAddress",
+              "permanentAddress",
+              "course",
+              "examRoll",
+              "examRank",
+              "abcId",
             ],
             academic: [
-              "classX_institute", "classX_board", "classX_year", "classX_aggregate",
-              "classX_pcm", "classX_isDiplomaOrPolytechnic", "classXII_institute",
-              "classXII_board", "classXII_year", "classXII_aggregate", "classXII_pcm",
-              "otherQualification_institute", "otherQualification_board",
-              "otherQualification_year", "otherQualification_aggregate",
-              "otherQualification_pcm", "academicAchievements", "coCurricularAchievements"
+              "classX_institute",
+              "classX_board",
+              "classX_year",
+              "classX_aggregate",
+              "classX_pcm",
+              "classX_isDiplomaOrPolytechnic",
+              "classXII_institute",
+              "classXII_board",
+              "classXII_year",
+              "classXII_aggregate",
+              "classXII_pcm",
+              "otherQualification_institute",
+              "otherQualification_board",
+              "otherQualification_year",
+              "otherQualification_aggregate",
+              "otherQualification_pcm",
+              "academicAchievements",
+              "coCurricularAchievements",
             ],
             parent: [
-              "father_name", "father_mobile", "father_email", "mother_name",
-              "mother_mobile", "mother_email", "family_income"
+              "father_name",
+              "father_mobile",
+              "father_email",
+              "mother_name",
+              "mother_mobile",
+              "mother_email",
+              "family_income",
             ],
             documents: [
-              "photo", "ipuRegistration", "allotmentLetter", "examAdmitCard",
-              "examScoreCard", "marksheet10", "passing10", "marksheet12",
-              "passing12", "aadhar", "characterCertificate", "medicalCertificate",
-              "migrationCertificate", "categoryCertificate"
-            ]
+              "photo",
+              "ipuRegistration",
+              "allotmentLetter",
+              "examAdmitCard",
+              "examScoreCard",
+              "marksheet10",
+              "passing10",
+              "marksheet12",
+              "passing12",
+              "aadhar",
+              "characterCertificate",
+              "medicalCertificate",
+              "migrationCertificate",
+              "categoryCertificate",
+            ],
           };
 
           // Find which section contains this field
@@ -226,36 +273,79 @@ export default function AdminStudentDetailsModal({
   // Check if all fields across all sections have been verified
   const isAllFieldsVerified = () => {
     const allSections = ["personal", "academic", "parent", "documents"];
-    return allSections.every(section => isSectionVerified(section));
+    return allSections.every((section) => isSectionVerified(section));
   };
 
   // Get count of verified fields for progress tracking
   const getVerificationProgress = () => {
     const sectionFields = {
       personal: [
-        "firstName", "middleName", "lastName", "email", "mobile", "dob",
-        "gender", "category", "subCategory", "region", "currentAddress",
-        "permanentAddress", "course", "examRoll", "examRank", "abcId"
+        "firstName",
+        "middleName",
+        "lastName",
+        "email",
+        "mobile",
+        "dob",
+        "gender",
+        "category",
+        "subCategory",
+        "region",
+        "currentAddress",
+        "permanentAddress",
+        "course",
+        "examRoll",
+        "examRank",
+        "abcId",
       ],
       academic: [
-        "classX_institute", "classX_board", "classX_year", "classX_aggregate",
-        "classX_pcm", "classX_isDiplomaOrPolytechnic", "classXII_institute",
-        "classXII_board", "classXII_year", "classXII_aggregate", "classXII_pcm",
-        "otherQualification_institute", "otherQualification_board",
-        "otherQualification_year", "otherQualification_aggregate",
-        "otherQualification_pcm", "academicAchievements", "coCurricularAchievements"
+        "classX_institute",
+        "classX_board",
+        "classX_year",
+        "classX_aggregate",
+        "classX_pcm",
+        "classX_isDiplomaOrPolytechnic",
+        "classXII_institute",
+        "classXII_board",
+        "classXII_year",
+        "classXII_aggregate",
+        "classXII_pcm",
+        "otherQualification_institute",
+        "otherQualification_board",
+        "otherQualification_year",
+        "otherQualification_aggregate",
+        "otherQualification_pcm",
+        "academicAchievements",
+        "coCurricularAchievements",
       ],
       parent: [
-        "father_name", "father_mobile", "father_email", "mother_name",
-        "mother_mobile", "mother_email", "familyIncome"
+        "father_name",
+        "father_mobile",
+        "father_email",
+        "mother_name",
+        "mother_mobile",
+        "mother_email",
+        "familyIncome",
       ],
       documents: [
-        "photo", "ipuRegistration", "allotmentLetter", "examAdmitCard",
-        "examScoreCard", "marksheet10", "passing10", "marksheet12", "passing12",
-        "aadhar", "characterCertificate", "medicalCertificate", "migrationCertificate",
-        "categoryCertificate", "specialCategoryCertificate", "academicFeeReceipt",
-        "collegeFeeReceipt", "parentSignature"
-      ]
+        "photo",
+        "ipuRegistration",
+        "allotmentLetter",
+        "examAdmitCard",
+        "examScoreCard",
+        "marksheet10",
+        "passing10",
+        "marksheet12",
+        "passing12",
+        "aadhar",
+        "characterCertificate",
+        "medicalCertificate",
+        "migrationCertificate",
+        "categoryCertificate",
+        "specialCategoryCertificate",
+        "academicFeeReceipt",
+        "collegeFeeReceipt",
+        "parentSignature",
+      ],
     };
 
     let totalFields = 0;
@@ -263,14 +353,18 @@ export default function AdminStudentDetailsModal({
 
     Object.entries(sectionFields).forEach(([section, fields]) => {
       totalFields += fields.length;
-      fields.forEach(field => {
+      fields.forEach((field) => {
         if (verifications[section]?.[field] !== undefined) {
           verifiedFields++;
         }
       });
     });
 
-    return { verifiedFields, totalFields, percentage: Math.round((verifiedFields / totalFields) * 100) };
+    return {
+      verifiedFields,
+      totalFields,
+      percentage: Math.round((verifiedFields / totalFields) * 100),
+    };
   };
 
   const handleSelectAll = (section) => {
@@ -475,7 +569,7 @@ export default function AdminStudentDetailsModal({
       );
       refresh?.();
       onClose();
-      
+
       // Show success popup based on status
       const actionText = status === "approved" ? "approved" : "declined";
       Swal.fire({
@@ -509,12 +603,12 @@ export default function AdminStudentDetailsModal({
     const isDeclined = declinedFields?.includes(field);
 
     let displayValue = value;
-    
+
     // Format family income if it's the familyIncome field
     if (field === "familyIncome" && value) {
       displayValue = formatFamilyIncome(value);
     }
-    
+
     if (
       (field === "academicAchievements" ||
         field === "coCurricularAchievements") &&
@@ -522,7 +616,7 @@ export default function AdminStudentDetailsModal({
     ) {
       try {
         displayValue = typeof value === "string" ? JSON.parse(value) : value;
-      } catch { }
+      } catch {}
       if (Array.isArray(displayValue)) {
         displayValue =
           displayValue.length === 0 ? (
@@ -549,22 +643,24 @@ export default function AdminStudentDetailsModal({
 
     return (
       <div
-        className={`p-4 rounded-lg border transition-all ${isDeclined
+        className={`p-4 rounded-lg border transition-all ${
+          isDeclined
             ? "border-red-400 bg-red-50"
             : verifiedStatus === true
-              ? "border-green-200 bg-green-50"
-              : verifiedStatus === false
-                ? "border-red-200 bg-red-50"
-                : verifiedStatus === undefined && tableType === "pending"
-                  ? "border-orange-300 bg-orange-50"
-                  : "border-gray-200 bg-white hover:bg-gray-50"
-          }`}
+            ? "border-green-200 bg-green-50"
+            : verifiedStatus === false
+            ? "border-red-200 bg-red-50"
+            : verifiedStatus === undefined && tableType === "pending"
+            ? "border-orange-300 bg-orange-50"
+            : "border-gray-200 bg-white hover:bg-gray-50"
+        }`}
       >
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <h4
-              className={`font-medium flex items-center ${isDeclined ? "text-red-700" : "text-gray-800"
-                }`}
+              className={`font-medium flex items-center ${
+                isDeclined ? "text-red-700" : "text-gray-800"
+              }`}
             >
               {label}
               {isDeclined && (
@@ -585,56 +681,66 @@ export default function AdminStudentDetailsModal({
               )}
             </h4>
             <div className="mt-1 text-gray-600 text-sm">
-              {isDocument && value ? (
-                (() => {
-                  // Check if the document is a PDF or image with proper type checking
-                  const isPDF = value && typeof value === 'string' && value.toLowerCase().includes('.pdf');
-                  const isImage = value && typeof value === 'string' && (value.toLowerCase().includes('.jpg') || value.toLowerCase().includes('.jpeg') || value.toLowerCase().includes('.png') || value.toLowerCase().includes('.gif') || value.toLowerCase().includes('.webp'));
-                  
-                  return (
-                    <a
-                      href={value}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 flex items-center"
-                    >
-                      {isPDF ? (
-                        <>
-                          <FiDownload className="mr-1" /> Download Document
-                        </>
-                      ) : (
-                        <>
-                          <FiDownload className="mr-1" /> View Document
-                        </>
-                      )}
-                    </a>
-                  );
-                })()
-              ) : (
-                displayValue || (
-                  <span className="text-gray-400">Not provided</span>
-                )
-              )}
+              {isDocument && value
+                ? (() => {
+                    // Check if the document is a PDF or image with proper type checking
+                    const isPDF =
+                      value &&
+                      typeof value === "string" &&
+                      value.toLowerCase().includes(".pdf");
+                    const isImage =
+                      value &&
+                      typeof value === "string" &&
+                      (value.toLowerCase().includes(".jpg") ||
+                        value.toLowerCase().includes(".jpeg") ||
+                        value.toLowerCase().includes(".png") ||
+                        value.toLowerCase().includes(".gif") ||
+                        value.toLowerCase().includes(".webp"));
+
+                    return (
+                      <a
+                        href={value}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 flex items-center"
+                      >
+                        {isPDF ? (
+                          <>
+                            <FiDownload className="mr-1" /> Download Document
+                          </>
+                        ) : (
+                          <>
+                            <FiDownload className="mr-1" /> View Document
+                          </>
+                        )}
+                      </a>
+                    );
+                  })()
+                : displayValue || (
+                    <span className="text-gray-400">Not provided</span>
+                  )}
             </div>
           </div>
           {showVerify && (
             <div className="flex space-x-2 ml-4">
               <button
                 onClick={() => handleVerify(section, field, true)}
-                className={`p-1.5 rounded-full ${verifiedStatus === true
+                className={`p-1.5 rounded-full ${
+                  verifiedStatus === true
                     ? "bg-green-100 text-green-600"
                     : "bg-gray-100 text-gray-400 hover:bg-green-50"
-                  }`}
+                }`}
                 title="Mark as correct"
               >
                 <FiCheck size={16} />
               </button>
               <button
                 onClick={() => handleVerify(section, field, false)}
-                className={`p-1.5 rounded-full ${verifiedStatus === false
+                className={`p-1.5 rounded-full ${
+                  verifiedStatus === false
                     ? "bg-red-100 text-red-600"
                     : "bg-gray-100 text-gray-400 hover:bg-red-50"
-                  }`}
+                }`}
                 title="Mark as incorrect"
               >
                 <FiX size={16} />
@@ -1146,7 +1252,7 @@ export default function AdminStudentDetailsModal({
           </div>
           <div className="flex items-center space-x-2">
             {/* Status Icon */}
-            {student?.status === 'approved' && (
+            {student?.status === "approved" && (
               <div className="relative group">
                 <div className="p-2 rounded-full bg-green-100 text-green-600 cursor-help">
                   <FiCheckCircle size={20} />
@@ -1156,7 +1262,7 @@ export default function AdminStudentDetailsModal({
                 </div>
               </div>
             )}
-            {student?.status === 'declined' && (
+            {student?.status === "declined" && (
               <div className="relative group">
                 <div className="p-2 rounded-full bg-red-100 text-red-600 cursor-help">
                   <FiXCircle size={20} />
@@ -1166,15 +1272,56 @@ export default function AdminStudentDetailsModal({
                 </div>
               </div>
             )}
-            {student?.status === 'pending' && (
-              <div className="relative group">
-                <div className="p-2 rounded-full bg-yellow-100 text-yellow-600 cursor-help">
-                  <FiClock size={20} />
+            {student?.status === "pending" && (
+              <>
+                <div className="relative">
+                  {/* AI Review Button */}
+                  <button
+                    type="button"
+                    onClick={handleClick}
+                    className="relative flex items-center px-3 py-1.5 cursor-pointer bg-gradient-to-r from-blue-600 to-red-500 text-white font-semibold rounded-lg shadow hover:from-blue-700 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 mr-6"
+                    style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.10)" }}
+                    title="Let AI review this student"
+                  >
+                    <span className="relative flex h-3 w-3 mr-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                    </span>
+                    AI Review
+                  </button>
+                  {/* Coming Soon Message */}
+                  {showMessage && (
+                    <div className="absolute top-full left-0 mt-2 bg-gray-800 text-white text-sm px-3 py-2 rounded-md shadow-lg z-50 animate-fadeIn">
+                      AI Review coming soon
+                      <div className="absolute -top-1 left-3 w-3 h-3 bg-gray-800 transform rotate-45"></div>
+                    </div>
+                  )}
+                  <style jsx>{`
+                    @keyframes fadeIn {
+                      from {
+                        opacity: 0;
+                        transform: translateY(-5px);
+                      }
+                      to {
+                        opacity: 1;
+                        transform: translateY(0);
+                      }
+                    }
+                    .animate-fadeIn {
+                      animation: fadeIn 0.2s ease-out;
+                    }
+                  `}</style>
                 </div>
-                <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-                  Pending Student
+
+                <div className="relative group">
+                  <div className="p-2 rounded-full bg-yellow-100 text-yellow-600 cursor-help">
+                    <FiClock size={20} />
+                  </div>
+                  <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                    Pending Student
+                  </div>
                 </div>
-              </div>
+              </>
             )}
             <div className="flex items-center space-x-2">
               <button
@@ -1182,7 +1329,9 @@ export default function AdminStudentDetailsModal({
                   setLoading(true);
                   axios
                     .get(
-                      `${import.meta.env.VITE_API_URL}/admin/student-details/${student.id}`,
+                      `${import.meta.env.VITE_API_URL}/admin/student-details/${
+                        student.id
+                      }`,
                       { withCredentials: true }
                     )
                     .then((res) => {
@@ -1208,7 +1357,7 @@ export default function AdminStudentDetailsModal({
           </div>
         </div>
 
-                {/* Review Progress for pending review */}
+        {/* Review Progress for pending review */}
         {tableType === "pending" && (
           <div className="px-6 pt-4">
             {(() => {
@@ -1218,18 +1367,29 @@ export default function AdminStudentDetailsModal({
                 <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <FiCheckCircle className={`mr-2 ${allVerified ? 'text-green-600' : 'text-blue-600'}`} />
+                      <FiCheckCircle
+                        className={`mr-2 ${
+                          allVerified ? "text-green-600" : "text-blue-600"
+                        }`}
+                      />
                       <span className="text-sm font-medium text-gray-700">
-                        Review Progress: {progress.verifiedFields}/{progress.totalFields} fields verified
+                        Review Progress: {progress.verifiedFields}/
+                        {progress.totalFields} fields verified
                       </span>
                     </div>
-                    <span className={`text-sm font-bold ${allVerified ? 'text-green-600' : 'text-blue-600'}`}>
+                    <span
+                      className={`text-sm font-bold ${
+                        allVerified ? "text-green-600" : "text-blue-600"
+                      }`}
+                    >
                       {progress.percentage}%
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                     <div
-                      className={`h-2 rounded-full ${allVerified ? 'bg-green-500' : 'bg-blue-500'}`}
+                      className={`h-2 rounded-full ${
+                        allVerified ? "bg-green-500" : "bg-blue-500"
+                      }`}
                       style={{ width: `${progress.percentage}%` }}
                     ></div>
                   </div>
@@ -1254,12 +1414,15 @@ export default function AdminStudentDetailsModal({
                 return (
                   <button
                     key={section.key}
-                    onClick={() => tableType !== "pending" && setActiveTab(index)}
-                    className={`py-4 px-1 font-medium text-sm border-b-2 transition-colors flex items-center relative ${activeTab === index
+                    onClick={() =>
+                      tableType !== "pending" && setActiveTab(index)
+                    }
+                    className={`py-4 px-1 font-medium text-sm border-b-2 transition-colors flex items-center relative ${
+                      activeTab === index
                         ? "border-blue-500 text-blue-600"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                      }
-                    ${hasDeclinedFields ? 'border-red-400' : ''}`}
+                    }
+                    ${hasDeclinedFields ? "border-red-400" : ""}`}
                   >
                     {section.icon}
                     <span className="flex items-center">
@@ -1267,8 +1430,16 @@ export default function AdminStudentDetailsModal({
                       {hasDeclinedFields && (
                         <div className="relative ml-1 group">
                           <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center animate-pulse cursor-help">
-                            <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                            <svg
+                              className="w-2.5 h-2.5 text-white"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                           </div>
                           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-red-600 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50 mb-0">
@@ -1279,7 +1450,10 @@ export default function AdminStudentDetailsModal({
                       )}
                     </span>
                     {tableType === "pending" && sectionCompleted[index] && (
-                      <FiCheckCircle className="ml-2 text-green-500" size={16} />
+                      <FiCheckCircle
+                        className="ml-2 text-green-500"
+                        size={16}
+                      />
                     )}
                   </button>
                 );
@@ -1328,10 +1502,11 @@ export default function AdminStudentDetailsModal({
                   <button
                     onClick={handleProceed}
                     disabled={!isSectionVerified(sectionDefs[activeTab].key)}
-                    className={`flex items-center px-4 py-2 rounded-md text-white ${isSectionVerified(sectionDefs[activeTab].key)
+                    className={`flex items-center px-4 py-2 rounded-md text-white ${
+                      isSectionVerified(sectionDefs[activeTab].key)
                         ? "bg-blue-600 hover:bg-blue-700"
                         : "bg-blue-300 cursor-not-allowed"
-                      }`}
+                    }`}
                   >
                     Next <FiArrowRight className="ml-2" />
                   </button>
@@ -1344,19 +1519,30 @@ export default function AdminStudentDetailsModal({
                         <>
                           <div className="flex items-center text-sm text-gray-600">
                             <span className="mr-2">Review Progress:</span>
-                            <span className={`font-semibold ${allVerified ? 'text-green-600' : 'text-orange-600'}`}>
-                              {progress.verifiedFields}/{progress.totalFields} ({progress.percentage}%)
+                            <span
+                              className={`font-semibold ${
+                                allVerified
+                                  ? "text-green-600"
+                                  : "text-orange-600"
+                              }`}
+                            >
+                              {progress.verifiedFields}/{progress.totalFields} (
+                              {progress.percentage}%)
                             </span>
                           </div>
                           <button
                             onClick={handleDone}
                             disabled={actionLoading || !allVerified}
                             className={`flex items-center px-6 py-2 rounded-md disabled:opacity-50 ${
-                              allVerified 
-                                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                                : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                              allVerified
+                                ? "bg-blue-600 hover:bg-blue-700 text-white"
+                                : "bg-gray-400 text-gray-600 cursor-not-allowed"
                             }`}
-                            title={!allVerified ? 'Please review all fields before proceeding' : 'Complete review'}
+                            title={
+                              !allVerified
+                                ? "Please review all fields before proceeding"
+                                : "Complete review"
+                            }
                           >
                             Done
                           </button>

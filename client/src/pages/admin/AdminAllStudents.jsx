@@ -243,7 +243,7 @@ export default function AdminAllStudents() {
           {/* Search Button */}
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm cursor-pointer"
           >
             Search
           </button>
@@ -254,7 +254,7 @@ export default function AdminAllStudents() {
           {STATUS_OPTIONS.map((opt) => (
             <button
               key={opt.value}
-              className={`inline-flex items-center px-4 py-2 rounded-lg border transition-all ${status === opt.value
+              className={`inline-flex items-center px-4 py-2 rounded-lg border cursor-pointer transition-all ${status === opt.value
                   ? "bg-blue-600 text-white border-blue-600 shadow-inner"
                   : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100 shadow-sm"
                 }`}
