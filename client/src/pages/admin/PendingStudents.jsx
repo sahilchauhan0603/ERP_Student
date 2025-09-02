@@ -256,7 +256,7 @@ export default function PendingStudents() {
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => handleViewDetails(student)}
-                        className="text-yellow-600 hover:text-yellow-800 inline-flex items-center"
+                        className="text-yellow-600 hover:text-yellow-800 inline-flex items-center cursor-pointer"
                       >
                         <FiEye className="mr-1" /> Review
                       </button>

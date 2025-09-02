@@ -348,7 +348,7 @@ export default function AdminAllStudents() {
                         setSelected(student);
                         setShowModal(true);
                       }}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-blue-600 hover:text-blue-900 cursor-pointer"
                     >
                       View
                     </button>

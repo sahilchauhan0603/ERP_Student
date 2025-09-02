@@ -29,7 +29,6 @@ export default function DeclinedStudents() {
   ];
 
   const BATCH_OPTIONS = [
-    '',
     '2024-2027', '2024-2028', '2024-2029',
     '2025-2028', '2025-2029',
     '2026-2029', '2026-2030',
@@ -262,7 +261,7 @@ export default function DeclinedStudents() {
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => handleViewDetails(student)}
-                        className="text-red-600 hover:text-red-800 inline-flex items-center"
+                        className="text-red-600 hover:text-red-800 inline-flex items-center cursor-pointer"
                       >
                         <FiEye className="mr-1" /> View
                       </button>

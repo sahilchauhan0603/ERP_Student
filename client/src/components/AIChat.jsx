@@ -336,8 +336,9 @@ export default function AIChat({ onClose }) {
             onClick={() => setShowEmoji((v) => !v)}
             className="absolute right-5 top-1/2 transform -translate-y-1/2 text-yellow-400 hover:text-yellow-600 transition-colors duration-150"
             title="Add emoji"
+            style={{ fontSize: '1rem', lineHeight: 1 }}
           >
-            <FaSmile />
+            <FaSmile style={{ fontSize: '1.5rem', lineHeight: 1 }} />
           </button>
         </div>
         

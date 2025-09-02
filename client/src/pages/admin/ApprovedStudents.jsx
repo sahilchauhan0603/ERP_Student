@@ -256,7 +256,7 @@ export default function ApprovedStudents() {
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => handleViewDetails(student)}
-                        className="text-green-600 hover:text-green-800 inline-flex items-center"
+                        className="text-green-600 hover:text-green-800 inline-flex items-center cursor-pointer"
                       >
                         <FiEye className="mr-1" /> View
                       </button>
