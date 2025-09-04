@@ -81,4 +81,11 @@ router.get(
   adminController.getAdminProfile
 );
 
+router.post(
+  "/ai-review-student",
+  authenticate,
+  authorizeRole("admin"),
+  adminController.aiReviewStudent
+);
+
 module.exports = router;

@@ -53,12 +53,14 @@ export default function AdminStudentDetailsModal({
     false,
   ]);
   const [showMessage, setShowMessage] = useState(false);
-
-  const handleClick = () => {
-    setShowMessage(true);
-    // Hide the message after 2 seconds
-    setTimeout(() => setShowMessage(false), 2000);
-  };
+  
+  const [progress, setProgress] = useState(0);
+  const [reviewing, setReviewing] = useState(false);
+  // const handleClick = () => {
+  //   setShowMessage(true);
+  //   // Hide the message after 2 seconds
+  //   setTimeout(() => setShowMessage(false), 2000);
+  // };
 
   // Parse declined fields - handle both string and array formats
   const parseDeclinedFields = (fields) => {
@@ -274,6 +276,62 @@ export default function AdminStudentDetailsModal({
   const isAllFieldsVerified = () => {
     const allSections = ["personal", "academic", "parent", "documents"];
     return allSections.every((section) => isSectionVerified(section));
+  };
+
+  const handleAIReview = async () => {
+    setActionLoading(true);
+    setReviewing(true);
+    setProgress(0);
+  
+    // Fake progress simulation
+    let i = 0;
+    const interval = setInterval(() => {
+      i += 10;
+      setProgress((prev) => (prev < 95 ? i : prev)); // cap at 95% until API resolves
+    }, 300);
+  
+    try {
+      // Step 1: Call backend AI review
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/admin/ai-review-student`,
+        { student: details },
+        { withCredentials: true }
+      );
+  
+      const { status, declinedFields } = res.data;
+  
+      // Step 2: Save result via verify-student
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/admin/verify-student`,
+        { studentId: student.id, status, declinedFields },
+        { withCredentials: true }
+      );
+  
+      clearInterval(interval);
+      setProgress(100); // finish progress
+      setTimeout(() => {
+        setReviewing(false);
+        refresh?.();
+        onClose();
+        Swal.fire({
+          icon: status === "approved" ? "success" : "info",
+          title: "AI Review Complete",
+          text: `Student has been ${status} by AI.`,
+          timer: 2500,
+          showConfirmButton: false,
+        });
+      }, 500);
+    } catch (e) {
+      clearInterval(interval);
+      setReviewing(false);
+      Swal.fire({
+        icon: "error",
+        title: "AI Review Failed",
+        text: e.message || "Could not review student.",
+      });
+    }
+  
+    setActionLoading(false);
   };
 
   // Get count of verified fields for progress tracking
@@ -1278,7 +1336,7 @@ export default function AdminStudentDetailsModal({
                   {/* AI Review Button */}
                   <button
                     type="button"
-                    onClick={handleClick}
+                    onClick={handleAIReview}
                     className="relative flex items-center px-3 py-1.5 cursor-pointer bg-gradient-to-r from-blue-600 to-red-500 text-white font-semibold rounded-lg shadow hover:from-blue-700 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 mr-6"
                     style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.10)" }}
                     title="Let AI review this student"
@@ -1289,28 +1347,19 @@ export default function AdminStudentDetailsModal({
                     </span>
                     AI Review
                   </button>
-                  {/* Coming Soon Message */}
-                  {showMessage && (
-                    <div className="absolute top-full left-0 mt-2 bg-gray-800 text-white text-sm px-3 py-2 rounded-md shadow-lg z-50 animate-fadeIn">
-                      AI Review coming soon
-                      <div className="absolute -top-1 left-3 w-3 h-3 bg-gray-800 transform rotate-45"></div>
+                  {reviewing && (
+                    <div className="mt-3">
+                      <div className="w-64 bg-gray-200 rounded-full h-3">
+                        <div
+                          className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-300"
+                          style={{ width: `${progress}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">
+                        AI reviewing student... {progress}%
+                      </p>
                     </div>
-                  )}
-                  <style jsx>{`
-                    @keyframes fadeIn {
-                      from {
-                        opacity: 0;
-                        transform: translateY(-5px);
-                      }
-                      to {
-                        opacity: 1;
-                        transform: translateY(0);
-                      }
-                    }
-                    .animate-fadeIn {
-                      animation: fadeIn 0.2s ease-out;
-                    }
-                  `}</style>
+                   )}
                 </div>
 
                 <div className="relative group">

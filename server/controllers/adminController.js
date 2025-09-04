@@ -527,3 +527,125 @@ exports.getAdminProfile = (req, res) => {
   }
   res.json({ email: req.user.email });
 };
+
+exports.aiReviewStudent = (req, res) => {
+  const { student } = req.body;
+  if (!student) {
+    return res.status(400).json({ message: "Student data required" });
+  }
+
+  const verifications = { personal: {}, academic: {}, parent: {}, documents: {} };
+  const declinedFields = [];
+
+  // --- Personal Info Validation ---
+  const personal = student.personal || {};
+  const personalRequired = [
+    "course", "firstName", "lastName", "abcId", "dob", "placeOfBirth",
+    "mobile", "email", "examRoll", "examRank", "gender", "category",
+    "region", "currentAddress", "permanentAddress", "feeReimbursement", "antiRaggingRef"
+  ];
+  personalRequired.forEach((field) => {
+    if (!personal[field]) {
+      verifications.personal[field] = false;
+      declinedFields.push(`personal.${field}`);
+    } else {
+      verifications.personal[field] = true;
+    }
+  });
+
+  // --- Academic Info Validation ---
+  const academic = student.academic || {};
+  const classX = academic.classX || {};
+  const classXII = academic.classXII || {};
+  const otherQualification = academic.otherQualification || {};
+
+  // Class X
+  ["institute", "board", "year", "aggregate"].forEach((f) => {
+    if (!classX[f]) {
+      verifications.academic[`classX.${f}`] = false;
+      declinedFields.push(`academic.classX.${f}`);
+    } else {
+      verifications.academic[`classX.${f}`] = true;
+    }
+  });
+
+  // Class XII
+  ["institute", "board", "year", "aggregate", "pcm"].forEach((f) => {
+    if (!classXII[f]) {
+      verifications.academic[`classXII.${f}`] = false;
+      declinedFields.push(`academic.classXII.${f}`);
+    } else {
+      verifications.academic[`classXII.${f}`] = true;
+    }
+  });
+
+  // Other Qualification (if any field is filled, then all are required)
+  const oqAny = otherQualification.institute || otherQualification.board ||
+                otherQualification.year || otherQualification.aggregate ||
+                otherQualification.pcm;
+  if (oqAny) {
+    ["institute", "board", "year", "aggregate", "pcm"].forEach((f) => {
+      if (!otherQualification[f]) {
+        verifications.academic[`otherQualification.${f}`] = false;
+        declinedFields.push(`academic.otherQualification.${f}`);
+      } else {
+        verifications.academic[`otherQualification.${f}`] = true;
+      }
+    });
+  }
+
+  // --- Parent Info Validation ---
+  const parents = student.parents || { father: {}, mother: {} };
+  const father = parents.father || {};
+  const mother = parents.mother || {};
+
+  const fatherRequired = ["name", "qualification", "occupation", "email", "mobile"];
+  fatherRequired.forEach((f) => {
+    if (!father[f]) {
+      verifications.parent[`father.${f}`] = false;
+      declinedFields.push(`parent.father.${f}`);
+    } else {
+      verifications.parent[`father.${f}`] = true;
+    }
+  });
+
+  const motherRequired = ["name", "qualification", "occupation", "mobile"];
+  motherRequired.forEach((f) => {
+    if (!mother[f]) {
+      verifications.parent[`mother.${f}`] = false;
+      declinedFields.push(`parent.mother.${f}`);
+    } else {
+      verifications.parent[`mother.${f}`] = true;
+    }
+  });
+
+  if (!parents.familyIncome) {
+    verifications.parent["familyIncome"] = false;
+    declinedFields.push("parent.familyIncome");
+  } else {
+    verifications.parent["familyIncome"] = true;
+  }
+
+  // --- Documents Validation ---
+  const documents = student.documents || {};
+  const requiredDocs = [
+    "photo", "ipuRegistration", "allotmentLetter", "examAdmitCard", "examScoreCard",
+    "marksheet10", "passing10", "marksheet12", "passing12", "aadhar",
+    "characterCertificate", "medicalCertificate", "migrationCertificate",
+    "academicFeeReceipt", "collegeFeeReceipt", "parentSignature"
+  ];
+  requiredDocs.forEach((doc) => {
+    if (!documents[doc]) {
+      verifications.documents[doc] = false;
+      declinedFields.push(`documents.${doc}`);
+    } else {
+      verifications.documents[doc] = true;
+    }
+  });
+
+  // --- Final Status ---
+  const status = declinedFields.length > 0 ? "declined" : "approved";
+
+  return res.json({ status, declinedFields, verifications });
+};
+
