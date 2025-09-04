@@ -1449,7 +1449,7 @@ const StudentDetailsDashboard = () => {
             </Tab.Panel>
 
             {/* Academic Information Tab */}
-            <Tab.Panel >
+            <Tab.Panel>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                 <DetailCard title="Class X Details" section="academic">
                   <DetailItem
@@ -1633,7 +1633,7 @@ const StudentDetailsDashboard = () => {
             </Tab.Panel>
 
             {/* Documents Tab */}
-            <Tab.Panel className="rounded-xl bg-white p-6 shadow">
+            <Tab.Panel>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
                 {Object.entries(details.documents || {}).map(([field, url]) => (
                   <DocumentCard
