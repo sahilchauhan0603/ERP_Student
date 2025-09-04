@@ -8,7 +8,7 @@ import FacultyRegistration from './pages/registration/faculty/FacultyRegistratio
 import NonTeachingStaffRegistration from './pages/registration/nonTeachingStaff/NonTeachingStaffRegistration';
 import StudentLogin from './pages/auth/StudentLogin';
 import AdminLogin from './pages/auth/AdminLogin';
-import StudentDetailsDashboardPage  from './pages/studentdashboard/StudentDetailsDashboardPage';
+import StudentDetailsDashboard from './pages/studentdashboard/Dashboard';
 import StudentLayout from './components/StudentLayout';
 import SARBooklet from './pages/studentdashboard/SARBooklet';
 import RegistrationPage from './pages/registration/registrationPage';
@@ -102,7 +102,7 @@ function AppContent() {
           <StudentLayout />
         </AuthRoute>
       }>
-        <Route path="/student/me" element={<StudentDetailsDashboardPage />} />
+        <Route path="/student/me" element={<StudentDetailsDashboard />} />
         <Route path="/student/sar" element={<SARBooklet />} />
       </Route>
 
