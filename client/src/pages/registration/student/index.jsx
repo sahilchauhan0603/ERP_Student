@@ -443,43 +443,9 @@ const StudentRegistration = () => {
     } else if (step === 2) {
       return validateAcademicInfo();
     } else if (step === 3) {
-      const { parents } = formData;
-      // Father
-      if (!parents.father.name) missing.push("father.name");
-      if (!parents.father.qualification) missing.push("father.qualification");
-      if (!parents.father.occupation) missing.push("father.occupation");
-      if (!parents.father.email) missing.push("father.email");
-      if (!parents.father.mobile) missing.push("father.mobile");
-      // Mother
-      if (!parents.mother.name) missing.push("mother.name");
-      if (!parents.mother.qualification) missing.push("mother.qualification");
-      if (!parents.mother.occupation) missing.push("mother.occupation");
-      if (!parents.mother.mobile) missing.push("mother.mobile");
-      // Family Income
-      if (!parents.familyIncome) missing.push("familyIncome");
+      return validateParentInfo();
     } else if (step === 4) {
-      const { documents } = formData;
-      const requiredDocs = [
-        "photo",
-        "ipuRegistration",
-        "allotmentLetter",
-        "examAdmitCard",
-        "examScoreCard",
-        "marksheet10",
-        "passing10",
-        "marksheet12",
-        "passing12",
-        "aadhar",
-        "characterCertificate",
-        "medicalCertificate",
-        "migrationCertificate",
-        "academicFeeReceipt",
-        "collegeFeeReceipt",
-        "parentSignature",
-      ];
-      requiredDocs.forEach((doc) => {
-        if (!documents[doc]) missing.push(doc);
-      });
+      return validateDocuments();
     }
     return missing;
   }
@@ -529,7 +495,10 @@ const StudentRegistration = () => {
     {
       label: "Review",
       component: (
-        <ReviewSubmit formData={formData} incompleteFields={incompleteFields} />
+        <ReviewSubmit 
+          formData={formData} 
+          incompleteFields={incompleteFields} 
+        />
       ),
     },
   ];
@@ -608,6 +577,7 @@ const StudentRegistration = () => {
         />
         <div className="max-w-6xl mx-auto">
           <div className="bg-white py-6 sm:py-8 px-4 sm:px-6 shadow-lg rounded-2xl ">
+            
             {/* Headings */}
             <div className="text-center mb-6 sm:mb-8">
               <div className="relative mb-3 sm:mb-4">
@@ -647,7 +617,7 @@ const StudentRegistration = () => {
               <button
                 onClick={prevStep}
                 disabled={currentStep === 0 || isSubmitting}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm sm:text-base"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 cursor-pointer text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm sm:text-base"
               >
                 Previous
               </button>
@@ -657,7 +627,7 @@ const StudentRegistration = () => {
                   <button
                     onClick={nextStep}
                     disabled={isSubmitting}
-                    className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm sm:text-base"
+                    className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-700 cursor-pointer text-white rounded-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm sm:text-base"
                   >
                     Next
                   </button>
