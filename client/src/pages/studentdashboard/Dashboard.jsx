@@ -133,20 +133,7 @@ const StudentDetailsDashboard = () => {
     }
   };
 
-  const handleBackClick = async () => {
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "You will be logged out!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, logout!",
-    });
-    if (result.isConfirmed) {
-      handleLogout();
-    }
-  };
+  const handleBackClick = async () => {};
 
   const handleEditToggle = () => {
     if (!editMode) {
@@ -321,10 +308,6 @@ const StudentDetailsDashboard = () => {
     }
   };
 
-
-
-  // Removed LogoutModal component since we now use SweetAlert
-
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
@@ -338,8 +321,8 @@ const StudentDetailsDashboard = () => {
 
   const DetailCard = ({ title, children, section }) => (
     <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-4 w-full">
-      <div className="px-4 py-3 bg-blue-50 border-b border-blue-200 flex items-center">
-        <h3 className="text-lg font-semibold text-blue-800">{title}</h3>
+      <div className="px-4 py-3 bg-gray-100 border-b border-gray-200 flex justify-center">
+        <h3 className="text-lg font-semibold text-black">{title}</h3>
       </div>
       <div className="px-0 py-0 relative">
         <div className="w-full">
@@ -700,7 +683,7 @@ const StudentDetailsDashboard = () => {
                       href={newFileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-2 mb-2 text-center py-1 px-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+                      className="mt-2 mb-2 text-center py-1 px-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-xs font-medium rounded-md hover:from-gray-600 hover:to-gray-600 transition-all shadow-sm"
                     >
                       View Document
                     </a>
@@ -709,7 +692,7 @@ const StudentDetailsDashboard = () => {
                       href={newFileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-2 mb-2 text-center py-1 px-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+                      className="mt-2 mb-2 text-center py-1 px-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-xs font-medium rounded-md hover:from-gray-900 hover:to-gray-600 transition-all shadow-sm"
                     >
                       View Document
                     </a>
@@ -749,7 +732,7 @@ const StudentDetailsDashboard = () => {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 text-center py-2 px-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+              className="mt-3 text-center py-2 px-3 bg-gradient-to-r from-gray-600 to-gray-900 text-white text-sm font-medium rounded-md hover:from-gray-600 hover:to-gray-700 transition-all shadow-sm"
             >
               Download Document
             </a>
@@ -758,7 +741,7 @@ const StudentDetailsDashboard = () => {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 text-center py-2 px-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+              className="mt-3 text-center py-2 px-3 bg-gradient-to-r from-gray-600 to-gray-900 text-white text-sm font-medium rounded-md hover:from-gray-600 hover:to-gray-700 transition-all shadow-sm"
             >
               View Document
             </a>
@@ -869,21 +852,32 @@ const StudentDetailsDashboard = () => {
     hasTenth && hasTwelfth ? ((tenth + twelfth) / 2).toFixed(2) : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-25 to-gray-50 overflow-x-hidden">
       {/* Removed LogoutModal rendering since we now use SweetAlert */}
 
-
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-8 w-full">
+       
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
               Student Dashboard
             </h1>
-            <p className="text-gray-600 mt-2">
+            <p className="text-gray-600 mt-2 flex items-center gap-3">
               Welcome back,{" "}
               <span className="font-medium text-blue-600">
                 {details.personal?.firstName}
+              </span>
+              <span
+                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  details.personal?.status === "approved"
+                    ? "bg-green-200 text-green-800"
+                    : details.personal?.status === "declined"
+                      ? "bg-red-200 text-red-800"
+                      : "bg-orange-200 text-orange-800"
+                }`}
+              >
+                {details.personal?.status?.toUpperCase() || "PENDING"}
               </span>
             </p>
           </div>
@@ -892,46 +886,21 @@ const StudentDetailsDashboard = () => {
               <button
                 onClick={handleEditToggle}
                 className={`px-4 py-2 rounded-lg transition-all shadow-sm ${editMode
-                  ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                  : "bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700"
+                  ? "bg-gray-200 text-gray-800 hover:bg-gray-400"
+                  : "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-800"
                   }`}
               >
                 {editMode ? "Cancel Editing" : "Update Profile"}
               </button>
             )}
-            <button
-              onClick={handleBackClick}
-              className="px-4 py-2 bg-gradient-to-r from-gray-200 to-gray-300 text-gray-700 rounded-lg hover:from-gray-300 hover:to-gray-400 transition-all flex items-center gap-2 shadow-sm"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
-              Logout
-            </button>
+            {/* Logout moved to sidebar */}
           </div>
         </div>
 
         {/* Student Profile Summary */}
-        <div
-          className={`rounded-xl shadow-lg overflow-hidden mb-8 ${details.personal?.status === "declined"
-            ? "bg-gradient-to-r from-red-500 to-red-600"
-            : details.personal?.status === "approved"
-              ? "bg-gradient-to-r from-green-500 to-green-600"
-              : "bg-gradient-to-r from-orange-400 to-yellow-400"
-            }`}
-        >
+        <div className="rounded-xl shadow-lg overflow-hidden mb-8 bg-white border border-gray-300">
           <div className="p-6 flex flex-col md:flex-row items-center">
-            <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white/80 shadow-lg mb-4 md:mb-0 md:mr-6">
+            <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-gray-700 shadow-lg mb-4 md:mb-0 md:mr-6">
               <img
                 src={
                   details.documents?.photo ||
@@ -954,7 +923,7 @@ const StudentDetailsDashboard = () => {
               />
             </div>
             <div className="flex-1 text-center md:text-left">
-              <h2 className="text-2xl font-bold text-white">
+              <h2 className="text-2xl font-bold text-gray-900">
                 {details.personal?.firstName}{" "}
                 {details.personal?.middleName
                   ? details.personal.middleName + " "
@@ -962,7 +931,7 @@ const StudentDetailsDashboard = () => {
                 {details.personal?.lastName}
               </h2>
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-2">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-300 text-gray-800">
                   <svg
                     className="w-3 h-3 mr-1"
                     fill="currentColor"
@@ -972,7 +941,7 @@ const StudentDetailsDashboard = () => {
                   </svg>
                   {details.personal?.course}
                 </span>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-300 text-gray-800">
                   <svg
                     className="w-3 h-3 mr-1"
                     fill="currentColor"
@@ -987,14 +956,14 @@ const StudentDetailsDashboard = () => {
                   {details.personal?.category}
                 </span>
                 {details.personal?.batch && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-300 text-gray-800">
                     <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     Batch: {details.personal.batch}
                   </span>
                 )}
-                <span
+                {/* <span
                   className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${details.personal?.status === "approved"
                     ? "bg-green-100 text-green-800"
                     : details.personal?.status === "declined"
@@ -1003,9 +972,9 @@ const StudentDetailsDashboard = () => {
                     }`}
                 >
                   {details.personal?.status?.toUpperCase() || "PENDING"}
-                </span>
+                </span> */}
               </div>
-              <div className="mt-3 flex flex-wrap justify-center md:justify-start gap-3 text-sm text-white/90">
+              <div className="mt-3 flex flex-wrap justify-center md:justify-start gap-3 text-sm text-gray-700">
                 <span className="flex items-center">
                   <svg
                     className="w-4 h-4 mr-1"
@@ -1058,13 +1027,13 @@ const StudentDetailsDashboard = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full">
-          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border-t-4 border-blue-400">
+          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border-t-4 border-black">
             <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-blue-100 text-blue-600 mr-4">
+              <div className="p-3 rounded-lg bg-gray-300 text-blue-600 mr-4">
                 <svg
                   className="w-6 h-6"
                   fill="none"
-                  stroke="currentColor"
+                  stroke="black"
                   viewBox="0 0 24 24"
                 >
                   <path
@@ -1076,13 +1045,13 @@ const StudentDetailsDashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Documents Uploaded</p>
+                <p className="text-sm text-gray-800">Documents Uploaded</p>
                 <p className="text-2xl font-bold text-gray-800">
                   {
                     Object.values(details.documents || {}).filter((doc) => doc)
                       .length
                   }
-                  <span className="text-sm font-normal text-gray-500">
+                  <span className="text-sm font-normal text-gray-600">
                     {" "}
                     / {Object.keys(details.documents || {}).length}
                   </span>
@@ -1091,13 +1060,13 @@ const StudentDetailsDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border-t-4 border-green-400">
+          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border-t-4 border-black">
             <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-green-100 text-green-600 mr-4">
+              <div className="p-3 rounded-lg bg-gray-300 text-green-600 mr-4">
                 <svg
                   className="w-6 h-6"
                   fill="none"
-                  stroke="currentColor"
+                  stroke="black"
                   viewBox="0 0 24 24"
                 >
                   <path
@@ -1109,13 +1078,13 @@ const StudentDetailsDashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-800">
                   Academic Status - 10th + 12th
                 </p>
                 <p className="text-2xl font-bold text-gray-800">
                   {hasTenth && hasTwelfth ? `${academicAvg}%` : "N/A"}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-600 mt-1">
                   {hasTenth ? `10th: ${tenth}%` : "10th: N/A"} |{" "}
                   {hasTwelfth ? `12th: ${twelfth}%` : "12th: N/A"}
                 </p>
@@ -1123,27 +1092,30 @@ const StudentDetailsDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border-t-4 border-yellow-400">
+          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border-t-4 border-black">
             <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-purple-100 text-purple-600 mr-4">
+              <div className="p-3 rounded-lg bg-gray-300 text-purple-600 mr-4">
                 <svg
                   className="w-6 h-6"
                   fill="none"
-                  stroke="currentColor"
+                  stroke="black"
                   viewBox="0 0 24 24"
                 >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
                   />
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Family Income</p>
-                <p className="text-2xl font-bold text-gray-800">
-                  {formatFamilyIncome(details.parent?.familyIncome)}
+                <p className="text-sm text-gray-800">Branch & Batch</p>
+                <p className="text-lg font-bold text-gray-800">
+                  {details.personal?.course || "N/A"}
+                </p>
+                <p className="text-xs text-gray-600 mt-1">
+                  Batch: {details.personal?.batch || "N/A"}
                 </p>
               </div>
             </div>
@@ -1162,10 +1134,10 @@ const StudentDetailsDashboard = () => {
                   key={category}
                   className={({ selected }) =>
                     `w-full rounded-lg py-3 text-sm font-medium leading-5 transition-all duration-200
-                    ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2 relative
+                    ring-white ring-opacity-60 ring-offset-2 ring-offset-gray-800 focus:outline-none focus:ring-2 relative
                     ${selected
-                      ? "bg-white shadow text-blue-700"
-                      : "text-gray-600 hover:bg-white/50 hover:text-blue-600"
+                      ? "bg-white shadow text-gray-900"
+                      : "text-gray-600 hover:bg-white/50 hover:text-black"
                     }
                     ${hasDeclinedFields ? 'border-2 border-red-400' : ''}`
                   }
@@ -1194,8 +1166,8 @@ const StudentDetailsDashboard = () => {
           <Tab.Panels className="mt-2">
             {/* Personal Information Tab */}
             <Tab.Panel
-              className="rounded-xl p-2 bg-white shadow"
-              style={{ minHeight: 0, background: "#fff" }}
+              // className="rounded-xl p-2 bg-white shadow"
+              // style={{ minHeight: 0, background: "#fff" }}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3 w-full">
                 <DetailCard title="Basic Information" section="personal">
@@ -1324,7 +1296,7 @@ const StudentDetailsDashboard = () => {
             </Tab.Panel>
 
             {/* Parent Information Tab */}
-            <Tab.Panel className="rounded-xl bg-white p-2 shadow">
+            <Tab.Panel>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                 <DetailCard title="Father's Details" section="parent">
                   <DetailItem
@@ -1477,7 +1449,7 @@ const StudentDetailsDashboard = () => {
             </Tab.Panel>
 
             {/* Academic Information Tab */}
-            <Tab.Panel className="rounded-xl bg-white p-2 shadow">
+            <Tab.Panel >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                 <DetailCard title="Class X Details" section="academic">
                   <DetailItem
@@ -1604,8 +1576,8 @@ const StudentDetailsDashboard = () => {
 
                 {details.academic?.academicAchievements?.length > 0 && (
                   <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-4 w-full">
-                    <div className="px-4 py-3 bg-blue-50 border-b border-blue-200 flex items-center">
-                      <h3 className="text-lg font-semibold text-blue-800">
+                    <div className="px-4 py-3 bg-gray-100 border-b border-gray-200 flex justify-center">
+                      <h3 className="text-lg font-semibold text-black">
                         Academic Achievements
                       </h3>
                     </div>
@@ -1615,7 +1587,7 @@ const StudentDetailsDashboard = () => {
                           (achievement, index) => (
                             <div
                               key={index}
-                              className="text-sm text-gray-600 p-2 bg-gray-50 rounded break-words w-full"
+                              className="text-sm text-gray-800 p-2 bg-gray-25 rounded break-words w-full"
                               style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
                             >
                               <strong>{achievement.event}</strong> ({achievement.date})<br />
@@ -1632,8 +1604,8 @@ const StudentDetailsDashboard = () => {
 
                 {details.academic?.coCurricularAchievements?.length > 0 && (
                   <div className="border border-gray-200 rounded-xl p-0 bg-white shadow-sm hover:shadow-md transition-shadow mb-4 w-full">
-                    <div className="px-4 py-3 bg-blue-50 border-b border-blue-200 flex items-center">
-                      <h3 className="text-lg font-semibold text-blue-800">
+                    <div className="px-4 py-3 bg-gray-100 border-b border-gray-200 flex justify-center">
+                      <h3 className="text-lg font-semibold text-black">
                         Co-Curricular Achievements
                       </h3>
                     </div>
@@ -1643,7 +1615,7 @@ const StudentDetailsDashboard = () => {
                           (achievement, index) => (
                             <div
                               key={index}
-                              className="text-sm text-gray-600 p-2 bg-gray-50 rounded break-words w-full"
+                              className="text-sm text-gray-800 p-2 bg-gray-25 rounded break-words w-full"
                               style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
                             >
                               <strong>{achievement.event}</strong> ({achievement.date})<br />
@@ -1718,7 +1690,7 @@ const StudentDetailsDashboard = () => {
         {/* Final Update Button (only in edit mode for declined status) */}
         {editMode && details.personal?.status === "declined" && (
           <div className="mt-8 flex justify-end items-center">
-            <div className="mr-4 text-sm text-gray-600">
+            <div className="mr-4 text-sm text-gray-800">
               {updatedFields.length} of {declinedFields.length} required fields
               updated
             </div>
@@ -1728,7 +1700,7 @@ const StudentDetailsDashboard = () => {
                 !allDeclinedFieldsUpdated() || saveStatus.final?.loading
               }
               className={`px-6 py-3 text-white font-medium rounded-lg transition-all shadow-lg flex items-center gap-2 ${allDeclinedFieldsUpdated()
-                ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                ? "bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-700"
                 : "bg-gray-400 cursor-not-allowed"
                 }`}
             >

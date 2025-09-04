@@ -9,6 +9,8 @@ import NonTeachingStaffRegistration from './pages/registration/nonTeachingStaff/
 import StudentLogin from './pages/auth/StudentLogin';
 import AdminLogin from './pages/auth/AdminLogin';
 import StudentDetailsDashboardPage  from './pages/studentdashboard/StudentDetailsDashboardPage';
+import StudentLayout from './components/StudentLayout';
+import SARBooklet from './pages/studentdashboard/SARBooklet';
 import RegistrationPage from './pages/registration/registrationPage';
 import AdminLayout from './components/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -94,12 +96,15 @@ function AppContent() {
       <Route path="/login" element={<StudentLogin />} />
       <Route path="/admin" element={<AdminLogin />} />
 
-      {/* Student Routes */}
-      <Route path="/student/me" element={
+      {/* Student Routes with Sidebar Layout */}
+      <Route element={
         <AuthRoute role="student">
-          <StudentDetailsDashboardPage />
+          <StudentLayout />
         </AuthRoute>
-      } />
+      }>
+        <Route path="/student/me" element={<StudentDetailsDashboardPage />} />
+        <Route path="/student/sar" element={<SARBooklet />} />
+      </Route>
 
       {/* Admin Routes - Authentication handled at AdminLayout level */}
       <Route element={<AdminLayout />}>
