@@ -934,14 +934,14 @@ exports.updateDeclinedFields = async (req, res) => {
 
     // Now flatten data after processing files
     const flatData = flattenObject(data);
-    console.log("Declined fields:", declinedFields);
-    console.log("Flattened data keys:", Object.keys(flatData));
-    console.log("Data documents:", data.documents);
+    // console.log("Declined fields:", declinedFields);
+    // console.log("Flattened data keys:", Object.keys(flatData));
+    // console.log("Data documents:", data.documents);
 
     const updatableFields = Object.keys(flatData).filter((field) =>
       declinedFields.includes(normalizeDeclinedField(field))
     );
-    console.log("Updatable fields:", updatableFields);
+    // console.log("Updatable fields:", updatableFields);
 
     if (updatableFields.length === 0) {
       return res.status(400).json({
