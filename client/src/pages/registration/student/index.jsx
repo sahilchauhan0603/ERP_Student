@@ -13,12 +13,14 @@ import bpitLogo from "../../../assets/icons/BPIT-logo-transparent.png";
 import campusBackground from "../../../assets/images/BPIT.png";
 import AIChatLauncher from "../../../components/AIChatLauncher"; // adjust path as needed
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { FiInfo } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";
 
 const StudentRegistration = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isDirty, setIsDirty] = useState(false);
+  const skipUnloadRef = useRef(false);
   // Scroll to top on step change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -133,6 +135,28 @@ const StudentRegistration = () => {
       familyIncome: "",
     },
   });
+
+  // Mark form as dirty on any change
+  const setFormDataDirty = (updater) => {
+    setIsDirty(true);
+    if (typeof updater === "function") {
+      setFormData((prev) => updater(prev));
+    } else {
+      setFormData(updater);
+    }
+  };
+
+  // Warn on page reload/close when data may be unsaved
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (!isDirty || skipUnloadRef.current) return;
+      e.preventDefault();
+      e.returnValue = "Your data might not be saved";
+      return "Your data might not be saved";
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isDirty]);
 
   const nextStep = () => {
     const missing = getIncompleteFields(currentStep);
@@ -415,8 +439,10 @@ const StudentRegistration = () => {
           confirmButtonColor: "#3B82F6",
           allowOutsideClick: false,
           allowEscapeKey: false,
-        }).then((result) => {
+    }).then((result) => {
           if (result.isConfirmed) {
+      // Allow navigation without unload warning
+      skipUnloadRef.current = true;
             // Redirect to homepage
             window.location.href = "/";
           }
@@ -457,7 +483,7 @@ const StudentRegistration = () => {
       component: (
         <PersonalInfo
           formData={formData}
-          setFormData={setFormData}
+          setFormData={setFormDataDirty}
           incompleteFields={incompleteFields}
         />
       ),
@@ -467,7 +493,7 @@ const StudentRegistration = () => {
       component: (
         <AcademicInfo
           formData={formData}
-          setFormData={setFormData}
+          setFormData={setFormDataDirty}
           incompleteFields={incompleteFields}
         />
       ),
@@ -477,7 +503,7 @@ const StudentRegistration = () => {
       component: (
         <ParentsInfo
           formData={formData}
-          setFormData={setFormData}
+          setFormData={setFormDataDirty}
           incompleteFields={incompleteFields}
         />
       ),
@@ -487,7 +513,7 @@ const StudentRegistration = () => {
       component: (
         <DocumentsUpload
           formData={formData}
-          setFormData={setFormData}
+          setFormData={setFormDataDirty}
           incompleteFields={incompleteFields}
         />
       ),
@@ -720,16 +746,18 @@ const StudentRegistration = () => {
         onClick={() => {
           Swal.fire({
             title: 'Do you want to leave this page?',
-            text: 'Your data will be lost.',
+            text: 'Your data might not be saved',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, leave',
+            confirmButtonText: 'Leave',
             cancelButtonText: 'Cancel',
             reverseButtons: true,
           }).then((result) => {
             if (result.isConfirmed) {
+              // Allow navigation without unload warning
+              skipUnloadRef.current = true;
               window.location.href = "/";
             }
           });

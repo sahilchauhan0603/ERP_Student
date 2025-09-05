@@ -16,6 +16,8 @@ const allowedOrigins = [
   'https://erp-student-sm4v.onrender.com',
   'http://localhost:3000',
   'http://localhost:5173',
+  'https://www.erpstudent.tech/',
+  'https://erpstudent.tech/',
 ];
 
 // CORS middleware
