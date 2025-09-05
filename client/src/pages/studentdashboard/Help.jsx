@@ -8,7 +8,7 @@ import {
   Phone,
   Mail,
 } from "lucide-react";
-import AIChatLauncher from "../../components/AIChatLauncher";
+// import AIChatLauncher from "../../components/AIChatLauncher";
 
 export default function Help() {
   const [openIndex, setOpenIndex] = useState(null);
@@ -193,7 +193,7 @@ export default function Help() {
         </div>
       </div>
 
-      <AIChatLauncher />
+      {/* <AIChatLauncher /> */}
     </div>
   );
 }
