@@ -230,7 +230,7 @@ export default function SARBooklet() {
             </h2>
             {/* Personal Details */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg font-bold font-serif text-gray-800 mb-2">
                 Personal Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-gray-700">
@@ -310,7 +310,7 @@ export default function SARBooklet() {
             </div>
             {/* Family Details */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg font-bold font-serif text-gray-800 mb-2">
                 Family Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-gray-700">
@@ -374,7 +374,7 @@ export default function SARBooklet() {
             </div>
             {/* Academic Details */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg font-bold font-serif text-gray-800 mb-2">
                 Academic Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-gray-700">
@@ -422,7 +422,7 @@ export default function SARBooklet() {
             </div>
             {/* Achievements */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg font-bold font-serif text-gray-800 mb-2">
                 Achievements
               </h3>
               <div>
@@ -437,7 +437,7 @@ export default function SARBooklet() {
             </div>
             {/* Internship Details */}
             <div className="mb-2">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg font-bold font-serif text-gray-800 mb-2">
                 Internship Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-gray-700">
