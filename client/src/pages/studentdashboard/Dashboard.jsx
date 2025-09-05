@@ -1012,7 +1012,7 @@ const StudentDetailsDashboard = () => {
                 <div className="mt-4 bg-white/20 text-white text-sm p-3 rounded-lg">
                   <p>
                     Your profile has been declined. Please update the required
-                    information (marked in red) and resubmit for review.
+                    information (marked in red) in the Dashboard section and resubmit for review.
                   </p>
                   {declinedFields.length > 0 && (
                     <p className="mt-1">

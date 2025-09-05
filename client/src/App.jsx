@@ -9,6 +9,7 @@ import NonTeachingStaffRegistration from './pages/registration/nonTeachingStaff/
 import StudentLogin from './pages/auth/StudentLogin';
 import AdminLogin from './pages/auth/AdminLogin';
 import StudentDetailsDashboard from './pages/studentdashboard/Dashboard';
+import Help from './pages/studentdashboard/Help';
 import StudentLayout from './components/StudentLayout';
 import SARBooklet from './pages/studentdashboard/SARBooklet';
 import RegistrationPage from './pages/registration/registrationPage';
@@ -104,6 +105,7 @@ function AppContent() {
       }>
         <Route path="/student/me" element={<StudentDetailsDashboard />} />
         <Route path="/student/sar" element={<SARBooklet />} />
+        <Route path="/student/help" element={<Help />} />
       </Route>
 
       {/* Admin Routes - Authentication handled at AdminLayout level */}
