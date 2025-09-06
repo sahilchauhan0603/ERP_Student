@@ -6,7 +6,7 @@ const db = require('./config/db'); // MySQL connection file
 
 dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 9080;
 
 // Trust proxy for rate limiting (needed for Render deployment)
 app.set('trust proxy', 1);
