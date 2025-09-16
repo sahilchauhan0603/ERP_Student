@@ -86,6 +86,33 @@ function AuthRoute({ children, role }) {
 }
 
 function AppContent() {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Map pathname to title
+    const routeTitles = {
+      '/': 'Home | ERP-Student',
+      '/login': 'Login | ERP-Student',
+      '/admin': 'Admin Login | ERP-Student',
+      '/registration': 'Registration | ERP-Student',
+      '/registration/student': 'Student Registration | ERP-Student',
+      '/registration/faculty': 'Faculty Registration | ERP-Student',
+      '/registration/non-teaching-staff': 'Non-Teaching Staff Registration | ERP-Student',
+      '/student/me': 'Student Dashboard | ERP-Student',
+      '/student/sar': 'Student SAR Booklet | ERP-Student',
+      '/student/help': 'Student Help | ERP-Student',
+      '/admin/dashboard': 'Admin Dashboard | ERP-Student',
+      '/admin/students': 'All Students | ERP-Student',
+      '/admin/students/pending': 'Pending Students | ERP-Student',
+      '/admin/students/approved': 'Approved Students | ERP-Student',
+      '/admin/students/declined': 'Declined Students | ERP-Student',
+    };
+    // Default to About | ERP-Student for /about, fallback for unknown
+    let title = routeTitles[location.pathname] ||
+      (location.pathname.startsWith('/about') ? 'About | ERP-Student' : 'ERP-Student');
+    document.title = title;
+  }, [location.pathname]);
+
   return (
     <Routes>
       {/* Public Routes */}
