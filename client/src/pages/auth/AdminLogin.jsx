@@ -17,6 +17,8 @@ const AdminLogin = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
+  const [otpTimer, setOtpTimer] = useState(0); // seconds left
+  const timerRef = React.useRef();
   const navigate = useNavigate();
   const { checkAuthStatus } = useAuth();
 
@@ -39,12 +41,31 @@ const AdminLogin = () => {
         { withCredentials: true }
       );
       setStep(2);
-      setSuccess("OTP sent to your email. Please check your inbox.");
+      setSuccess(`OTP sent to ${email}`);
+      setOtpTimer(300); // 5 minutes
+      // Start timer
+      if (timerRef.current) clearInterval(timerRef.current);
+      timerRef.current = setInterval(() => {
+        setOtpTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to send OTP.");
     }
     setLoading(false);
   };
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
@@ -176,20 +197,30 @@ const AdminLogin = () => {
                 </div>
               )}
               {success && (
-                <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  {success}
+                <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center justify-between">
+                  <span className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-2"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    {success}
+                  </span>
+                  {step === 2 && otpTimer > 0 && (
+                    <span className="ml-2 text-xs font-semibold text-blue-700">
+                      OTP valid for {Math.floor(otpTimer/60)}:{(otpTimer%60).toString().padStart(2,'0')} min
+                    </span>
+                  )}
+                  {step === 2 && otpTimer === 0 && (
+                    <span className="ml-2 text-xs font-semibold text-red-600">OTP expired</span>
+                  )}
                 </div>
               )}
 
@@ -311,6 +342,7 @@ const AdminLogin = () => {
                         }}
                         className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm tracking-widest text-center text-lg font-semibold"
                         placeholder="••••••"
+                        disabled={otpTimer === 0}
                       />
                     </div>
                     <p className="mt-2 text-xs text-gray-500">
@@ -344,9 +376,9 @@ const AdminLogin = () => {
                     </button>
                     <button
                       type="submit"
-                      disabled={loading || otp.length !== 6}
+                      disabled={loading || otp.length !== 6 || otpTimer === 0}
                       className={`ml-3 inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                        loading || otp.length !== 6
+                        loading || otp.length !== 6 || otpTimer === 0
                           ? "opacity-75 cursor-not-allowed"
                           : ""
                       }`}
