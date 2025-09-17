@@ -18,7 +18,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'https://www.erpstudent.tech',
   'https://erpstudent.tech',
-  'https://erp-student.bpitindia.com/',
+  'https://erp-student.bpitindia.com',
 ];
 
 // CORS middleware
