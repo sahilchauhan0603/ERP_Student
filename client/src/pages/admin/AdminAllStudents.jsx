@@ -171,7 +171,7 @@ export default function AdminAllStudents() {
           </div>
           <button
             onClick={refreshTable}
-            className="p-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors"
+            className="p-2 cursor-pointer rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors"
             title="Refresh"
           >
             <FiRefreshCw className={`${loading ? "animate-spin" : ""}`} />
@@ -302,7 +302,7 @@ export default function AdminAllStudents() {
             {loading ? (
               <tr className="divide-x divide-gray-200">
                 <td colSpan={7} className="px-6 py-8 text-center">
-                  <FiRefreshCw className="animate-spin text-gray-400 text-2xl mx-auto" />
+                  <FiRefreshCw className="animate-spin cursor-pointer text-gray-400 text-2xl mx-auto" />
                   <p className="mt-2 text-sm text-gray-500">
                     Loading student data...
                   </p>
@@ -393,14 +393,14 @@ export default function AdminAllStudents() {
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 cursor-pointer border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 cursor-pointer border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>

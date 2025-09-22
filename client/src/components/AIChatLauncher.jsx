@@ -12,7 +12,7 @@ export default function AIChatLauncher() {
         onClick={() => setOpen((v) => !v)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="fixed bottom-6 right-6 z-40 bg-gradient-to-br from-blue-600 via-blue-500 to-red-500 hover:from-blue-700 hover:to-red-600 text-white p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 group flex items-center justify-center"
+        className="fixed cursor-pointer bottom-6 right-6 z-40 bg-gradient-to-br from-blue-600 via-blue-500 to-red-500 hover:from-blue-700 hover:to-red-600 text-white p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 group flex items-center justify-center"
         aria-label="AI Chatbot"
         style={{ 
           boxShadow: "0 6px 30px rgba(37, 99, 235, 0.3), 0 2px 10px rgba(239, 68, 68, 0.2)",

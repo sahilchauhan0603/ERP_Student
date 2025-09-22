@@ -164,7 +164,7 @@ export default function AdminSidebar({ open, onClose }) {
         <button
           onClick={() => setIsAIChatOpen(true)}
           title="AI Assistant"
-          className={`flex items-center px-3 py-3 rounded-lg mx-2 transition-all duration-200 group mb-2 text-blue-100 hover:bg-blue-700 hover:text-white`}
+          className={`flex items-center cursor-pointer px-3 py-3 rounded-lg mx-2 transition-all duration-200 group mb-2 text-blue-100 hover:bg-blue-700 hover:text-white`}
         >
           <span
             className={`mr-3 p-1.5 rounded-lg bg-blue-900 text-blue-200 group-hover:bg-blue-900`}
@@ -201,7 +201,7 @@ export default function AdminSidebar({ open, onClose }) {
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition-colors"
+            className="w-full flex items-center cursor-pointer justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition-colors"
           >
             <FiLogOut /> Logout
           </button>

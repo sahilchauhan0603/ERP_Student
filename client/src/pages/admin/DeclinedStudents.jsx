@@ -29,9 +29,13 @@ export default function DeclinedStudents() {
   ];
 
   const BATCH_OPTIONS = [
-    '2024-2027', '2024-2028', '2024-2029',
-    '2025-2028', '2025-2029',
-    '2026-2029', '2026-2030',
+    "2024-2027",
+    "2024-2028",
+    "2024-2029",
+    "2025-2028",
+    "2025-2029",
+    "2026-2029",
+    "2026-2030",
     // Add more as needed
   ];
 
@@ -78,9 +82,9 @@ export default function DeclinedStudents() {
   const filteredStudents = students.filter((student) => {
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch =
-      (student.firstName?.toLowerCase() || '').includes(searchLower) ||
-      (student.lastName?.toLowerCase() || '').includes(searchLower) ||
-      (student.email?.toLowerCase() || '').includes(searchLower) ||
+      (student.firstName?.toLowerCase() || "").includes(searchLower) ||
+      (student.lastName?.toLowerCase() || "").includes(searchLower) ||
+      (student.email?.toLowerCase() || "").includes(searchLower) ||
       (student.studentId &&
         student.studentId.toLowerCase().includes(searchLower));
     const matchesCourse = selectedCourse
@@ -169,7 +173,7 @@ export default function DeclinedStudents() {
               {/* Refresh */}
               <button
                 onClick={fetchDeclinedStudents}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg shadow-sm transition-all duration-150"
+                className="px-4 cursor-pointer py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg shadow-sm transition-all duration-150"
                 title="Refresh"
               >
                 <FiRefreshCw className={`${loading ? "animate-spin" : ""}`} />
@@ -205,7 +209,7 @@ export default function DeclinedStudents() {
                   setSelectedCourse("");
                   setSelectedGender("");
                 }}
-                className="mt-4 text-sm text-red-600 hover:text-red-800"
+                className="mt-4 cursor-pointer text-sm text-red-600 hover:text-red-800"
               >
                 Clear Filters
               </button>
@@ -217,28 +221,47 @@ export default function DeclinedStudents() {
               {/* Add divide-x to thead and tbody rows for vertical lines */}
               <thead className="bg-gray-50">
                 <tr className="divide-x divide-gray-200">
-                  <th className="px-4 py-3 text-left font-semibold text-gray-500 uppercase">S.NO.</th>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Student</th>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Contact</th>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Course</th>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Batch</th>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-right font-semibold text-gray-500 uppercase">Actions</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-500 uppercase">
+                    S.NO.
+                  </th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">
+                    Student
+                  </th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">
+                    Contact
+                  </th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">
+                    Course
+                  </th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">
+                    Batch
+                  </th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-500 uppercase">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-right font-semibold text-gray-500 uppercase">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
                 {filteredStudents.map((student, idx) => (
-                  <tr key={student.id} className="hover:bg-gray-50 divide-x divide-gray-200">
-                    <td className="px-4 py-4 text-sm text-gray-900">{(currentPage - 1) * 10 + idx + 1}</td>
+                  <tr
+                    key={student.id}
+                    className="hover:bg-gray-50 divide-x divide-gray-200"
+                  >
+                    <td className="px-4 py-4 text-sm text-gray-900">
+                      {(currentPage - 1) * 10 + idx + 1}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap flex items-center">
                       <div className="h-10 w-10 rounded-full bg-red-100 text-red-700 flex items-center justify-center font-bold">
-                        {student.firstName?.charAt(0) || 'N'}
-                        {student.lastName?.charAt(0) || 'A'}
+                        {student.firstName?.charAt(0) || "N"}
+                        {student.lastName?.charAt(0) || "A"}
                       </div>
                       <div className="ml-4">
                         <div className="font-medium text-gray-900">
-                          {student.firstName || 'N/A'} {student.middleName || ''}{" "}
-                          {student.lastName}
+                          {student.firstName || "N/A"}{" "}
+                          {student.middleName || ""} {student.lastName}
                         </div>
                         <div className="text-gray-500 text-xs">
                           {student.studentId}
@@ -247,9 +270,13 @@ export default function DeclinedStudents() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-gray-800">{student.email}</div>
-                      <div className="text-gray-500 text-xs">{student.mobile}</div>
+                      <div className="text-gray-500 text-xs">
+                        {student.mobile}
+                      </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{student.course}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {student.course}
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {student.batch}
                     </td>
@@ -283,7 +310,7 @@ export default function DeclinedStudents() {
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 cursor-pointer py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
@@ -292,7 +319,7 @@ export default function DeclinedStudents() {
                   setCurrentPage((p) => Math.min(totalPages, p + 1))
                 }
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 cursor-pointer py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>

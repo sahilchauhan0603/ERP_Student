@@ -279,17 +279,28 @@ export default function AdminStudentDetailsModal({
   };
 
   const handleAIReview = async () => {
+    const result = await Swal.fire({
+      title: 'Run AI Review?',
+      text: 'Do you want to let AI review this student?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No',
+      reverseButtons: true,
+    });
+    if (!result.isConfirmed) return;
+
     setActionLoading(true);
     setReviewing(true);
     setProgress(0);
-  
+
     // Fake progress simulation
     let i = 0;
     const interval = setInterval(() => {
       i += 10;
       setProgress((prev) => (prev < 95 ? i : prev)); // cap at 95% until API resolves
     }, 300);
-  
+
     try {
       // Step 1: Call backend AI review
       const res = await axios.post(
@@ -297,16 +308,16 @@ export default function AdminStudentDetailsModal({
         { student: details },
         { withCredentials: true }
       );
-  
+
       const { status, declinedFields } = res.data;
-  
+
       // Step 2: Save result via verify-student
       await axios.post(
         `${import.meta.env.VITE_API_URL}/admin/verify-student`,
         { studentId: student.id, status, declinedFields },
         { withCredentials: true }
       );
-  
+
       clearInterval(interval);
       setProgress(100); // finish progress
       setTimeout(() => {
@@ -330,7 +341,7 @@ export default function AdminStudentDetailsModal({
         text: e.message || "Could not review student.",
       });
     }
-  
+
     setActionLoading(false);
   };
 
@@ -1281,10 +1292,10 @@ export default function AdminStudentDetailsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-lg">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="border-b border-gray-200 p-6 flex justify-between items-center bg-gradient-to-r from-blue-50 to-white">
+        <div className="border-b border-gray-200 p-6 flex justify-between items-center bg-gradient-to-r from-blue-50 to-blue-50">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 flex items-center">
               {student?.firstName} {student?.lastName}
@@ -1391,14 +1402,14 @@ export default function AdminStudentDetailsModal({
                     })
                     .finally(() => setLoading(false));
                 }}
-                className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                className="p-2 cursor-pointer rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
                 title="Refresh student details"
               >
                 <FiRefreshCw size={20} />
               </button>
               <button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                className="p-2 cursor-pointer rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
               >
                 <FiX size={24} />
               </button>
@@ -1466,7 +1477,7 @@ export default function AdminStudentDetailsModal({
                     onClick={() =>
                       tableType !== "pending" && setActiveTab(index)
                     }
-                    className={`py-4 px-1 font-medium text-sm border-b-2 transition-colors flex items-center relative ${
+                    className={`py-4 px-1 cursor-pointer font-medium text-sm border-b-2 transition-colors flex items-center relative ${
                       activeTab === index
                         ? "border-blue-500 text-blue-600"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -1542,7 +1553,7 @@ export default function AdminStudentDetailsModal({
                 {activeTab > 0 && (
                   <button
                     onClick={() => setActiveTab((prev) => prev - 1)}
-                    className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                    className="flex items-center px-4 cursor-pointer py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                   >
                     <FiArrowLeft className="mr-2" /> Previous
                   </button>
@@ -1551,7 +1562,7 @@ export default function AdminStudentDetailsModal({
                   <button
                     onClick={handleProceed}
                     disabled={!isSectionVerified(sectionDefs[activeTab].key)}
-                    className={`flex items-center px-4 py-2 rounded-md text-white ${
+                    className={`flex items-center px-4 cursor-pointer py-2 rounded-md text-white ${
                       isSectionVerified(sectionDefs[activeTab].key)
                         ? "bg-blue-600 hover:bg-blue-700"
                         : "bg-blue-300 cursor-not-allowed"
@@ -1582,7 +1593,7 @@ export default function AdminStudentDetailsModal({
                           <button
                             onClick={handleDone}
                             disabled={actionLoading || !allVerified}
-                            className={`flex items-center px-6 py-2 rounded-md disabled:opacity-50 ${
+                            className={`flex items-center px-6 cursor-pointer py-2 rounded-md disabled:opacity-50 ${
                               allVerified
                                 ? "bg-blue-600 hover:bg-blue-700 text-white"
                                 : "bg-gray-400 text-gray-600 cursor-not-allowed"
@@ -1606,7 +1617,7 @@ export default function AdminStudentDetailsModal({
             <div className="flex justify-end">
               <button
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md"
+                className="px-4 cursor-pointer py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md"
               >
                 Close
               </button>

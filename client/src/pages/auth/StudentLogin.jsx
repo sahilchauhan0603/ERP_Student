@@ -13,6 +13,8 @@ const API_URL = import.meta.env.VITE_API_URL;
 const StudentLogin = () => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
+  const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
+  const otpInputsRef = React.useRef([]);
   const [step, setStep] = useState(1); // 1: email, 2: otp
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -68,6 +70,41 @@ const StudentLogin = () => {
     };
   }, []);
 
+  // Modern OTP input: handle digit change
+  const handleOtpBoxChange = (idx, val) => {
+    if (!/^[0-9]?$/.test(val)) return;
+    const newDigits = [...otpDigits];
+    newDigits[idx] = val;
+    setOtpDigits(newDigits);
+    setOtp(newDigits.join(""));
+    // Auto-focus next box
+    if (val && idx < 5) {
+      otpInputsRef.current[idx + 1]?.focus();
+    }
+  };
+
+  // Handle backspace navigation
+  const handleOtpBoxKeyDown = (idx, e) => {
+    if (e.key === "Backspace" && !otpDigits[idx] && idx > 0) {
+      otpInputsRef.current[idx - 1]?.focus();
+    }
+  };
+
+  // Paste support
+  const handleOtpBoxPaste = (e) => {
+    const paste = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (paste.length) {
+      const arr = paste.split("");
+      while (arr.length < 6) arr.push("");
+      setOtpDigits(arr);
+      setOtp(arr.join(""));
+      // Focus last filled
+      const lastIdx = arr.findIndex((d) => d === "");
+      otpInputsRef.current[lastIdx === -1 ? 5 : lastIdx]?.focus();
+    }
+  };
+
+  // Verify OTP handler
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     setError("");
@@ -328,7 +365,7 @@ const StudentLogin = () => {
                     <button
                       type="submit"
                       disabled={loading}
-                      className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                      className={`w-full flex justify-center cursor-pointer py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                         loading ? "opacity-75 cursor-not-allowed" : ""
                       }`}
                     >
@@ -373,35 +410,34 @@ const StudentLogin = () => {
                     >
                       Enter 6-digit OTP
                     </label>
-                    <div className="mt-1">
-                      <input
-                        id="otp"
-                        name="otp"
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        required
-                        value={otp}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, "");
-                          setOtp(value.slice(0, 6));
-                        }}
-                        className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm tracking-widest text-center text-lg font-semibold"
-                        placeholder="••••••"
-                        disabled={otpTimer === 0}
-                      />
+                    <div className="mt-1 flex gap-2 justify-center" onPaste={handleOtpBoxPaste}>
+                      {otpDigits.map((digit, idx) => (
+                        <input
+                          key={idx}
+                          ref={el => otpInputsRef.current[idx] = el}
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={1}
+                          pattern="[0-9]"
+                          autoComplete="one-time-code"
+                          className={`w-10 h-12 text-center text-xl font-bold border-2 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${digit ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-white"}`}
+                          value={digit}
+                          onChange={e => handleOtpBoxChange(idx, e.target.value)}
+                          onKeyDown={e => handleOtpBoxKeyDown(idx, e)}
+                          disabled={otpTimer === 0}
+                        />
+                      ))}
                     </div>
-                    <p className="mt-2 text-xs text-gray-500">
-                      Check your email for the OTP. It may take a few minutes to
-                      arrive.
+                    <p className="mt-2 text-xs text-gray-500 text-center">
+                      Check your email for the OTP. It may take a few minutes to arrive.
                     </p>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <button
                       type="button"
-                      onClick={() => setStep(1)}
-                      className="text-sm font-medium text-blue-600 hover:text-blue-500 flex items-center"
+                      onClick={() => { setStep(1); setOtpDigits(["", "", "", "", "", ""]); setOtp(""); }}
+                      className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-500 flex items-center"
                       disabled={loading}
                     >
                       <svg
@@ -423,7 +459,7 @@ const StudentLogin = () => {
                     <button
                       type="submit"
                       disabled={loading || otp.length !== 6 || otpTimer === 0}
-                      className={`ml-3 inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                      className={`ml-3 inline-flex justify-center py-2 cursor-pointer px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                         loading || otp.length !== 6 || otpTimer === 0
                           ? "opacity-75 cursor-not-allowed"
                           : ""
@@ -460,7 +496,20 @@ const StudentLogin = () => {
 
       {/* Persistent Home Navigation Button */}
       <button
-        onClick={() => window.location.href = '/'}
+        onClick={async () => {
+          const result = await Swal.fire({
+            title: 'Go to Homepage?',
+            text: 'Are you sure you want to leave this page?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            reverseButtons: true,
+          });
+          if (result.isConfirmed) {
+            window.location.href = '/';
+          }
+        }}
         className="fixed bottom-6 right-24 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 group"
         // title="Go to Homepage"
       >

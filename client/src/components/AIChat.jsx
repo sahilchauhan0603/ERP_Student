@@ -207,7 +207,7 @@ export default function AIChat({ onClose }) {
         </div>
         <button 
           onClick={onClose} 
-          className="opacity-80 hover:opacity-100 transition-all duration-200 p-1.5 hover:bg-white/10 rounded-full"
+          className="opacity-80 cursor-pointer hover:opacity-100 transition-all duration-200 p-1.5 hover:bg-white/10 rounded-full"
         >
           <FaTimes className="text-lg" />
         </button>
@@ -364,7 +364,7 @@ export default function AIChat({ onClose }) {
             `bg-gradient-to-r from-blue-600 to-red-500 ` +
             `hover:from-blue-700 hover:to-red-600 ` +
             `disabled:from-gray-300 disabled:to-gray-400 disabled:text-gray-500 disabled:cursor-not-allowed ` +
-            `text-white rounded-xl px-4 py-3 flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md`
+            `text-white rounded-xl px-4 py-3 cursor-pointer flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md`
           }
         >
           {isLoading ? (
