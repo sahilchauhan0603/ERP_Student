@@ -29,7 +29,19 @@ const StudentLogin = () => {
     if (localStorage.getItem("showBackToHomePopup") === "student") {
       localStorage.removeItem("showBackToHomePopup");
     }
-  }, []);
+
+    // Alert on page refresh if OTP step is active
+    const handleBeforeUnload = (e) => {
+      if (step === 2) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [step]);
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
@@ -431,6 +443,16 @@ const StudentLogin = () => {
                     <p className="mt-2 text-xs text-gray-500 text-center">
                       Check your email for the OTP. It may take a few minutes to arrive.
                     </p>
+                    {otpTimer === 0 && (
+                      <button
+                        type="button"
+                        className="mt-2 w-full py-2 px-4 cursor-pointer rounded-md bg-blue-100 text-blue-700 font-semibold hover:bg-blue-200 transition"
+                        onClick={handleSendOtp}
+                        disabled={loading}
+                      >
+                        Resend OTP
+                      </button>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between">

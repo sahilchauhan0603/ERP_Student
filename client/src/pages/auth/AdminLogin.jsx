@@ -32,7 +32,19 @@ const { checkAuthStatus } = useAuth();
     if (localStorage.getItem("showBackToHomePopup") === "admin") {
       localStorage.removeItem("showBackToHomePopup");
     }
-  }, []);
+
+    // Alert on page refresh if OTP step is active
+    const handleBeforeUnload = (e) => {
+      if (step === 2) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [step]);
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
@@ -359,7 +371,7 @@ const { checkAuthStatus } = useAuth();
               )}
 
               {step === 2 && (
-                <form className="space-y-6" onSubmit={handleOtpSubmit}>
+                <form className="space-y-6" onSubmit={handleVerifyOtp}>
                   <div>
                     <label
                       htmlFor="otp"
@@ -388,6 +400,16 @@ const { checkAuthStatus } = useAuth();
                     <p className="mt-2 text-xs text-gray-500 text-center">
                       Check your email for the OTP. It may take a few minutes to arrive.
                     </p>
+                    {otpTimer === 0 && (
+                      <button
+                        type="button"
+                        className="mt-2 w-full py-2 cursor-pointer px-4 rounded-md bg-blue-100 text-blue-700 font-semibold hover:bg-blue-200 transition"
+                        onClick={handleEmailSubmit}
+                        disabled={loading}
+                      >
+                        Resend OTP
+                      </button>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -416,7 +438,7 @@ const { checkAuthStatus } = useAuth();
                     <button
                       type="submit"
                       disabled={loading || otp.length !== 6 || otpTimer === 0}
-                      className={`ml-3 inline-flex justify-center cursor-pointer py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                      className={`ml-3 inline-flex justify-center py-2 cursor-pointer px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                         loading || otp.length !== 6 || otpTimer === 0
                           ? "opacity-75 cursor-not-allowed"
                           : ""
