@@ -120,7 +120,7 @@ export default function Help() {
                   onClick={() =>
                     setOpenIndex(openIndex === index ? null : index)
                   }
-                  className="flex justify-between items-center w-full px-4 py-3 text-left text-gray-800 font-medium hover:bg-gray-50"
+                  className="flex justify-between cursor-pointer items-center w-full px-4 py-3 text-left text-gray-800 font-medium hover:bg-gray-50"
                 >
                   {faq.question}
                   {openIndex === index ? (

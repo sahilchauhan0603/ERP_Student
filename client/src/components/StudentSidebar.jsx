@@ -112,7 +112,7 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
             onClick={() => onToggle && onToggle(!open)}
             title={open ? "Collapse" : "Expand"}
             aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
-            className="w-9 h-9 rounded-md border border-white/20 bg-white/10 hover:bg-white/20 transition-all duration-200 flex items-center justify-center flex-shrink-0 shadow-md hover:shadow-lg"
+            className="w-9 h-9 cursor-pointer rounded-md border border-white/20 bg-white/10 hover:bg-white/20 transition-all duration-200 flex items-center justify-center flex-shrink-0 shadow-md hover:shadow-lg"
           >
             {open ? (
               <svg
@@ -198,7 +198,7 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
               if (isMobile && onClose) onClose();
             }}
             title="AI Assistant"
-            className="flex items-center justify-center gap-3 px-3 py-3 rounded-2xl text-gray-200 border border-blue-600 hover:bg-white/10 hover:shadow-sm transition-all duration-200 text-left group mb-4"
+            className="flex items-center cursor-pointer justify-center gap-3 px-3 py-3 rounded-2xl text-gray-200 border border-blue-600 hover:bg-white/10 hover:shadow-sm transition-all duration-200 text-left group mb-4"
           >
             <span className="text-lg w-6 text-center group-hover:scale-110 transition-transform">
               🤖
@@ -216,7 +216,7 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
             <button
               onClick={handleHelp}
               title="Help"
-              className="flex items-center justify-center gap-3 px-3 py-3 rounded-2xl text-gray-200 border border-yellow-600 hover:bg-white/10 hover:shadow-sm transition-all duration-200 text-left group"
+              className="flex items-center cursor-pointer justify-center gap-3 px-3 py-3 rounded-2xl text-gray-200 border border-yellow-600 hover:bg-white/10 hover:shadow-sm transition-all duration-200 text-left group"
             >
               <span className="text-lg w-6 text-center group-hover:scale-110 transition-transform">
                 ❓
@@ -232,7 +232,7 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
             <button
               onClick={handleLogout}
               title="Logout"
-              className="flex items-center justify-center gap-3 px-3 py-3 rounded-2xl text-gray-200 border border-red-600 hover:bg-white/10 hover:shadow-sm transition-all duration-200 text-left group"
+              className="flex items-center cursor-pointer justify-center gap-3 px-3 py-3 rounded-2xl text-gray-200 border border-red-600 hover:bg-white/10 hover:shadow-sm transition-all duration-200 text-left group"
             >
               <span className="text-lg w-6 text-center group-hover:scale-110 transition-transform">
                 ⎋
