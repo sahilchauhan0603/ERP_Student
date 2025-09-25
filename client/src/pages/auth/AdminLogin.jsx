@@ -371,7 +371,7 @@ const { checkAuthStatus } = useAuth();
               )}
 
               {step === 2 && (
-                <form className="space-y-6" onSubmit={handleVerifyOtp}>
+                <form className="space-y-6" onSubmit={handleOtpSubmit}>
                   <div>
                     <label
                       htmlFor="otp"

@@ -66,7 +66,7 @@ export default function AdminLayout() {
       )}
       {/* Hamburger for mobile */}
       <button
-        className="fixed top-4 left-4 z-40 md:hidden bg-white p-2 rounded shadow-md"
+        className="fixed cursor-pointer top-4 left-4 z-40 md:hidden bg-white p-2 rounded shadow-md"
         onClick={() => setSidebarOpen((open) => !open)}
         aria-label="Toggle sidebar"
       >

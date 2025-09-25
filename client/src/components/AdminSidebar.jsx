@@ -86,14 +86,14 @@ export default function AdminSidebar({ open, onClose }) {
       {/* Backdrop for mobile */}
       {open && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-40 z-20 md:hidden"
+          className="fixed inset-0 backdrop-blur-sm bg-opacity-40 z-20 md:hidden"
           onClick={onClose}
         ></div>
       )}
       <aside className={sidebarClasses}>
         {/* Close button for mobile */}
         <button
-          className="absolute top-4 right-4 md:hidden text-white text-2xl z-40"
+          className="absolute top-4 cursor-pointer right-4 md:hidden text-white text-2xl z-40"
           onClick={onClose}
           aria-label="Close sidebar"
         >
