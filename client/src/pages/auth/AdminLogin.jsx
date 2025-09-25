@@ -403,11 +403,11 @@ const { checkAuthStatus } = useAuth();
                     {otpTimer === 0 && (
                       <button
                         type="button"
-                        className="mt-2 w-full py-2 cursor-pointer px-4 rounded-md bg-blue-100 text-blue-700 font-semibold hover:bg-blue-200 transition"
+                        className={`mt-2 w-full py-2 px-4 rounded-md font-semibold transition ${loading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-100 text-blue-700 hover:bg-blue-200 cursor-pointer'}`}
                         onClick={handleEmailSubmit}
                         disabled={loading}
                       >
-                        Resend OTP
+                        {loading ? 'Sending OTP...' : 'Resend OTP'}
                       </button>
                     )}
                   </div>
