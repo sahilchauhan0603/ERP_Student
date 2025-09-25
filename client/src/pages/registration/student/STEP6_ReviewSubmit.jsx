@@ -87,7 +87,7 @@ export default function ReviewSubmit({
                 link.click();
               }
             }}
-            className="text-xs bg-gray-800 text-white px-2 py-1 rounded hover:bg-gray-700 transition-colors whitespace-nowrap w-full sm:w-auto text-center"
+            className="text-xs bg-gray-800 text-white cursor-pointer px-2 py-1 rounded hover:bg-gray-700 transition-colors whitespace-nowrap w-full sm:w-auto text-center"
           >
             {isImage ? 'View' : 'Download'}
           </button>

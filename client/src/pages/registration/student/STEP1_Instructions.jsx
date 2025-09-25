@@ -183,7 +183,7 @@ const Instructions = ({ nextStep }) => {
         <button
           onClick={nextStep}
           disabled={!agree}
-          className={`px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg transition-all duration-300 ${
+          className={`px-6 sm:px-8 py-3 cursor-pointer sm:py-4 rounded-lg font-bold text-base sm:text-lg transition-all duration-300 ${
             agree
               ? "bg-gray-800 hover:bg-black text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               : "bg-gray-300 text-gray-500 cursor-not-allowed"

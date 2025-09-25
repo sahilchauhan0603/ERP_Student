@@ -662,7 +662,7 @@ const StudentRegistration = () => {
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className={`px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
+                  className={`px-6 sm:px-8 py-2 sm:py-3 rounded-lg cursor-pointer font-medium transition-colors text-sm sm:text-base ${
                     isSubmitting
                       ? "bg-gray-500 cursor-not-allowed"
                       : "bg-gray-900 hover:bg-black"
