@@ -70,8 +70,8 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
     <>
       {/* Mobile overlay */}
       {isMobile && open && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+        <div
+          className="fixed inset-0 backdrop-blur-sm bg-opacity-50 z-20 md:hidden"
           onClick={onClose}
         />
       )}
@@ -85,7 +85,7 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
         {isMobile && open && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-50 md:hidden"
+            className="absolute top-4 right-4 cursor-pointer z-50 md:hidden"
             aria-label="Close sidebar"
           >
             <svg

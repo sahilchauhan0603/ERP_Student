@@ -18,7 +18,7 @@ export default function StudentLayout() {
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <div className="md:hidden">
-          <div className="fixed inset-0 bg-black/40 z-20" onClick={() => setMobileOpen(false)} />
+          <div className="fixed inset-0 backdrop-blur-sm z-20" onClick={() => setMobileOpen(false)} />
           <div className="fixed left-0 top-0 h-screen z-30 w-60">
             <StudentSidebar open={true} onToggle={() => setMobileOpen(false)} onClose={() => setMobileOpen(false)} />
           </div>
@@ -27,7 +27,7 @@ export default function StudentLayout() {
 
       {/* Hamburger for mobile */}
       <button
-        className="fixed top-4 left-4 z-40 md:hidden bg-white/90 text-sky-700 p-2 rounded shadow"
+        className="fixed top-4 left-4 cursor-pointer z-40 md:hidden bg-white/90 text-sky-700 p-2 rounded shadow"
         onClick={() => setMobileOpen(true)}
         aria-label="Open sidebar"
       >
