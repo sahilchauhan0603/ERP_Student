@@ -77,4 +77,19 @@ router.post("/logout", studentController.logout);
 router.get("/check-email", studentController.checkEmailExists);
 router.get("/check-abcid", studentController.checkAbcIdExists);
 
+// Public testing endpoint: get all students (name, email, batch, branch)
+router.get('/test/all', async (req, res) => {
+  try {
+    const db = require('../config/db');
+    db.query('SELECT firstName, email, batch, course FROM students', (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error', details: err });
+      }
+      res.json({ students: results });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error', details: error });
+  }
+});
+
 module.exports = router;
