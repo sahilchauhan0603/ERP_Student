@@ -19,7 +19,7 @@ const allowedOrigins = [
   'https://www.erpstudent.tech',
   'https://erpstudent.tech',
   'https://erp-student.bpitindia.com',
-  'https://verla-nymphean-sylvie.ngrok-free.dev',
+  // 'https://verla-nymphean-sylvie.ngrok-free.dev',
 ];
 
 // CORS middleware
