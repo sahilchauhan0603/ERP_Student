@@ -53,7 +53,7 @@ export default function AdminStudentDetailsModal({
     false,
   ]);
   const [showMessage, setShowMessage] = useState(false);
-  
+
   const [progress, setProgress] = useState(0);
   const [reviewing, setReviewing] = useState(false);
   // const handleClick = () => {
@@ -280,12 +280,12 @@ export default function AdminStudentDetailsModal({
 
   const handleAIReview = async () => {
     const result = await Swal.fire({
-      title: 'Run AI Review?',
-      text: 'Do you want to let AI review this student?',
-      icon: 'question',
+      title: "Run AI Review?",
+      text: "Do you want to let AI review this student?",
+      icon: "question",
       showCancelButton: true,
-      confirmButtonText: 'Yes',
-      cancelButtonText: 'No',
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
       reverseButtons: true,
     });
     if (!result.isConfirmed) return;
@@ -1292,7 +1292,7 @@ export default function AdminStudentDetailsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-lg bg-black/60">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="border-b border-gray-200 p-6 flex justify-between items-center bg-gradient-to-r from-blue-50 to-blue-50">
@@ -1341,7 +1341,7 @@ export default function AdminStudentDetailsModal({
                 </div>
               </div>
             )}
-            {student?.status === "pending" && (
+            {student?.status === "pending" && tableType === "pending" && (
               <>
                 <div className="relative">
                   {/* AI Review Button */}
@@ -1370,7 +1370,7 @@ export default function AdminStudentDetailsModal({
                         AI reviewing student... {progress}%
                       </p>
                     </div>
-                   )}
+                  )}
                 </div>
 
                 <div className="relative group">
@@ -1407,12 +1407,15 @@ export default function AdminStudentDetailsModal({
               >
                 <FiRefreshCw size={20} />
               </button>
-              <button
-                onClick={onClose}
-                className="p-2 cursor-pointer rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
-              >
-                <FiX size={24} />
-              </button>
+              {/* Show cross (close) button only in pending student table */}
+              {tableType === "pending" && (
+                <button
+                  onClick={onClose}
+                  className="p-2 cursor-pointer rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                >
+                  <FiX size={24} />
+                </button>
+              )}
             </div>
           </div>
         </div>

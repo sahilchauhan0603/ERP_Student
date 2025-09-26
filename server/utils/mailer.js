@@ -1,13 +1,13 @@
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-async function sendStatusEmail(to, subject, html) {
+async function sendEmail(to, subject, text, html) {
   const msg = {
-    from: `"BPIT Admissions" <${process.env.EMAIL_USER}>`,
+    from: process.env.EMAIL_USER,
     to,
     subject,
     html,
-    text: html.replace(/<[^>]*>/g, ''), // Fallback text version
+    text
   };
   try {
     await sgMail.send(msg);
@@ -18,4 +18,4 @@ async function sendStatusEmail(to, subject, html) {
   }
 }
 
-module.exports = sendStatusEmail;
+module.exports = sendEmail;

@@ -1,18 +1,11 @@
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 async function sendAdminOtpMail(to, otp) {
-  const mailOptions = {
-    from: `"BPIT Admin Portal" <${process.env.EMAIL_USER}>`,
+  const msg = {
     to,
-    subject: 'Your Admin Portal OTP Verification',
+    from: `"BPIT Admin Portal" <${process.env.EMAIL_USER}>`, 
+    subject: 'Your One-Time Password (OTP) for BPIT Admin Login',
     html: `
       <div style="max-width:480px;margin:32px auto;padding:32px 24px;background:linear-gradient(135deg,#e0e7ff 0%,#f3e8ff 100%);border-radius:18px;box-shadow:0 4px 24px rgba(80,80,180,0.10);font-family:'Segoe UI',Arial,sans-serif;">
         <div style="text-align:center;margin-bottom:18px;">
@@ -38,12 +31,11 @@ async function sendAdminOtpMail(to, otp) {
     `,
     text: `Your BPIT Admin Portal verification code is: ${otp}\n\nThis code is valid for 5 minutes. Do not share this code with anyone.\n\nIf you didn't request this, please contact IT support immediately.`
   };
-
   try {
-    await transporter.sendMail(mailOptions);
+    await sgMail.send(msg);
     return true;
-  } catch (err) {
-    // Admin OTP email error
+  } catch (error) {
+    console.error('SendGrid error:', error);
     return false;
   }
 }
