@@ -68,7 +68,7 @@ const Instructions = ({ nextStep }) => {
             <li className="pl-2 sm:pl-4 bg-white p-3 sm:p-4 rounded-lg border border-gray-200 shadow-sm">
               <div className="font-semibold text-gray-900 mb-2">Document Preparation</div>
               <p className="text-sm sm:text-base text-gray-700 mb-3">
-                Prepare the following official documents in PNG/JPEG(Image) format (maximum 2MB each):
+                Prepare the following official documents in PNG/JPEG/JPG(Image) format (maximum 2MB each):
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mt-3 sm:mt-4">
                 {[

@@ -96,7 +96,7 @@ export default function DocumentsUpload({
       <div className="bg-gray-50 p-2 sm:p-4 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl">
         <div className="mt-2 mb-4 p-2 sm:p-4 bg-gray-100 rounded-lg border border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center">
-            <svg
+            {/* <svg
               className="h-5 w-5 text-gray-500 mr-2 mt-0.5 flex-shrink-0"
               fill="none"
               stroke="currentColor"
@@ -108,7 +108,7 @@ export default function DocumentsUpload({
                 strokeWidth="2"
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
-            </svg>
+            </svg> */}
             <div className="flex-1">
               <p className="text-sm sm:text-base font-medium text-gray-700">
                 Important Notes:
@@ -116,7 +116,7 @@ export default function DocumentsUpload({
               <ul className="list-disc pl-5 text-xs sm:text-sm text-gray-600 mt-1 space-y-1 break-words">
                 <li>Maximum file size: 2MB per document</li>
                 <li>
-                  Name files clearly (e.g., "10th_Marksheet_YourName.pdf")
+                  Name files clearly (e.g., "10th_Marksheet_YourName.jpg")
                 </li>
                 <li>Ensure documents are clear and legible</li>
               </ul>
@@ -139,7 +139,7 @@ export default function DocumentsUpload({
                   type="file"
                   name={name}
                   onChange={handleFileChange}
-                  accept=".pdf,.jpg,.jpeg,.png"
+                  accept=".jpg,.jpeg,.png"
                   className={`absolute inset-0 w-full h-full opacity-0 cursor-pointer ${
                     incompleteFields.includes(name) ? "border-red-500" : ""
                   }`}
@@ -177,7 +177,7 @@ export default function DocumentsUpload({
                       )}
                     </span>
                     <span className="text-xs text-gray-500 mt-1">
-                      PDF, JPG, or PNG
+                      JPEG, JPG, or PNG
                     </span>
                   </div>
                 </label>
