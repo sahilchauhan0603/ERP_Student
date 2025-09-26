@@ -165,10 +165,10 @@ export default function Help() {
                 Send us an email and we'll respond within 24 hours.
               </p>
               <a
-                href="mailto:support@studentportal.edu"
+                href="mailto:bpitindia@yahoo.com"
                 className="text-blue-600 hover:text-blue-800 font-medium"
               >
-                support@studentportal.edu
+                bpitindia@yahoo.com
               </a>
             </motion.div>
 
@@ -183,10 +183,10 @@ export default function Help() {
                 Call us during business hours (9 AM - 5 PM, Mon-Fri).
               </p>
               <a
-                href="tel:5551234567"
+                href="tel:011-2757-2900"
                 className="text-blue-600 hover:text-blue-800 font-medium"
               >
-                (555) 123-4567
+                (011)-2757-2900
               </a>
             </motion.div>
           </div>

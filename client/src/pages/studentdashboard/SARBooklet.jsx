@@ -211,7 +211,7 @@ export default function SARBooklet() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }
               }}
-              className={`px-5 py-3 font-medium whitespace-nowrap transition-colors ${
+              className={`px-5 py-3 font-medium whitespace-nowrap cursor-pointer transition-colors ${
                 activeSection === tab.key
                   ? "text-blue-600 border-b-2 border-blue-600"
                   : "text-gray-500 hover:text-gray-700"
@@ -490,7 +490,7 @@ export default function SARBooklet() {
               </h2>
               <button
                 onClick={() => toggleEdit("personal")}
-                className="px-4 py-2 text-sm font-medium rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
+                className="px-4 py-2 text-sm cursor-pointer font-medium rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
               >
                 {editMode.personal ? (
                   <span className="flex items-center">
@@ -673,7 +673,7 @@ export default function SARBooklet() {
                 <div className="md:col-span-2 flex justify-end pt-2">
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm flex items-center"
+                    className="px-5 cursor-pointer py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm flex items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -783,7 +783,7 @@ export default function SARBooklet() {
               </h2>
               <button
                 onClick={() => toggleEdit("family")}
-                className="px-4 py-2 text-sm font-medium rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
+                className="px-4 py-2 cursor-pointer text-sm font-medium rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
               >
                 {editMode.family ? (
                   <span className="flex items-center">
@@ -926,7 +926,7 @@ export default function SARBooklet() {
                 <div className="md:col-span-2 flex justify-end pt-2">
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm flex items-center"
+                    className="px-5 cursor-pointer py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm flex items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -1020,7 +1020,7 @@ export default function SARBooklet() {
               </h2>
               <button
                 onClick={() => toggleEdit("academic")}
-                className="px-4 py-2 text-sm font-medium rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
+                className="px-4 py-2 cursor-pointer text-sm font-medium rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
               >
                 {editMode.academic ? (
                   <span className="flex items-center">
@@ -1139,7 +1139,7 @@ export default function SARBooklet() {
                 <div className="md:col-span-2 flex justify-end pt-2">
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm flex items-center"
+                    className="px-5 py-2.5 cursor-pointer bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm flex items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -1217,7 +1217,7 @@ export default function SARBooklet() {
               </h2>
               <button
                 onClick={() => toggleEdit("achievements")}
-                className="px-4 py-2 text-sm font-medium rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
+                className="px-4 py-2 text-sm cursor-pointer font-medium rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
               >
                 {editMode.achievements ? (
                   <span className="flex items-center">
@@ -1284,7 +1284,7 @@ export default function SARBooklet() {
                 <div className="flex justify-end mt-4">
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm flex items-center"
+                    className="px-5 py-2.5 cursor-pointer bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm flex items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -1329,7 +1329,7 @@ export default function SARBooklet() {
               </h2>
               <button
                 onClick={() => toggleEdit("internship")}
-                className="px-4 py-2 text-sm font-medium rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
+                className="px-4 py-2 text-sm cursor-pointer font-medium rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
               >
                 {editMode.internship ? (
                   <span className="flex items-center">
@@ -1435,7 +1435,7 @@ export default function SARBooklet() {
                 <div className="md:col-span-2 flex justify-end pt-2">
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm flex items-center"
+                    className="px-5 py-2.5 cursor-pointer bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors shadow-sm flex items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

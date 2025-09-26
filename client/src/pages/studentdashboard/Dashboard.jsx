@@ -1133,7 +1133,7 @@ const StudentDetailsDashboard = () => {
                 <Tab
                   key={category}
                   className={({ selected }) =>
-                    `w-full rounded-lg py-3 text-sm font-medium leading-5 transition-all duration-200
+                    `w-full rounded-lg py-3 text-sm font-medium cursor-pointer leading-5 transition-all duration-200
                     ring-white ring-opacity-60 ring-offset-2 ring-offset-gray-800 focus:outline-none focus:ring-2 relative
                     ${selected
                       ? "bg-white shadow text-gray-900"
