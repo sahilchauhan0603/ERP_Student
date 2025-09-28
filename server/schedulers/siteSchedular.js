@@ -12,7 +12,7 @@ async function callOwnApi() {
     }
 }
 function startScheduler() {
-    cron.schedule('*/12 * * * *', () => {
+    cron.schedule('*/6 * * * *', () => {
         // console.log(`Running scheduled API call at ${new Date().toISOString()}`);
         callOwnApi();
     });
