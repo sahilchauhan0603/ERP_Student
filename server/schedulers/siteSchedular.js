@@ -6,7 +6,7 @@ const API_URL = "https://erp-student-backend.onrender.com";
 async function callOwnApi() {
     try {
         const response = await axios.get(API_URL);
-        console.log(`Scheduler API call at ${new Date().toISOString()}:`, response.data);
+        console.log(`Cron Scheduler API call at ${new Date().toISOString()}:`, response.data);
     } catch (error) {
         // console.error(`Scheduler API error at ${new Date().toISOString()}:`, error.message);
     }
