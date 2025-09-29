@@ -3,7 +3,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 async function sendEmail(to, subject, text, html) {
   const msg = {
-    from: process.env.EMAIL_USER,
+    from: `"BPIT Admissions" <${process.env.EMAIL_USER}>`,
     to,
     subject,
     html,

@@ -4,8 +4,8 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 async function sendAdminOtpMail(to, otp) {
   const msg = {
     to,
-    from: `"BPIT Admin Portal" <${process.env.EMAIL_USER}>`, 
-    subject: 'Your One-Time Password (OTP) for BPIT Admin Login',
+    from: `"BPIT Admin Panel Login" <${process.env.EMAIL_USER}>`, 
+    subject: 'Your One-Time Password (OTP) for BPIT Admin Panel Login',
     html: `
       <div style="max-width:480px;margin:32px auto;padding:32px 24px;background:linear-gradient(135deg,#e0e7ff 0%,#f3e8ff 100%);border-radius:18px;box-shadow:0 4px 24px rgba(80,80,180,0.10);font-family:'Segoe UI',Arial,sans-serif;">
         <div style="text-align:center;margin-bottom:18px;">
