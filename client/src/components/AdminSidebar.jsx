@@ -91,14 +91,6 @@ export default function AdminSidebar({ open, onClose }) {
         ></div>
       )}
       <aside className={sidebarClasses}>
-        {/* Close button for mobile */}
-        <button
-          className="absolute top-4 cursor-pointer right-4 md:hidden text-white text-2xl z-40"
-          onClick={onClose}
-          aria-label="Close sidebar"
-        >
-          <FiX />
-        </button>
         {/* Logo/Branding */}
         <div className="px-6 py-5 border-b border-blue-700 flex items-center space-x-3">
           <div className="bg-white p-2 rounded-lg">

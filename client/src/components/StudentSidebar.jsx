@@ -81,29 +81,6 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
           open ? "w-62 translate-x-0" : "w-0 -translate-x-full md:translate-x-0 md:w-16"
         } fixed left-0 top-0 h-screen transition-all duration-300 bg-gradient-to-b from-neutral-950 to-neutral-900 text-white border-r border-neutral-800 shadow-2xl flex flex-col z-30 md:relative`}
       >
-        {/* Close button for mobile */}
-        {isMobile && open && (
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 cursor-pointer z-50 md:hidden"
-            aria-label="Close sidebar"
-          >
-            <svg
-              className="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        )}
-
         {/* Subtle background pattern */}
         <div className="absolute inset-0 opacity-5 bg-[radial-gradient(#ffffff_1px,transparent_1px)] bg-[length:20px_20px]"></div>
 

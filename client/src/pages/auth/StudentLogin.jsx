@@ -532,7 +532,7 @@ const StudentLogin = () => {
             window.location.href = '/';
           }
         }}
-        className="fixed bottom-6 right-24 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 group"
+        className="fixed bottom-6 cursor-pointer right-24 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 group"
         // title="Go to Homepage"
       >
         <FiHome className="w-8 h-8" />

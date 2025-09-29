@@ -64,25 +64,23 @@ export default function AdminLayout() {
           />
         </div>
       )}
-      {/* Hamburger for mobile */}
+      {/* Hamburger/Close toggle for mobile */}
       <button
-        className="fixed cursor-pointer top-4 left-4 z-40 md:hidden bg-white p-2 rounded shadow-md"
+        className="fixed cursor-pointer top-4 left-4 z-40 md:hidden bg-white p-2 rounded shadow-md transition-all duration-300 hover:bg-gray-50"
         onClick={() => setSidebarOpen((open) => !open)}
-        aria-label="Toggle sidebar"
+        aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
       >
-        <svg
-          className="w-6 h-6 text-blue-800"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
+        {sidebarOpen ? (
+          // X icon when sidebar is open
+          <svg className="w-6 h-6 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          // Hamburger icon when sidebar is closed
+          <svg className="w-6 h-6 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        )}
       </button>
       {/* Main content - h-screen, scrollable, margin left for sidebar */}
       <div className="min-h-screen h-screen md:ml-64 overflow-y-auto p-4 md:p-6 bg-gray-50 transition-all duration-300">
