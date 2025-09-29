@@ -86,14 +86,14 @@ export default function AdminSidebar({ open, onClose }) {
       {/* Backdrop for mobile */}
       {open && (
         <div
-          className="fixed inset-0 backdrop-blur-sm bg-opacity-40 z-20 md:hidden"
+          className="fixed inset-0 backdrop-blur-sm bg-black/40 bg-opacity-40 z-20 md:hidden"
           onClick={onClose}
         ></div>
       )}
       <aside className={sidebarClasses}>
         {/* Logo/Branding */}
-        <div className="px-6 py-5 border-b border-blue-700 flex items-center space-x-3">
-          <div className="bg-white p-2 rounded-lg">
+        <div className="px-6 py-5 border-b border-blue-700 flex justify-center items-center space-x-3">
+          {/* <div className="bg-white p-2 rounded-lg">
             <svg
               className="w-6 h-6 text-blue-600"
               fill="none"
@@ -107,7 +107,7 @@ export default function AdminSidebar({ open, onClose }) {
                 d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"
               />
             </svg>
-          </div>
+          </div> */}
           <h1 className="text-xl font-bold tracking-tight">Admin Portal</h1>
         </div>
         {/* Navigation */}

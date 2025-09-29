@@ -172,7 +172,6 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
           <button
             onClick={() => {
               setIsAIChatOpen(true);
-              if (isMobile && onClose) onClose();
             }}
             title="AI Assistant"
             className="flex items-center cursor-pointer justify-center gap-3 px-3 py-3 rounded-2xl text-gray-200 border border-blue-600 hover:bg-white/10 hover:shadow-sm transition-all duration-200 text-left group mb-4"
@@ -251,7 +250,7 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
 
       {/* AI Chat Modal */}
       {isAIChatOpen && (
-        <div className="fixed inset-0 z-50 md:fixed md:right-0 md:top-0 md:inset-auto">
+        <div className="fixed right-0 top-0 z-50 shadow-lg">
           <AIChat onClose={() => setIsAIChatOpen(false)} />
         </div>
       )}
