@@ -30,12 +30,23 @@ export default function AdminDashboard() {
     approved: 0,
     declined: 0,
   });
+  const [batchStats, setBatchStats] = useState([]);
+  const [branchStats, setBranchStats] = useState([]);
+  const [selectedBatch, setSelectedBatch] = useState('');
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState("");
 
   useEffect(() => {
     fetchStats();
+    fetchBatchStats();
+    fetchBranchStats();
   }, []);
+
+  useEffect(() => {
+    if (selectedBatch) {
+      fetchBranchStats(selectedBatch);
+    }
+  }, [selectedBatch]);
 
   const fetchStats = async () => {
     setLoading(true);
@@ -55,6 +66,38 @@ export default function AdminDashboard() {
       });
     }
     setLoading(false);
+  };
+
+  const fetchBatchStats = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/admin/batch-stats`, {
+        withCredentials: true,
+      });
+      setBatchStats(res.data);
+      // Set default selected batch to the most recent one
+      if (res.data.length > 0 && !selectedBatch) {
+        setSelectedBatch(res.data[0].batch_year);
+      }
+    } catch (err) {
+      console.error("Failed to fetch batch stats:", err);
+      setBatchStats([]);
+    }
+  };
+
+  const fetchBranchStats = async (batchYear = '') => {
+    try {
+      const url = batchYear 
+        ? `${API_URL}/admin/branch-stats?batchYear=${batchYear}`
+        : `${API_URL}/admin/branch-stats`;
+      
+      const res = await axios.get(url, {
+        withCredentials: true,
+      });
+      setBranchStats(res.data);
+    } catch (err) {
+      console.error("Failed to fetch branch stats:", err);
+      setBranchStats([]);
+    }
   };
 
   const calculatePercentageChange = (current, previous = current * 0.975) => {
@@ -145,6 +188,65 @@ export default function AdminDashboard() {
         hoverBackgroundColor: ["#6B63FF", "#FFC154", "#2DD4BF", "#E56969"],
         borderRadius: 6,
         borderSkipped: false,
+      },
+    ],
+  };
+
+  // Batch Statistics Pie Chart
+  const batchPieData = {
+    labels: batchStats.map(item => `Batch ${item.batch_year}`),
+    datasets: [
+      {
+        data: batchStats.map(item => item.student_count),
+        backgroundColor: [
+          "#8B5CF6", "#06B6D4", "#10B981", "#F59E0B", 
+          "#EF4444", "#6366F1", "#EC4899", "#84CC16"
+        ],
+        hoverBackgroundColor: [
+          "#A78BFA", "#22D3EE", "#34D399", "#FBBF24", 
+          "#F87171", "#818CF8", "#F472B6", "#A3E635"
+        ],
+        borderWidth: 0,
+        hoverOffset: 10,
+      },
+    ],
+  };
+
+  // Function to shorten branch names for better display
+  const shortenBranchName = (branch) => {
+    const branchMap = {
+      'B.Tech Computer Science Engineering (CSE)': 'CSE',
+      'B.Tech Electronics and Communication Engineering (ECE)': 'ECE',
+      'B.Tech Electrical and Electronics Engineering (EEE)': 'EEE',
+      'B.Tech Information Technology Engineering (IT)': 'IT',
+      'B.Tech Artificial Intelligence and Data Science Engineering (AI-DS)': 'AI-DS',
+      'B.Tech Computer Science Engineering with specialization in Data Science (CSE-DS)': 'CSE-DS',
+      'LE-B.Tech Computer Science Engineering (CSE)': 'LE-CSE',
+      'LE-B.Tech Information Technology Engineering (IT)': 'LE-IT',
+      'LE-B.Tech Electronics and Communication Engineering (ECE)': 'LE-ECE',
+      'LE-B.Tech Electrical and Electronics Engineering (EEE)': 'LE-EEE',
+      'BBA': 'BBA',
+      'MBA': 'MBA',
+    };
+    return branchMap[branch] || branch;
+  };
+
+  // Branch Statistics Pie Chart
+  const branchPieData = {
+    labels: branchStats.map(item => shortenBranchName(item.branch)),
+    datasets: [
+      {
+        data: branchStats.map(item => item.student_count),
+        backgroundColor: [
+          "#3B82F6", "#EF4444", "#10B981", "#F59E0B",
+          "#8B5CF6", "#EC4899", "#06B6D4", "#84CC16"
+        ],
+        hoverBackgroundColor: [
+          "#60A5FA", "#F87171", "#34D399", "#FBBF24",
+          "#A78BFA", "#F472B6", "#22D3EE", "#A3E635"
+        ],
+        borderWidth: 0,
+        hoverOffset: 10,
       },
     ],
   };
@@ -398,6 +500,184 @@ export default function AdminDashboard() {
                   },
                 }}
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Batch and Branch Statistics */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Batch-wise Statistics */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Batch Distribution
+              </h2>
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                By Year
+              </div>
+            </div>
+            <div className="h-80">
+              {batchStats.length > 0 ? (
+                <Pie
+                  data={batchPieData}
+                  options={{
+                    ...chartOptions,
+                    plugins: {
+                      ...chartOptions.plugins,
+                      tooltip: {
+                        callbacks: {
+                          label: function (context) {
+                            const label = context.label || "";
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} students (${percentage}%)`;
+                          },
+                        },
+                      },
+                      legend: {
+                        position: "bottom",
+                        labels: {
+                          padding: 15,
+                          usePointStyle: true,
+                          font: {
+                            size: 11,
+                            weight: '500'
+                          },
+                          boxWidth: 12,
+                          boxHeight: 12,
+                          generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                              return data.labels.map((label, index) => {
+                                const value = data.datasets[0].data[index];
+                                const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return {
+                                  text: `${label} (${percentage}%)`,
+                                  fillStyle: data.datasets[0].backgroundColor[index],
+                                  strokeStyle: data.datasets[0].backgroundColor[index],
+                                  lineWidth: 0,
+                                  pointStyle: 'circle',
+                                  hidden: false,
+                                  index: index
+                                };
+                              });
+                            }
+                            return [];
+                          }
+                        },
+                      },
+                    },
+                  }}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <div className="text-center">
+                    <div className="text-4xl mb-2">📊</div>
+                    <div>No batch data available</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Branch-wise Statistics */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Branch Distribution
+              </h2>
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                By Course
+              </div>
+            </div>
+            
+            {/* Batch Selector */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Batch Year:
+              </label>
+              <select
+                value={selectedBatch}
+                onChange={(e) => setSelectedBatch(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">All Batches</option>
+                {batchStats.map((batch) => (
+                  <option key={batch.batch_year} value={batch.batch_year}>
+                    Batch {batch.batch_year}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="h-64">
+              {branchStats.length > 0 ? (
+                <Pie
+                  data={branchPieData}
+                  options={{
+                    ...chartOptions,
+                    plugins: {
+                      ...chartOptions.plugins,
+                      tooltip: {
+                        callbacks: {
+                          label: function (context) {
+                            const shortLabel = context.label || "";
+                            const originalBranch = branchStats[context.dataIndex]?.branch || shortLabel;
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return [`${originalBranch}`, `${value} students (${percentage}%)`];
+                          },
+                        },
+                      },
+                      legend: {
+                        position: "bottom",
+                        labels: {
+                          padding: 12,
+                          usePointStyle: true,
+                          font: {
+                            size: 10,
+                            weight: '500'
+                          },
+                          boxWidth: 12,
+                          boxHeight: 12,
+                          generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                              return data.labels.map((label, index) => {
+                                const value = data.datasets[0].data[index];
+                                const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return {
+                                  text: `${label} (${percentage}%)`,
+                                  fillStyle: data.datasets[0].backgroundColor[index],
+                                  strokeStyle: data.datasets[0].backgroundColor[index],
+                                  lineWidth: 0,
+                                  pointStyle: 'circle',
+                                  hidden: false,
+                                  index: index
+                                };
+                              });
+                            }
+                            return [];
+                          }
+                        },
+                      },
+                    },
+                  }}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <div className="text-center">
+                    <div className="text-4xl mb-2">🎓</div>
+                    <div>No branch data available</div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

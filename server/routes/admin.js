@@ -28,6 +28,22 @@ router.get(
   adminController.getStudentStats
 );
 
+// Batch-wise statistics Route
+router.get(
+  "/batch-stats",
+  authenticate,
+  authorizeRole("admin"),
+  adminController.getBatchStats
+);
+
+// Branch-wise statistics Route
+router.get(
+  "/branch-stats",
+  authenticate,
+  authorizeRole("admin"),
+  adminController.getBranchStats
+);
+
 // This route is not required currently
 router.get(
   "/list",
@@ -86,6 +102,14 @@ router.post(
   authenticate,
   authorizeRole("admin"),
   adminController.aiReviewStudent
+);
+
+// Delete student route
+router.delete(
+  "/students/:studentId",
+  authenticate,
+  authorizeRole("admin"),
+  adminController.deleteStudent
 );
 
 module.exports = router;

@@ -108,6 +108,54 @@ exports.getStudentStats = (req, res) => {
   });
 };
 
+// Get batch-wise student statistics
+exports.getBatchStats = (req, res) => {
+  const query = `
+    SELECT 
+      YEAR(created_at) as batch_year,
+      COUNT(*) as student_count
+    FROM students 
+    WHERE created_at IS NOT NULL
+    GROUP BY YEAR(created_at)
+    ORDER BY batch_year DESC
+  `;
+  
+  db.query(query, (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: "DB error", error: err });
+    }
+    res.json(results);
+  });
+};
+
+// Get branch-wise student statistics within a specific batch
+exports.getBranchStats = (req, res) => {
+  const { batchYear } = req.query;
+  
+  let query = `
+    SELECT 
+      course as branch,
+      COUNT(*) as student_count
+    FROM students 
+    WHERE course IS NOT NULL AND course != ''
+  `;
+  
+  const params = [];
+  if (batchYear) {
+    query += ` AND YEAR(created_at) = ?`;
+    params.push(batchYear);
+  }
+  
+  query += ` GROUP BY course ORDER BY student_count DESC`;
+  
+  db.query(query, params, (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: "DB error", error: err });
+    }
+    res.json(results);
+  });
+};
+
 exports.listAllStudents = (req, res) => {
   let { page = 1, limit = 10, batch = "" } = req.query;
   page = parseInt(page);
@@ -647,5 +695,55 @@ exports.aiReviewStudent = (req, res) => {
   const status = declinedFields.length > 0 ? "declined" : "approved";
 
   return res.json({ status, declinedFields, verifications });
+};
+
+// Delete student by ID
+exports.deleteStudent = (req, res) => {
+  const { studentId } = req.params;
+  
+  if (!studentId) {
+    return res.status(400).json({ message: "Student ID is required" });
+  }
+
+  // First, check if student exists
+  db.query(
+    "SELECT id, firstName, lastName, email FROM students WHERE id = ?",
+    [studentId],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ message: "DB error", error: err });
+      }
+      
+      if (result.length === 0) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+
+      const studentInfo = result[0];
+      
+      // Delete the student
+      db.query(
+        "DELETE FROM students WHERE id = ?",
+        [studentId],
+        (deleteErr, deleteResult) => {
+          if (deleteErr) {
+            return res.status(500).json({ message: "Failed to delete student", error: deleteErr });
+          }
+          
+          if (deleteResult.affectedRows === 0) {
+            return res.status(404).json({ message: "Student not found" });
+          }
+          
+          res.json({
+            message: "Student deleted successfully",
+            deletedStudent: {
+              id: studentInfo.id,
+              name: `${studentInfo.firstName} ${studentInfo.lastName}`,
+              email: studentInfo.email
+            }
+          });
+        }
+      );
+    }
+  );
 };
 

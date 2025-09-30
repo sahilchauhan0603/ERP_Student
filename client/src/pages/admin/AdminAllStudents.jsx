@@ -10,6 +10,7 @@ import {
   FiClock,
   FiCheck,
   FiX,
+  FiTrash2,
 } from "react-icons/fi";
 import Swal from "sweetalert2";
 
@@ -111,6 +112,52 @@ export default function AdminAllStudents() {
       });
     }
     setLoading(false);
+  };
+
+  const handleDeleteStudent = async (student) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      html: `
+        <div class="text-left">
+          <p class="mb-2">You are about to permanently delete:</p>
+          <p class="font-semibold">${student.firstName} ${student.lastName}</p>
+          <p class="text-sm text-gray-600">${student.email}</p>
+          <p class="mt-3 text-red-600 font-medium">This action cannot be undone!</p>
+        </div>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, Delete!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.delete(`${API_URL}/admin/students/${student.id}`, {
+          withCredentials: true,
+        });
+        
+        Swal.fire({
+          title: 'Deleted!',
+          text: `${student.firstName} ${student.lastName} has been deleted successfully.`,
+          icon: 'success',
+          confirmButtonColor: '#059669',
+        });
+        
+        // Refresh the students list
+        fetchStudents();
+      } catch (error) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to delete student. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#dc2626',
+        });
+      }
+    }
   };
 
   const refreshTable = () => {
@@ -343,15 +390,25 @@ export default function AdminAllStudents() {
                     <StatusBadge status={student.status} />
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => {
-                        setSelected(student);
-                        setShowModal(true);
-                      }}
-                      className="text-blue-600 hover:text-blue-900 cursor-pointer"
-                    >
-                      View
-                    </button>
+                    <div className="flex items-center justify-end gap-3">
+                      <button
+                        onClick={() => {
+                          setSelected(student);
+                          setShowModal(true);
+                        }}
+                        className="text-blue-600 hover:text-blue-900 cursor-pointer font-medium"
+                        title="View Details"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => handleDeleteStudent(student)}
+                        className="text-red-600 hover:text-red-900 cursor-pointer p-1 hover:bg-red-50 rounded transition-colors duration-200"
+                        title="Delete Student"
+                      >
+                        <FiTrash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
