@@ -477,6 +477,7 @@ exports.getStudentFullDetails = (req, res) => {
         email: student.email,
         mobile: student.mobile,
         dob: student.dob,
+        placeOfBirth: student.placeOfBirth,
         gender: student.gender,
         category: student.category,
         subCategory: student.subCategory,
@@ -487,15 +488,27 @@ exports.getStudentFullDetails = (req, res) => {
         examRoll: student.examRoll,
         examRank: student.examRank,
         abcId: student.abcId,
+        feeReimbursement: student.feeReimbursement,
+        antiRaggingRef: student.antiRaggingRef,
       };
       // Parent
       const parent = {
         father_name: student.father_name,
-        father_mobile: student.father_mobile,
+        father_qualification: student.father_qualification,
+        father_occupation: student.father_occupation,
         father_email: student.father_email,
+        father_mobile: student.father_mobile,
+        father_telephoneSTD: student.father_telephoneSTD,
+        father_telephone: student.father_telephone,
+        father_officeAddress: student.father_officeAddress,
         mother_name: student.mother_name,
-        mother_mobile: student.mother_mobile,
+        mother_qualification: student.mother_qualification,
+        mother_occupation: student.mother_occupation,
         mother_email: student.mother_email,
+        mother_mobile: student.mother_mobile,
+        mother_telephoneSTD: student.mother_telephoneSTD,
+        mother_telephone: student.mother_telephone,
+        mother_officeAddress: student.mother_officeAddress,
         familyIncome: student.familyIncome,
       };
       // Documents
