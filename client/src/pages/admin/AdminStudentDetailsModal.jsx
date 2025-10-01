@@ -81,6 +81,18 @@ export default function AdminStudentDetailsModal({
     student?.declinedFields || details?.declinedFields
   );
 
+  // Debug logging to help identify declined fields format
+  React.useEffect(() => {
+    if (declinedFields && declinedFields.length > 0) {
+      // console.log('=== DECLINED FIELDS DEBUG ===');
+      // console.log('Raw student.declinedFields:', student?.declinedFields);
+      // console.log('Raw details.declinedFields:', details?.declinedFields);
+      // console.log('Parsed declinedFields:', declinedFields);
+      // console.log('Student status:', student?.status || details?.status);
+      // console.log('=============================');
+    }
+  }, [declinedFields, student, details]);
+
   // Helper to check if a section has declined fields
   const getDeclinedSections = () => {
     const declinedSections = new Set();
@@ -103,6 +115,7 @@ export default function AdminStudentDetailsModal({
               "email",
               "mobile",
               "dob",
+              "placeOfBirth",
               "gender",
               "category",
               "subCategory",
@@ -113,6 +126,8 @@ export default function AdminStudentDetailsModal({
               "examRoll",
               "examRank",
               "abcId",
+              "feeReimbursement",
+              "antiRaggingRef",
             ],
             academic: [
               "classX_institute",
@@ -136,11 +151,21 @@ export default function AdminStudentDetailsModal({
             ],
             parent: [
               "father_name",
+              "father_qualification",
+              "father_occupation",
               "father_mobile",
               "father_email",
+              "father_telephoneSTD",
+              "father_telephone",
+              "father_officeAddress",
               "mother_name",
+              "mother_qualification",
+              "mother_occupation",
               "mother_mobile",
               "mother_email",
+              "mother_telephoneSTD",
+              "mother_telephone",
+              "mother_officeAddress",
               "family_income",
             ],
             documents: [
@@ -206,6 +231,7 @@ export default function AdminStudentDetailsModal({
         "email",
         "mobile",
         "dob",
+        "placeOfBirth",
         "gender",
         "category",
         "subCategory",
@@ -216,6 +242,8 @@ export default function AdminStudentDetailsModal({
         "examRoll",
         "examRank",
         "abcId",
+        "feeReimbursement",
+        "antiRaggingRef",
       ],
       academic: [
         "classX_institute",
@@ -239,11 +267,21 @@ export default function AdminStudentDetailsModal({
       ],
       parent: [
         "father_name",
+        "father_qualification",
+        "father_occupation",
         "father_mobile",
         "father_email",
+        "father_telephoneSTD",
+        "father_telephone",
+        "father_officeAddress",
         "mother_name",
+        "mother_qualification",
+        "mother_occupation",
         "mother_mobile",
         "mother_email",
+        "mother_telephoneSTD",
+        "mother_telephone",
+        "mother_officeAddress",
         "familyIncome",
       ],
       documents: [
@@ -302,43 +340,95 @@ export default function AdminStudentDetailsModal({
     }, 300);
 
     try {
+      console.log("Sending student data to AI review:", details);
+
+      // Transform data structure to match backend expectations
+      const transformedStudent = {
+        personal: details?.personal || {},
+        academic: details?.academic || {},
+        parents: {
+          father: {
+            name: details?.parent?.father_name,
+            qualification: details?.parent?.father_qualification,
+            occupation: details?.parent?.father_occupation,
+            email: details?.parent?.father_email,
+            mobile: details?.parent?.father_mobile,
+            telephoneSTD: details?.parent?.father_telephoneSTD,
+            telephone: details?.parent?.father_telephone,
+            officeAddress: details?.parent?.father_officeAddress,
+          },
+          mother: {
+            name: details?.parent?.mother_name,
+            qualification: details?.parent?.mother_qualification,
+            occupation: details?.parent?.mother_occupation,
+            email: details?.parent?.mother_email,
+            mobile: details?.parent?.mother_mobile,
+            telephoneSTD: details?.parent?.mother_telephoneSTD,
+            telephone: details?.parent?.mother_telephone,
+            officeAddress: details?.parent?.mother_officeAddress,
+          },
+          familyIncome: details?.parent?.familyIncome,
+        },
+        documents: details?.documents || {},
+      };
+
       // Step 1: Call backend AI review
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/admin/ai-review-student`,
-        { student: details },
+        { student: transformedStudent },
         { withCredentials: true }
       );
 
-      const { status, declinedFields } = res.data;
+      console.log("AI Review Response:", res.data);
 
-      // Step 2: Save result via verify-student
+      const { status, declinedFields, verifications } = res.data;
+
+      // Step 2: Save result via verify-student endpoint
       await axios.post(
         `${import.meta.env.VITE_API_URL}/admin/verify-student`,
-        { studentId: student.id, status, declinedFields },
+        {
+          studentId: student.id,
+          status,
+          declinedFields: declinedFields || [],
+          verifications: verifications || {},
+        },
         { withCredentials: true }
       );
 
       clearInterval(interval);
       setProgress(100); // finish progress
+
       setTimeout(() => {
         setReviewing(false);
         refresh?.();
         onClose();
         Swal.fire({
           icon: status === "approved" ? "success" : "info",
-          title: "AI Review Complete",
-          text: `Student has been ${status} by AI.`,
-          timer: 2500,
+          title: "AI Review Completed",
+          text: `${student.firstName} ${student.lastName} has been ${status}.${
+            status === "declined" && declinedFields?.length > 0
+              ? ` ${declinedFields.length} fields need attention.`
+              : ""
+          }`,
+          timer: 3000,
           showConfirmButton: false,
         });
       }, 500);
     } catch (e) {
+      console.error("AI Review Error:", e);
       clearInterval(interval);
       setReviewing(false);
+      setProgress(0);
+
+      const errorMessage =
+        e.response?.data?.message || e.message || "Could not review student.";
+
       Swal.fire({
         icon: "error",
         title: "AI Review Failed",
-        text: e.message || "Could not review student.",
+        text: errorMessage,
+        confirmButtonText: "OK",
+        showConfirmButton: true,
       });
     }
 
@@ -355,6 +445,7 @@ export default function AdminStudentDetailsModal({
         "email",
         "mobile",
         "dob",
+        "placeOfBirth",
         "gender",
         "category",
         "subCategory",
@@ -365,6 +456,8 @@ export default function AdminStudentDetailsModal({
         "examRoll",
         "examRank",
         "abcId",
+        "feeReimbursement",
+        "antiRaggingRef",
       ],
       academic: [
         "classX_institute",
@@ -388,11 +481,21 @@ export default function AdminStudentDetailsModal({
       ],
       parent: [
         "father_name",
+        "father_qualification",
+        "father_occupation",
         "father_mobile",
         "father_email",
+        "father_telephoneSTD",
+        "father_telephone",
+        "father_officeAddress",
         "mother_name",
+        "mother_qualification",
+        "mother_occupation",
         "mother_mobile",
         "mother_email",
+        "mother_telephoneSTD",
+        "mother_telephone",
+        "mother_officeAddress",
         "familyIncome",
       ],
       documents: [
@@ -445,6 +548,7 @@ export default function AdminStudentDetailsModal({
         "email",
         "mobile",
         "dob",
+        "placeOfBirth",
         "gender",
         "category",
         "subCategory",
@@ -455,6 +559,8 @@ export default function AdminStudentDetailsModal({
         "examRoll",
         "examRank",
         "abcId",
+        "feeReimbursement",
+        "antiRaggingRef",
       ],
       academic: [
         "classX_institute",
@@ -478,11 +584,21 @@ export default function AdminStudentDetailsModal({
       ],
       parent: [
         "father_name",
+        "father_qualification",
+        "father_occupation",
         "father_mobile",
         "father_email",
+        "father_telephoneSTD",
+        "father_telephone",
+        "father_officeAddress",
         "mother_name",
+        "mother_qualification",
+        "mother_occupation",
         "mother_mobile",
         "mother_email",
+        "mother_telephoneSTD",
+        "mother_telephone",
+        "mother_officeAddress",
         "familyIncome",
       ],
       documents: [
@@ -669,7 +785,65 @@ export default function AdminStudentDetailsModal({
     const verifiedStatus = verifications[section]?.[field];
 
     // Highlight if this field is declined (for any declined student)
-    const isDeclined = declinedFields?.includes(field);
+    const isDeclined = declinedFields?.some((fieldPath) => {
+      // Handle direct field name match
+      if (fieldPath === field) return true;
+
+      // Handle section.field format
+      if (fieldPath === `${section}.${field}`) return true;
+
+      // Handle parent fields mapping
+      if (section === "parent") {
+        // Map parent field names to declined field format
+        const parentFieldMappings = {
+          father_name: "parent.father.name",
+          father_qualification: "parent.father.qualification",
+          father_occupation: "parent.father.occupation",
+          father_email: "parent.father.email",
+          father_mobile: "parent.father.mobile",
+          father_telephoneSTD: "parent.father.telephoneSTD",
+          father_telephone: "parent.father.telephone",
+          father_officeAddress: "parent.father.officeAddress",
+          mother_name: "parent.mother.name",
+          mother_qualification: "parent.mother.qualification",
+          mother_occupation: "parent.mother.occupation",
+          mother_email: "parent.mother.email",
+          mother_mobile: "parent.mother.mobile",
+          mother_telephoneSTD: "parent.mother.telephoneSTD",
+          mother_telephone: "parent.mother.telephone",
+          mother_officeAddress: "parent.mother.officeAddress",
+          familyIncome: "parent.familyIncome",
+        };
+
+        const mappedFieldPath = parentFieldMappings[field];
+        if (mappedFieldPath && fieldPath === mappedFieldPath) {
+          return true;
+        }
+      }
+
+      // Handle academic fields mapping
+      if (section === "academic" && field.includes("_")) {
+        // Convert academic field names like "classX_institute" to "academic.classX.institute"
+        const normalizedField = field.replace("_", ".");
+        const academicFieldPath = `academic.${normalizedField}`;
+        if (fieldPath === academicFieldPath) {
+          return true;
+        }
+      }
+
+      // Handle nested field paths (e.g., "personal.firstName", "documents.photo")
+      const parts = fieldPath.split(".");
+      if (parts.length > 1) {
+        const [sectionPart, ...fieldParts] = parts;
+        const fieldPart = fieldParts.join(".");
+
+        if (sectionPart === section && fieldPart === field) {
+          return true;
+        }
+      }
+
+      return false;
+    });
 
     let displayValue = value;
 
@@ -888,6 +1062,13 @@ export default function AdminStudentDetailsModal({
           showVerify={tableType === "pending"}
         />
         <DetailField
+          label="Place of Birth"
+          value={details?.personal?.placeOfBirth}
+          section="personal"
+          field="placeOfBirth"
+          showVerify={tableType === "pending"}
+        />
+        <DetailField
           label="Gender"
           value={details?.personal?.gender}
           section="personal"
@@ -955,6 +1136,20 @@ export default function AdminStudentDetailsModal({
           value={details?.personal?.abcId}
           section="personal"
           field="abcId"
+          showVerify={tableType === "pending"}
+        />
+        <DetailField
+          label="Fee Reimbursement"
+          value={details?.personal?.feeReimbursement}
+          section="personal"
+          field="feeReimbursement"
+          showVerify={tableType === "pending"}
+        />
+        <DetailField
+          label="Anti Ragging Reference"
+          value={details?.personal?.antiRaggingRef}
+          section="personal"
+          field="antiRaggingRef"
           showVerify={tableType === "pending"}
         />
       </div>
@@ -1174,10 +1369,17 @@ export default function AdminStudentDetailsModal({
               showVerify={tableType === "pending"}
             />
             <DetailField
-              label="Mobile"
-              value={details?.parent?.father_mobile}
+              label="Qualification"
+              value={details?.parent?.father_qualification}
               section="parent"
-              field="father_mobile"
+              field="father_qualification"
+              showVerify={tableType === "pending"}
+            />
+            <DetailField
+              label="Occupation"
+              value={details?.parent?.father_occupation}
+              section="parent"
+              field="father_occupation"
               showVerify={tableType === "pending"}
             />
             <DetailField
@@ -1185,6 +1387,34 @@ export default function AdminStudentDetailsModal({
               value={details?.parent?.father_email}
               section="parent"
               field="father_email"
+              showVerify={tableType === "pending"}
+            />
+            <DetailField
+              label="Mobile"
+              value={details?.parent?.father_mobile}
+              section="parent"
+              field="father_mobile"
+              showVerify={tableType === "pending"}
+            />
+            <DetailField
+              label="Telephone (STD)"
+              value={details?.parent?.father_telephoneSTD}
+              section="parent"
+              field="father_telephoneSTD"
+              showVerify={tableType === "pending"}
+            />
+            <DetailField
+              label="Telephone"
+              value={details?.parent?.father_telephone}
+              section="parent"
+              field="father_telephone"
+              showVerify={tableType === "pending"}
+            />
+            <DetailField
+              label="Office Address"
+              value={details?.parent?.father_officeAddress}
+              section="parent"
+              field="father_officeAddress"
               showVerify={tableType === "pending"}
             />
           </div>
@@ -1203,10 +1433,17 @@ export default function AdminStudentDetailsModal({
               showVerify={tableType === "pending"}
             />
             <DetailField
-              label="Mobile"
-              value={details?.parent?.mother_mobile}
+              label="Qualification"
+              value={details?.parent?.mother_qualification}
               section="parent"
-              field="mother_mobile"
+              field="mother_qualification"
+              showVerify={tableType === "pending"}
+            />
+            <DetailField
+              label="Occupation"
+              value={details?.parent?.mother_occupation}
+              section="parent"
+              field="mother_occupation"
               showVerify={tableType === "pending"}
             />
             <DetailField
@@ -1214,6 +1451,34 @@ export default function AdminStudentDetailsModal({
               value={details?.parent?.mother_email}
               section="parent"
               field="mother_email"
+              showVerify={tableType === "pending"}
+            />
+            <DetailField
+              label="Mobile"
+              value={details?.parent?.mother_mobile}
+              section="parent"
+              field="mother_mobile"
+              showVerify={tableType === "pending"}
+            />
+            <DetailField
+              label="Telephone (STD)"
+              value={details?.parent?.mother_telephoneSTD}
+              section="parent"
+              field="mother_telephoneSTD"
+              showVerify={tableType === "pending"}
+            />
+            <DetailField
+              label="Telephone"
+              value={details?.parent?.mother_telephone}
+              section="parent"
+              field="mother_telephone"
+              showVerify={tableType === "pending"}
+            />
+            <DetailField
+              label="Office Address"
+              value={details?.parent?.mother_officeAddress}
+              section="parent"
+              field="mother_officeAddress"
               showVerify={tableType === "pending"}
             />
           </div>
@@ -1505,9 +1770,9 @@ export default function AdminStudentDetailsModal({
                               />
                             </svg>
                           </div>
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-red-600 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50 mb-0">
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-red-600 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50 mt-2">
                             Declined section
-                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-red-600"></div>
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-red-600"></div>
                           </div>
                         </div>
                       )}

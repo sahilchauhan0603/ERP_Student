@@ -928,7 +928,12 @@ const StudentDetailsDashboard = () => {
                   if (details.documents?.photo) {
                     Swal.fire({
                       title: 'Profile Photo',
-                      html: `<img src="${details.documents.photo}" alt="Profile Photo" style="width: 100%; max-width: 150px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">`,
+                      html: `<img src="${details.documents.photo}" 
+                         alt="Profile Photo" 
+                         style="max-width: 'auto'; height: auto; 
+                         border-radius: 8px; 
+                         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                         object-fit: contain;">`,
                       showCloseButton: true,
                       showConfirmButton: false,
                       background: '#fff',
