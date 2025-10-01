@@ -192,7 +192,7 @@ const sendRegistrationEmail = (studentEmail, studentName, studentId) => {
                 
                 <div class="message">
                     Visit the student portal to access your profile and track your application status at 
-                    <a href="https://erp-student-sm4v.onrender.com/login" style="color: #1e40af; text-decoration: underline;">https://erp-student-sm4v.onrender.com/login</a>
+                    <a href="https://erp-student.bpitindia.com/login" style="color: #1e40af; text-decoration: underline;">https://erp-student.bpitindia.com/login</a>
                 </div>
             </div>
             

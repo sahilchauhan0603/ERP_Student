@@ -61,9 +61,9 @@ const HomePage = () => {
 
   const menuItems = [
     {
-      href: "/registration",
+      href: "/registration/student",
       icon: <FaClipboardList className="text-5xl" />,
-      label: "Registration",
+      label: "Student Registration",
       color: "from-blue-800 to-blue-900",
       bgColor: "bg-blue-100",
     },

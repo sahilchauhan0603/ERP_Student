@@ -9,7 +9,7 @@ const rateLimit = require("express-rate-limit");
 
 const otpLimiter = rateLimit({
   windowMs: 30 * 60 * 1000, // 30 minutes
-  max: 15,                  // limit each IP to 15 requests per windowMs
+  max: 15, // limit each IP to 15 requests per windowMs
   message: { message: "Too many OTP requests, please try again later." },
   standardHeaders: true,
   legacyHeaders: false,
@@ -119,7 +119,7 @@ exports.getBatchStats = (req, res) => {
     GROUP BY YEAR(created_at)
     ORDER BY batch_year DESC
   `;
-  
+
   db.query(query, (err, results) => {
     if (err) {
       return res.status(500).json({ message: "DB error", error: err });
@@ -131,7 +131,7 @@ exports.getBatchStats = (req, res) => {
 // Get branch-wise student statistics within a specific batch
 exports.getBranchStats = (req, res) => {
   const { batchYear } = req.query;
-  
+
   let query = `
     SELECT 
       course as branch,
@@ -139,15 +139,15 @@ exports.getBranchStats = (req, res) => {
     FROM students 
     WHERE course IS NOT NULL AND course != ''
   `;
-  
+
   const params = [];
   if (batchYear) {
     query += ` AND YEAR(created_at) = ?`;
     params.push(batchYear);
   }
-  
+
   query += ` GROUP BY course ORDER BY student_count DESC`;
-  
+
   db.query(query, params, (err, results) => {
     if (err) {
       return res.status(500).json({ message: "DB error", error: err });
@@ -244,7 +244,7 @@ exports.updateStudentStatus = (req, res) => {
                   <div style="background:#f0f8ff;padding:15px;margin:20px 0;border-left:4px solid #4CAF50;">
                     <p style="margin:0;">Next Steps:</p>
                     <ul style="margin:10px 0 0 20px;">
-                      <li>Access your profile at <a href="https://erp-student-sm4v.onrender.com/login" target="_blank" rel="noopener noreferrer">Student Portal</a> to view your approved application</li>
+                      <li>Access your profile at <a href="https://erp-student.bpitindia.com/login" target="_blank" rel="noopener noreferrer">Student Portal</a> to view your approved application</li>
                       <li>Contact admissions for any queries at <a href="https://admissions-enquiry.bpitindia.ac.in/" target="_blank" rel="noopener noreferrer">https://admissions-enquiry.bpitindia.ac.in/</a></li>
                     </ul>
                   </div>
@@ -269,7 +269,7 @@ exports.updateStudentStatus = (req, res) => {
                   <ul style="margin:10px 0 0 20px;">
                     ${declinedArr.map((field) => `<li>${field}</li>`).join("")}
                   </ul>
-                  <p>Please review and update these fields before resubmitting your application. Access your profile at <a href="https://erp-student-sm4v.onrender.com/login" target="_blank" rel="noopener noreferrer">https://erp-student-sm4v.onrender.com/login</a> and update your declined sections.</p>
+                  <p>Please review and update these fields before resubmitting your application. Access your profile at <a href="https://erp-student.bpitindia.com/login" target="_blank" rel="noopener noreferrer">https://erp-student.bpitindia.com/login</a> and update your declined sections.</p>
                 </div>
               `;
             }
@@ -313,7 +313,7 @@ exports.updateStudentStatus = (req, res) => {
                   <div style="background:#fffaf0;padding:15px;margin:20px 0;border-left:4px solid #FFA500;">
                     <p>Current Status: <strong>Pending Review</strong></p>
                     <p>Expected decision timeline: 5-7 business days</p>
-                    <p>Track your application status at <a href="https://erp-student-sm4v.onrender.com/login" target="_blank" rel="noopener noreferrer">https://erp-student-sm4v.onrender.com/login</a></p>
+                    <p>Track your application status at <a href="https://erp-student.bpitindia.com/login" target="_blank" rel="noopener noreferrer">https://erp-student.bpitindia.com/login</a></p>
                   </div>
                   <p>Thank you for your patience.</p>
                   <p>Best regards,<br>The Admissions Team</p>
@@ -582,15 +582,34 @@ exports.aiReviewStudent = (req, res) => {
     return res.status(400).json({ message: "Student data required" });
   }
 
-  const verifications = { personal: {}, academic: {}, parent: {}, documents: {} };
+  const verifications = {
+    personal: {},
+    academic: {},
+    parent: {},
+    documents: {},
+  };
   const declinedFields = [];
 
   // --- Personal Info Validation ---
   const personal = student.personal || {};
   const personalRequired = [
-    "course", "firstName", "lastName", "abcId", "dob", "placeOfBirth",
-    "mobile", "email", "examRoll", "examRank", "gender", "category",
-    "region", "currentAddress", "permanentAddress", "feeReimbursement", "antiRaggingRef"
+    "course",
+    "firstName",
+    "lastName",
+    "abcId",
+    "dob",
+    "placeOfBirth",
+    "mobile",
+    "email",
+    "examRoll",
+    "examRank",
+    "gender",
+    "category",
+    "region",
+    "currentAddress",
+    "permanentAddress",
+    "feeReimbursement",
+    "antiRaggingRef",
   ];
   personalRequired.forEach((field) => {
     if (!personal[field]) {
@@ -628,9 +647,12 @@ exports.aiReviewStudent = (req, res) => {
   });
 
   // Other Qualification (if any field is filled, then all are required)
-  const oqAny = otherQualification.institute || otherQualification.board ||
-                otherQualification.year || otherQualification.aggregate ||
-                otherQualification.pcm;
+  const oqAny =
+    otherQualification.institute ||
+    otherQualification.board ||
+    otherQualification.year ||
+    otherQualification.aggregate ||
+    otherQualification.pcm;
   if (oqAny) {
     ["institute", "board", "year", "aggregate", "pcm"].forEach((f) => {
       if (!otherQualification[f]) {
@@ -647,7 +669,13 @@ exports.aiReviewStudent = (req, res) => {
   const father = parents.father || {};
   const mother = parents.mother || {};
 
-  const fatherRequired = ["name", "qualification", "occupation", "email", "mobile"];
+  const fatherRequired = [
+    "name",
+    "qualification",
+    "occupation",
+    "email",
+    "mobile",
+  ];
   fatherRequired.forEach((f) => {
     if (!father[f]) {
       verifications.parent[`father.${f}`] = false;
@@ -677,10 +705,22 @@ exports.aiReviewStudent = (req, res) => {
   // --- Documents Validation ---
   const documents = student.documents || {};
   const requiredDocs = [
-    "photo", "ipuRegistration", "allotmentLetter", "examAdmitCard", "examScoreCard",
-    "marksheet10", "passing10", "marksheet12", "passing12", "aadhar",
-    "characterCertificate", "medicalCertificate", "migrationCertificate",
-    "academicFeeReceipt", "collegeFeeReceipt", "parentSignature"
+    "photo",
+    "ipuRegistration",
+    "allotmentLetter",
+    "examAdmitCard",
+    "examScoreCard",
+    "marksheet10",
+    "passing10",
+    "marksheet12",
+    "passing12",
+    "aadhar",
+    "characterCertificate",
+    "medicalCertificate",
+    "migrationCertificate",
+    "academicFeeReceipt",
+    "collegeFeeReceipt",
+    "parentSignature",
   ];
   requiredDocs.forEach((doc) => {
     if (!documents[doc]) {
@@ -700,7 +740,7 @@ exports.aiReviewStudent = (req, res) => {
 // Delete student by ID
 exports.deleteStudent = (req, res) => {
   const { studentId } = req.params;
-  
+
   if (!studentId) {
     return res.status(400).json({ message: "Student ID is required" });
   }
@@ -713,37 +753,38 @@ exports.deleteStudent = (req, res) => {
       if (err) {
         return res.status(500).json({ message: "DB error", error: err });
       }
-      
+
       if (result.length === 0) {
         return res.status(404).json({ message: "Student not found" });
       }
 
       const studentInfo = result[0];
-      
+
       // Delete the student
       db.query(
         "DELETE FROM students WHERE id = ?",
         [studentId],
         (deleteErr, deleteResult) => {
           if (deleteErr) {
-            return res.status(500).json({ message: "Failed to delete student", error: deleteErr });
+            return res
+              .status(500)
+              .json({ message: "Failed to delete student", error: deleteErr });
           }
-          
+
           if (deleteResult.affectedRows === 0) {
             return res.status(404).json({ message: "Student not found" });
           }
-          
+
           res.json({
             message: "Student deleted successfully",
             deletedStudent: {
               id: studentInfo.id,
               name: `${studentInfo.firstName} ${studentInfo.lastName}`,
-              email: studentInfo.email
-            }
+              email: studentInfo.email,
+            },
           });
         }
       );
     }
   );
 };
-

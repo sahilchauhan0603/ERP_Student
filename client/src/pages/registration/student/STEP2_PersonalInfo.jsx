@@ -59,6 +59,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
   const [examRankError, setExamRankError] = useState("");
   const [addressError, setAddressError] = useState("");
   const [antiRaggingError, setAntiRaggingError] = useState("");
+  const [sameAsCurrentAddress, setSameAsCurrentAddress] = useState(false);
 
   // Place of Birth Dropdown Data
   const countries = [
@@ -255,15 +256,45 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
   // Address validation handlers
   const handleAddressChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      personal: {
-        ...prev.personal,
-        [name]: value,
-      },
-    }));
+    
+    setFormData((prev) => {
+      const updatedData = {
+        ...prev,
+        personal: {
+          ...prev.personal,
+          [name]: value,
+        },
+      };
+      
+      // If updating current address and checkbox is checked, also update permanent address
+      if (name === "currentAddress" && sameAsCurrentAddress) {
+        updatedData.personal.permanentAddress = value;
+      }
+      
+      return updatedData;
+    });
+    
     const error = validateAddress(name, value);
     setAddressError(error);
+  };
+
+  // Handle same as current address checkbox
+  const handleSameAddressChange = (e) => {
+    const isChecked = e.target.checked;
+    setSameAsCurrentAddress(isChecked);
+    
+    if (isChecked) {
+      // Copy current address to permanent address
+      setFormData((prev) => ({
+        ...prev,
+        personal: {
+          ...prev.personal,
+          permanentAddress: prev.personal.currentAddress || "",
+        },
+      }));
+    }
+    // Note: When unchecked, we keep the current value in permanentAddress
+    // so users don't lose their data if they accidentally uncheck
   };
 
   // Anti-ragging reference number validation
@@ -347,38 +378,39 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto bg-white p-4 sm:p-6 lg:p-10 rounded-3xl shadow-2xl border border-gray-200 animate-fade-in">
+    <div className="max-w-5xl mx-auto bg-white p-4 sm:p-6 lg:p-10 rounded-2xl shadow-xl border border-gray-300 animate-fade-in">
       {/* Header */}
       <div className="mb-8 sm:mb-10 text-center">
-        <div className="flex justify-center items-center mb-2">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
+        <div className="flex justify-center items-center mb-3">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black tracking-tight">
             Personal Information
           </h2>
         </div>
-        <p className="text-gray-700 text-base sm:text-lg font-medium tracking-wide">
-          Please complete all required fields carefully
+        <div className="w-20 h-1 bg-black mx-auto rounded-full mb-4"></div>
+        <p className="text-gray-700 text-base sm:text-lg font-medium">
+          Please complete all required fields carefully and accurately
         </p>
       </div>
 
       <div className="space-y-12">
         {/* Course Selection */}
-        <div className="bg-gray-50 p-6 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl">
-          <label className="block text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🎓</span> Select Course
+        <div className="bg-gray-50 p-6 rounded-xl shadow-md border border-gray-300 transition-all duration-300 hover:shadow-lg animate-slide-in">
+          <label className="flex items-center gap-2 text-base font-semibold text-black mb-4">
+            <span className="text-xl">🎓</span>Select Course
             <span className="text-red-500 font-bold">*</span>
           </label>
           <select
             name="course"
             value={formData.personal.course || ""}
             onChange={handleChange}
-            className={`w-full px-5 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+            className={`w-full px-5 py-4 border-2 rounded-xl focus:ring-4 transition-all duration-300 bg-white text-gray-900 shadow-sm font-medium ${
               incompleteFields.includes("course")
-                ? "border-red-500"
-                : "border-gray-400"
+                ? "border-gray-600 focus:border-black focus:ring-gray-300"
+                : "border-gray-300 focus:border-black focus:ring-gray-200 hover:border-gray-400"
             }`}
             required
           >
-            <option value="" className="text-gray-300">
+            <option value="" className="text-gray-400">
               -- Select Your Course --
             </option>
             {courses.map((course, index) => (
@@ -388,7 +420,12 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
             ))}
           </select>
           {incompleteFields.includes("course") && (
-            <div className="text-xs text-red-500 mt-1">Course is required</div>
+            <div className="text-xs text-gray-700 mt-2 font-medium flex items-center">
+              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              Course selection is required
+            </div>
           )}
         </div>
 
@@ -418,23 +455,26 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {/* Name Fields */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-800">
-                First Name<span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-black">
+                First Name<span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 name="firstName"
-                placeholder="First Name"
+                placeholder="Enter your first name"
                 value={formData.personal.firstName || ""}
                 onChange={handleNameChange}
-                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 transition-all duration-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm font-medium ${
                   incompleteFields.includes("firstName") || nameError
-                    ? "border-red-500"
-                    : "border-gray-400"
+                    ? "border-gray-600 focus:border-black focus:ring-gray-300"
+                    : "border-gray-300 focus:border-black focus:ring-gray-200 hover:border-gray-400"
                 }`}
                 required
               />
               {(incompleteFields.includes("firstName") || nameError) && (
-                <div className="text-xs text-red-500 mt-1">
+                <div className="text-xs text-gray-700 mt-1 font-medium flex items-center">
+                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
                   {nameError || "First name is required"}
                 </div>
               )}
@@ -539,7 +579,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
             {/* Place of Birth */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-800">
-                Place of Birth
+                Place of Birth<span className="text-red-500 font-bold">*</span>
               </label>
               <div className="flex flex-col sm:flex-row gap-2">
                 <select
@@ -1048,15 +1088,39 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-800">
-                Permanent Address<span className="text-red-500">*</span>
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-semibold text-gray-800">
+                  Permanent Address<span className="text-red-500">*</span>
+                </label>
+                {/* Same as Current Address Checkbox */}
+                <label className="flex items-center space-x-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={sameAsCurrentAddress}
+                    onChange={handleSameAddressChange}
+                    className="h-4 w-4 text-black focus:ring-2 focus:ring-gray-300 border-2 border-gray-400 rounded transition-all duration-200 hover:border-gray-500"
+                  />
+                  <div className="flex items-center space-x-1">
+                    <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2v0M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                    </svg>
+                    <span className="text-xs font-medium text-gray-700 select-none group-hover:text-gray-900 transition-colors duration-200">
+                      Same as current address
+                    </span>
+                  </div>
+                </label>
+              </div>
               <textarea
                 name="permanentAddress"
-                placeholder="Your permanent residential address"
+                placeholder={sameAsCurrentAddress ? "Same as current address" : "Your permanent residential address"}
                 value={formData.personal.permanentAddress || ""}
                 onChange={handleAddressChange}
-                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
+                disabled={sameAsCurrentAddress}
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 shadow-inner font-semibold ${
+                  sameAsCurrentAddress 
+                    ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300" 
+                    : "bg-white text-gray-900 placeholder-gray-300"
+                } ${
                   incompleteFields.includes("permanentAddress") || addressError
                     ? "border-red-500"
                     : "border-gray-400"

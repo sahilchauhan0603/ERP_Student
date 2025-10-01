@@ -500,7 +500,11 @@ const StudentDetailsDashboard = () => {
                       }
                     }
                   }}
-                  className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
+                  className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${
+                    updatedFields.includes(subSection ? `${section}.${subSection}.${field}` : `${section}.${field}`)
+                      ? "border-green-400 focus:ring-green-300"
+                      : "border-red-400 focus:ring-red-300"
+                  }`}
                 >
                   <option value="">Select {label}</option>
                   {dropdownOptions.map((option) => (
@@ -546,7 +550,11 @@ const StudentDetailsDashboard = () => {
                       }
                     }
                   }}
-                  className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
+                  className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${
+                    updatedFields.includes(subSection ? `${section}.${subSection}.${field}` : `${section}.${field}`)
+                      ? "border-green-400 focus:ring-green-300"
+                      : "border-red-400 focus:ring-red-300"
+                  }`}
                   max={new Date().toISOString().split('T')[0]} // Prevent future dates
                 />
               ) : (
@@ -586,7 +594,11 @@ const StudentDetailsDashboard = () => {
                       }
                     }
                   }}
-                  className="w-full px-3 py-2 border border-red-400 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
+                  className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${
+                    updatedFields.includes(subSection ? `${section}.${subSection}.${field}` : `${section}.${field}`)
+                      ? "border-green-400 focus:ring-green-300"
+                      : "border-red-400 focus:ring-red-300"
+                  }`}
                 />
               )}
             </div>
@@ -885,7 +897,7 @@ const StudentDetailsDashboard = () => {
             {details.personal?.status === "declined" && (
               <button
                 onClick={handleEditToggle}
-                className={`px-4 py-2 rounded-lg transition-all shadow-sm ${editMode
+                className={`px-4 py-2 rounded-lg cursor-pointer transition-all shadow-sm ${editMode
                   ? "bg-gray-200 text-gray-800 hover:bg-gray-400"
                   : "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-800"
                   }`}
@@ -900,7 +912,7 @@ const StudentDetailsDashboard = () => {
         {/* Student Profile Summary */}
         <div className="rounded-xl shadow-lg overflow-hidden mb-8 bg-white border border-gray-300">
           <div className="p-6 flex flex-col md:flex-row items-center">
-            <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-gray-700 shadow-lg mb-4 md:mb-0 md:mr-6">
+            <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-gray-700 shadow-lg mb-4 md:mb-0 md:mr-6 cursor-pointer hover:border-blue-500 transition-colors">
               <img
                 src={
                   details.documents?.photo ||
@@ -910,8 +922,22 @@ const StudentDetailsDashboard = () => {
                     (details.personal?.lastName || "")
                   )}&background=random&size=112`
                 }
-                alt="Student"
-                className="w-full h-full object-cover"
+                alt="Student Profile Photo"
+                className="w-full h-full object-cover hover:scale-105 transition-transform"
+                onClick={() => {
+                  if (details.documents?.photo) {
+                    Swal.fire({
+                      title: 'Profile Photo',
+                      html: `<img src="${details.documents.photo}" alt="Profile Photo" style="width: 100%; max-width: 150px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">`,
+                      showCloseButton: true,
+                      showConfirmButton: false,
+                      background: '#fff',
+                      customClass: {
+                        popup: 'rounded-lg'
+                      }
+                    });
+                  }
+                }}
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -1699,7 +1725,7 @@ const StudentDetailsDashboard = () => {
               disabled={
                 !allDeclinedFieldsUpdated() || saveStatus.final?.loading
               }
-              className={`px-6 py-3 text-white font-medium rounded-lg transition-all shadow-lg flex items-center gap-2 ${allDeclinedFieldsUpdated()
+              className={`px-6 cursor-pointer py-3 text-white font-medium rounded-lg transition-all shadow-lg flex items-center gap-2 ${allDeclinedFieldsUpdated()
                 ? "bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-700"
                 : "bg-gray-400 cursor-not-allowed"
                 }`}

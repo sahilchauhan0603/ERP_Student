@@ -4,28 +4,28 @@ const Instructions = ({ nextStep }) => {
   const [agree, setAgree] = useState(false);
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-4 sm:p-6 lg:p-10 rounded-3xl shadow-2xl border border-gray-200 animate-fade-in">
+    <div className="max-w-4xl mx-auto bg-white p-4 sm:p-6 lg:p-10 rounded-2xl shadow-xl border border-gray-300 animate-fade-in">
       <div className="text-center mb-8 sm:mb-10">
         <div className="flex justify-center items-center mb-3 sm:mb-4">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black tracking-tight">
             Official Registration Instructions
           </h2>
         </div>
-        <p className="text-base sm:text-lg text-gray-700 font-medium tracking-wide">
+        <p className="text-base sm:text-lg text-gray-700 font-semibold tracking-wide">
           Bhagwan Parshuram Institute of Technology
         </p>
-        <p className="text-xs sm:text-sm text-gray-600 mt-1">
+        <p className="text-xs sm:text-sm text-gray-600 mt-2 font-medium">
           Please read all instructions carefully before proceeding with registration
         </p>
       </div>
 
-      <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8 rounded-2xl shadow-lg border-2 border-gray-200 mb-8 sm:mb-10 transition-all duration-300 hover:shadow-xl">
+      <div className="bg-gray-50 p-4 sm:p-6 lg:p-8 rounded-xl shadow-lg border border-gray-300 mb-8 sm:mb-10 transition-all duration-300 hover:shadow-xl animate-slide-in">
         <div className="prose max-w-none">
-          <div className="bg-gray-100 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 border-l-4 border-gray-600">
+          <div className="bg-white p-4 sm:p-5 rounded-lg mb-4 sm:mb-6 border-l-4 border-black shadow-sm">
             <div className="flex items-start">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600 mr-2 sm:mr-3 mt-0.5 flex-shrink-0"
+                className="h-5 w-5 sm:h-6 sm:w-6 text-black mr-3 mt-0.5 flex-shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -38,8 +38,8 @@ const Instructions = ({ nextStep }) => {
                 />
               </svg>
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">Important Notice</h3>
-                <p className="text-sm sm:text-base text-gray-800 font-medium">
+                <h3 className="text-base sm:text-lg font-bold text-black mb-2">Important Notice</h3>
+                <p className="text-sm sm:text-base text-gray-700 font-medium leading-relaxed">
                   This is the official student registration portal of Bhagwan Parshuram Institute of Technology. 
                   All information provided will be verified and must be accurate and complete.
                 </p>
@@ -158,20 +158,20 @@ const Instructions = ({ nextStep }) => {
             />
           </svg>
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-2">Declaration</h3>
-            <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">
+            <h3 className="text-base sm:text-lg font-bold text-black mb-3">Declaration</h3>
+            <p className="text-sm sm:text-base text-gray-700 mb-4 sm:mb-5 leading-relaxed">
               By proceeding with registration, you acknowledge that all information provided is true and accurate. 
               You understand that providing false information may result in immediate disqualification and legal action.
             </p>
-            <div className="flex items-center">
+            <div className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
               <input
                 type="checkbox"
                 id="agree"
                 checked={agree}
                 onChange={(e) => setAgree(e.target.checked)}
-                className="h-4 w-4 text-gray-600 focus:ring-gray-500 border-gray-300 rounded"
+                className="h-5 w-5 mt-0.5 cursor-pointer text-black focus:ring-2 focus:ring-gray-500 border-2 border-gray-400 rounded transition-all duration-200"
               />
-              <label htmlFor="agree" className="ml-2 text-xs sm:text-sm font-medium text-gray-700">
+              <label htmlFor="agree" className="text-sm sm:text-base font-medium text-gray-800 cursor-pointer leading-relaxed">
                 I have read and understood all instructions and agree to proceed with registration
               </label>
             </div>
@@ -179,17 +179,26 @@ const Instructions = ({ nextStep }) => {
         </div>
       </div>
 
-      <div className="text-center">
+      <div className="text-center mt-8">
         <button
           onClick={nextStep}
           disabled={!agree}
-          className={`px-6 sm:px-8 py-3 cursor-pointer sm:py-4 rounded-lg font-bold text-base sm:text-lg transition-all duration-300 ${
+          className={`px-8 sm:px-12 cursor-pointer py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all duration-300 focus:outline-none focus:ring-4 ${
             agree
-              ? "bg-gray-800 hover:bg-black text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              ? "bg-black hover:bg-gray-800 text-white shadow-xl hover:shadow-2xl transform hover:scale-105 focus:ring-gray-400"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-md"
           }`}
         >
-          {agree ? "Proceed to Registration" : "Please Accept Declaration"}
+          {agree ? (
+            <span className="flex items-center justify-center space-x-2">
+              <span>Proceed to Registration</span>
+              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </span>
+          ) : (
+            "Please Accept Declaration"
+          )}
         </button>
       </div>
     </div>

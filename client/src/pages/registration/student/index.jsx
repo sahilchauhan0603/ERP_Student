@@ -489,7 +489,7 @@ const StudentRegistration = () => {
       ),
     },
     {
-      label: "Academic Info",
+      label: "Academics",
       component: (
         <AcademicInfo
           formData={formData}
@@ -639,12 +639,15 @@ const StudentRegistration = () => {
             {/* Step Content */}
             <div className="mt-6 sm:mt-8">{steps[currentStep].component}</div>
 
-            <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8 sm:mt-10 pt-6 border-t-2 border-gray-200">
               <button
                 onClick={prevStep}
                 disabled={currentStep === 0 || isSubmitting}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 cursor-pointer text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm sm:text-base"
+                className="flex items-center cursor-pointer justify-center px-6 sm:px-8 py-3 sm:py-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed font-semibold transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-4 focus:ring-gray-300 transform hover:scale-105 disabled:hover:scale-100"
               >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
                 Previous
               </button>
 
@@ -653,25 +656,28 @@ const StudentRegistration = () => {
                   <button
                     onClick={nextStep}
                     disabled={isSubmitting}
-                    className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-700 cursor-pointer text-white rounded-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm sm:text-base"
+                    className="flex items-center cursor-pointer justify-center px-6 sm:px-8 py-3 sm:py-4 bg-black text-white rounded-xl hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed font-semibold transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-4 focus:ring-gray-400 shadow-lg hover:shadow-xl transform hover:scale-105"
                   >
                     Next
+                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
                 )
               ) : (
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className={`px-6 sm:px-8 py-2 sm:py-3 rounded-lg cursor-pointer font-medium transition-colors text-sm sm:text-base ${
+                  className={`flex items-center cursor-pointer justify-center px-8 sm:px-12 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-4 shadow-lg min-w-40 sm:min-w-48 ${
                     isSubmitting
-                      ? "bg-gray-500 cursor-not-allowed"
-                      : "bg-gray-900 hover:bg-black"
-                  } text-white flex items-center justify-center min-w-32 sm:min-w-40`}
+                      ? "bg-gray-500 cursor-not-allowed focus:ring-gray-300"
+                      : "bg-black hover:bg-gray-800 focus:ring-gray-400 hover:shadow-xl transform hover:scale-105"
+                  } text-white`}
                 >
                   {isSubmitting ? (
                     <>
                       <svg
-                        className="animate-spin -ml-1 mr-2 h-3 w-3 sm:h-4 sm:w-4 text-white"
+                        className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -693,7 +699,12 @@ const StudentRegistration = () => {
                       Processing...
                     </>
                   ) : (
-                    "Submit Registration"
+                    <>
+                      <span>Submit Registration</span>
+                      <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </>
                   )}
                 </button>
               )}

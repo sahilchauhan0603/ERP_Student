@@ -359,11 +359,12 @@ exports.registerStudent = async (req, res) => {
               result.insertId
             );
 
-            await sendEmail({
-              to: student.email,
-              subject: "Registration Confirmation - Welcome to BPIT! 🎓",
-              html: emailHtml,
-            });
+            await sendEmail(
+              student.email,
+              "Registration Confirmation - Welcome to BPIT! 🎓",
+              `Dear ${studentName},\n\nYour registration (ID: ${result.insertId}) was successful. Welcome to BPIT!\n\nBest regards,\nBPIT Admissions Team`,
+              emailHtml
+            );
           } catch (emailError) {
             // Failed to send confirmation email
             // Don't fail the registration if email fails
