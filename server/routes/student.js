@@ -45,6 +45,7 @@ router.get(
   studentController.getStudentDashboard
 );
 
+// Detailed student info routes 
 router.get(
   "/students/me/details",
   authenticate,
@@ -53,6 +54,8 @@ router.get(
     studentController.getStudentDetailsMe(req, res, next);
   }
 );
+
+// Get student details by ID (admin or the student themselves)
 router.get(
   "/students/:studentId/details",
   authenticate,
@@ -62,7 +65,7 @@ router.get(
   }
 );
 
-// Update-declined route: use multer for file uploads
+// Update student profile (including file uploads)
 router.patch(
   "/students/me/update-declined",
   authenticate,
@@ -71,6 +74,7 @@ router.patch(
   studentController.updateDeclinedFields
 );
 
+// Logout endpoint
 router.post("/logout", studentController.logout);
 
 // Real-time uniqueness check endpoints

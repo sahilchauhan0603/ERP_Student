@@ -3,10 +3,13 @@ const sendStatusEmail = require("../utils/sendStatusEmail");
 const db = require("../config/db");
 const uploadToCloudinary = require("../utils/cloudinaryUpload");
 const sendRegistrationEmail = require("../utils/registrationEmail");
-const otpStore = {}; // In-memory store for OTPs, consider using Redis or similar in production
 const { signToken } = require("../utils/jwt");
 const rateLimit = require("express-rate-limit");
 
+
+/* LOGIN & AUTHENTICATION */
+const otpStore = {}; // In-memory store for OTPs, consider using Redis or similar in production
+// Rate limiter for OTP requests to prevent abuse - 30 min window, max 15 requests
 const otpLimiter = rateLimit({
   windowMs: 30 * 60 * 1000, // 30 minutes
   max: 15, // limit each IP to 15 requests per windowMs
@@ -15,42 +18,32 @@ const otpLimiter = rateLimit({
   legacyHeaders: false,
 });
 module.exports.otpLimiter = otpLimiter;
-
-// --- Student Profile ---
-exports.getStudentProfile = (req, res) => {
-  const { email } = req.query;
+// Send OTP to email if student exists - 6-digit OTP, expires in 5 minutes
+exports.sendLoginOtp = async (req, res) => {
+  const { email } = req.body;
   if (!email) return res.status(400).json({ message: "Email is required" });
   db.query(
     "SELECT * FROM students WHERE email = ?",
     [email],
-    (err, results) => {
+    async (err, results) => {
       if (err) return res.status(500).json({ message: "DB error", error: err });
       if (!results || results.length === 0)
-        return res.status(404).json({ message: "Student not found" });
-      const student = results[0];
-      res.json({ student });
+        return res
+          .status(404)
+          .json({ message: "No student found with this email" });
+      // Generate 6-digit OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
+      try {
+        await sendOtpMail(email, otp);
+        res.json({ message: "OTP sent to email" });
+      } catch (e) {
+        res.status(500).json({ message: "Failed to send OTP", error: e });
+      }
     }
   );
 };
-
-// --- Student Dashboard ---
-exports.getStudentDashboard = (req, res) => {
-  const { email } = req.query;
-  if (!email) return res.status(400).json({ message: "Email is required" });
-  db.query(
-    "SELECT * FROM students WHERE email = ?",
-    [email],
-    (err, results) => {
-      if (err) return res.status(500).json({ message: "DB error", error: err });
-      if (!results || results.length === 0)
-        return res.status(404).json({ message: "Student not found" });
-      const student = results[0];
-      res.json({ student });
-    }
-  );
-};
-
-// Verify OTP and "login"
+// Verify OTP and issue JWT if valid - 2 hour expiry
 exports.verifyLoginOtp = (req, res) => {
   const { email, otp } = req.body;
 
@@ -115,33 +108,7 @@ exports.verifyLoginOtp = (req, res) => {
     });
   });
 };
-
-// Send OTP to email if student exists
-exports.sendLoginOtp = async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ message: "Email is required" });
-  db.query(
-    "SELECT * FROM students WHERE email = ?",
-    [email],
-    async (err, results) => {
-      if (err) return res.status(500).json({ message: "DB error", error: err });
-      if (!results || results.length === 0)
-        return res
-          .status(404)
-          .json({ message: "No student found with this email" });
-      // Generate 6-digit OTP
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
-      try {
-        await sendOtpMail(email, otp);
-        res.json({ message: "OTP sent to email" });
-      } catch (e) {
-        res.status(500).json({ message: "Failed to send OTP", error: e });
-      }
-    }
-  );
-};
-
+// Logout by clearing the token cookie
 exports.logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
@@ -151,6 +118,43 @@ exports.logout = (req, res) => {
   res.json({ message: "Logged out successfully" });
 };
 
+
+/* DASHBOARD & PROFILE */
+// Get student profile by email
+exports.getStudentProfile = (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.status(400).json({ message: "Email is required" });
+  db.query(
+    "SELECT * FROM students WHERE email = ?",
+    [email],
+    (err, results) => {
+      if (err) return res.status(500).json({ message: "DB error", error: err });
+      if (!results || results.length === 0)
+        return res.status(404).json({ message: "Student not found" });
+      const student = results[0];
+      res.json({ student });
+    }
+  );
+};
+// get student profile by email
+exports.getStudentDashboard = (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.status(400).json({ message: "Email is required" });
+  db.query(
+    "SELECT * FROM students WHERE email = ?",
+    [email],
+    (err, results) => {
+      if (err) return res.status(500).json({ message: "DB error", error: err });
+      if (!results || results.length === 0)
+        return res.status(404).json({ message: "Student not found" });
+      const student = results[0];
+      res.json({ student });
+    }
+  );
+};
+
+
+/* STUDENT REGISTRATION */
 // List of all document fields
 const docFields = [
   "photo",
@@ -380,7 +384,6 @@ exports.registerStudent = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
-
 // Helper to normalize declined field names to full paths
 function normalizeDeclinedField(field) {
   // Personal fields
@@ -449,7 +452,6 @@ function normalizeDeclinedField(field) {
   // Fallback: return as is
   return field;
 }
-
 // Helper to flatten nested objects to dot-notated keys
 function flattenObject(obj, prefix = "") {
   return Object.keys(obj).reduce((acc, k) => {
@@ -467,7 +469,6 @@ function flattenObject(obj, prefix = "") {
     return acc;
   }, {});
 }
-
 // Helper to map dot-notated keys to flat MySQL column names
 function mapToColumn(key) {
   // Personal fields
@@ -492,7 +493,6 @@ function mapToColumn(key) {
   // Fallback
   return key;
 }
-
 // Helper to format ISO date strings to YYYY-MM-DD
 function formatDateToYMD(val) {
   if (!val) return null;
@@ -504,6 +504,8 @@ function formatDateToYMD(val) {
   return d.toISOString().slice(0, 10);
 }
 
+
+/* GET /student/:studentId - Get complete student details by ID */
 // Handler to fetch complete student details by ID
 exports.getStudentDetailsById = (req, res) => {
   res.set("Cache-Control", "no-store"); // Prevent caching
@@ -689,7 +691,8 @@ exports.getStudentDetailsById = (req, res) => {
     }
   );
 };
-
+/* GET /student/me - Get logged-in student's full details */
+// Handler to fetch complete student details for logged-in student
 exports.getStudentDetailsMe = (req, res) => {
   res.set("Cache-Control", "no-store"); // Prevent caching
   const studentId = req.user && req.user.id;
@@ -845,6 +848,8 @@ exports.getStudentDetailsMe = (req, res) => {
   );
 };
 
+
+/* PUT /student/declined - Update only declined fields for logged-in student */
 // update declined fields
 exports.updateDeclinedFields = async (req, res) => {
   const studentId = req.user && req.user.id;
@@ -1052,6 +1057,8 @@ exports.updateDeclinedFields = async (req, res) => {
   });
 };
 
+
+/* GET /student/check-email?email= - Check if email exists */
 // Real-time uniqueness check endpoints
 exports.checkEmailExists = (req, res) => {
   const { email } = req.query;
@@ -1069,7 +1076,6 @@ exports.checkEmailExists = (req, res) => {
     }
   );
 };
-
 exports.checkAbcIdExists = (req, res) => {
   const { abcId } = req.query;
   if (!abcId)
@@ -1087,6 +1093,8 @@ exports.checkAbcIdExists = (req, res) => {
   );
 };
 
+
+/* GET /stats - Public statistics for homepage */
 // Get public statistics for homepage
 exports.getPublicStats = (req, res) => {
   const queries = [
