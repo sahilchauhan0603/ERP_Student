@@ -16,16 +16,16 @@ const AdminLogin = () => {
   const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
   const otpInputsRef = React.useRef([]);
 
-// ...existing code...
+  // ...existing code...
 
-const [step, setStep] = useState(1); // 1: email, 2: otp
-const [error, setError] = useState("");
-const [loading, setLoading] = useState(false);
-const [success, setSuccess] = useState("");
-const [otpTimer, setOtpTimer] = useState(0); // seconds left
-const timerRef = React.useRef();
-const navigate = useNavigate();
-const { checkAuthStatus } = useAuth();
+  const [step, setStep] = useState(1); // 1: email, 2: otp
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [otpTimer, setOtpTimer] = useState(0); // seconds left
+  const timerRef = React.useRef();
+  const navigate = useNavigate();
+  const { checkAuthStatus } = useAuth();
 
   useEffect(() => {
     // Clean up any leftover localStorage items
@@ -37,12 +37,12 @@ const { checkAuthStatus } = useAuth();
     const handleBeforeUnload = (e) => {
       if (step === 2) {
         e.preventDefault();
-        e.returnValue = '';
+        e.returnValue = "";
       }
     };
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [step]);
 
@@ -75,7 +75,7 @@ const { checkAuthStatus } = useAuth();
       setError(err.response?.data?.message || "Failed to send OTP.");
     }
     setLoading(false);
-  }
+  };
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -95,18 +95,21 @@ const { checkAuthStatus } = useAuth();
     if (val && idx < 5) {
       otpInputsRef.current[idx + 1]?.focus();
     }
-  }
+  };
 
   // Handle backspace navigation
   const handleOtpBoxKeyDown = (idx, e) => {
     if (e.key === "Backspace" && !otpDigits[idx] && idx > 0) {
       otpInputsRef.current[idx - 1]?.focus();
     }
-  }
+  };
 
   // Paste support
   const handleOtpBoxPaste = (e) => {
-    const paste = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    const paste = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
     if (paste.length) {
       const arr = paste.split("");
       while (arr.length < 6) arr.push("");
@@ -116,7 +119,7 @@ const { checkAuthStatus } = useAuth();
       const lastIdx = arr.findIndex((d) => d === "");
       otpInputsRef.current[lastIdx === -1 ? 5 : lastIdx]?.focus();
     }
-  }
+  };
 
   // Handle OTP submit
   const handleOtpSubmit = async (e) => {
@@ -131,10 +134,10 @@ const { checkAuthStatus } = useAuth();
         { withCredentials: true }
       );
       setSuccess("Login successful! Redirecting...");
-      
+
       // Update authentication state
       await checkAuthStatus();
-      
+
       // Redirect to admin dashboard
       setTimeout(() => navigate("/admin/dashboard"), 1000);
     } catch (err) {
@@ -154,55 +157,73 @@ const { checkAuthStatus } = useAuth();
         minHeight: "100vh",
       }}
     >
-      <header
-        className="w-full bg-white border-t-4 border-b-4 border-red-500 shadow-lg flex flex-col md:flex-row items-center justify-between px-2 md:px-10 py-3 relative z-20"
-        style={{ minHeight: 100, borderRadius: "0 0 1.5rem 1.5rem" }}
-      >
-        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full md:w-auto">
-          <div className="flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-1 md:p-2 shadow-sm border border-blue-200">
-            <img
-              src={bpitLogo}
-              alt="BPIT Logo"
-              className="h-14 sm:h-16 w-auto object-contain drop-shadow-md"
-              style={{ minWidth: 56 }}
-            />
-          </div>
-          <div className="flex flex-col justify-center items-center sm:items-start text-center sm:text-left w-full">
-            <h1
-              className="text-lg xs:text-xl md:text-3xl font-extrabold text-blue-900 leading-tight tracking-tight drop-shadow-sm"
-              style={{ fontFamily: "serif", letterSpacing: 0.5 }}
-            >
-              Bhagwan Parshuram Institute of Technology
-            </h1>
-            <div
-              className="text-sm xs:text-base md:text-lg font-bold text-red-600 leading-tight mt-0.5 md:mt-1"
-              style={{ fontFamily: "serif", letterSpacing: 0.2 }}
-            >
-              <span className="tracking-wide">
-                A Unit of Bhartiya Brahmin Charitable Trust (Regd.)
-              </span>
+      {/* BPIT Modern Header */}
+      <header className="w-full bg-gradient-to-r from-red-50 via-white/95 to-red-50 backdrop-blur-sm border-b border-gray-200 shadow-xl relative z-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo and Institution Info */}
+            <div className="flex items-center space-x-4">
+              {/* Logo */}
+              <div className="flex-shrink-0">
+                <div className="h-16 rounded-2xl p-2 shadow-sm border border-blue-200 hover:shadow-md transition-shadow duration-200">
+                  <img
+                    src={bpitLogo}
+                    alt="BPIT Logo"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              </div>
+
+              {/* Institution Text */}
+              <div className="hidden sm:block border rounded-2xl border-gray-300 bg-white/50 backdrop-blur-sm p-1 pl-8 pr-40 relative border-r-4 border-r-gradient-to-b border-r-blue-600 shadow-sm">
+                <div className="absolute right-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-600 via-red-500 to-blue-600 rounded-r-xl"></div>
+                <h1 className="text-xl md:text-xl lg:text-2xl font-bold text-gray-900 leading-tight">
+                  <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
+                    Bhagwan Parshuram Institute of Technology
+                  </span>
+                </h1>
+                <div className="flex flex-col mt-1 space-y-0.5">
+                  <p className="text-sm md:text-base text-red-600 font-semibold">
+                    A Unit of Bhartiya Brahmin Charitable Trust (Regd.)
+                  </p>
+                  <div className="text-xs md:text-sm text-gray-600 space-y-0.5">
+                    <p>
+                      (Approved by AICTE, Ministry of Education) • Affiliated to
+                      GGSIPU, Delhi
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Institution Text */}
+              <div className="sm:hidden">
+                <h1 className="text-lg font-bold text-gray-900 leading-tight">
+                  <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
+                    BPIT
+                  </span>
+                </h1>
+                <p className="text-sm text-red-600 font-semibold">BBCT Unit</p>
+                <p className="text-xs text-gray-600">
+                  AICTE Approved • GGSIPU Affiliated
+                </p>
+              </div>
             </div>
-            <div
-              className="text-xs md:text-sm text-blue-700 font-medium mt-0.5 md:mt-1"
-              style={{ fontFamily: "serif" }}
-            >
-              <span className="block">
-                (Approved by AICTE, Ministry of Education (MoE))
-              </span>
-              <span className="block">
-                Affiliated to Guru Gobind Singh Indraprastha University, Delhi
-              </span>
+
+            {/* Right Side - Accreditation Logo */}
+            <div className="flex-shrink-0">
+              <div className="h-16 rounded-2xl border border-gray-200 shadow-sm p-2 hover:shadow-md transition-shadow duration-200">
+                <img
+                  src="https://bpitindia.ac.in/wp-content/uploads/2024/03/Header-1-1-300x88-1.jpg"
+                  alt="G20 & Accreditation Logos"
+                  className="w-full h-full object-contain"
+                />
+              </div>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 mt-3 md:mt-0 md:ml-4">
-          <img
-            src="https://bpitindia.ac.in/wp-content/uploads/2024/03/Header-1-1-300x88-1.jpg"
-            alt="G20 Logo"
-            className="h-16 sm:h-20 md:h-24 w-auto object-contain bg-white rounded-lg border border-blue-100 shadow-sm p-1"
-            style={{ minWidth: 40 }}
-          />
-        </div>
+
+        {/* Decorative Bottom Border */}
+        <div className="h-1 bg-gradient-to-r from-blue-600 via-red-500 to-blue-600"></div>
       </header>
 
       <div className="flex-1 flex flex-col justify-center items-center py-8 px-2 sm:px-4 mt-2 md:mt-6">
@@ -267,11 +288,14 @@ const { checkAuthStatus } = useAuth();
                   </span>
                   {step === 2 && otpTimer > 0 && (
                     <span className="ml-2 text-xs font-semibold text-blue-700">
-                      OTP valid for {Math.floor(otpTimer/60)}:{(otpTimer%60).toString().padStart(2,'0')} min
+                      OTP valid for {Math.floor(otpTimer / 60)}:
+                      {(otpTimer % 60).toString().padStart(2, "0")} min
                     </span>
                   )}
                   {step === 2 && otpTimer === 0 && (
-                    <span className="ml-2 text-xs font-semibold text-red-600">OTP expired</span>
+                    <span className="ml-2 text-xs font-semibold text-red-600">
+                      OTP expired
+                    </span>
                   )}
                 </div>
               )}
@@ -290,7 +314,8 @@ const { checkAuthStatus } = useAuth();
                   />
                 </svg>
                 <span className="text-blue-800 text-sm">
-                  Please use your registered admin email address. If you don't receive the OTP, check your spam folder or contact support.
+                  Please use your registered admin email address. If you don't
+                  receive the OTP, check your spam folder or contact support.
                 </span>
               </div>
 
@@ -316,17 +341,17 @@ const { checkAuthStatus } = useAuth();
                         </svg>
                       </div>
                       <input
-                          id="email"
-                          name="email"
-                          type="email"
-                          autoComplete="email"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-2 sm:text-sm border-gray-300 rounded-md"
-                          placeholder="admin@email.com"
-                          disabled={loading}
-                        />
+                        id="email"
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-2 sm:text-sm border-gray-300 rounded-md"
+                        placeholder="admin@email.com"
+                        disabled={loading}
+                      />
                     </div>
                   </div>
 
@@ -379,35 +404,49 @@ const { checkAuthStatus } = useAuth();
                     >
                       Enter 6-digit OTP
                     </label>
-                    <div className="mt-1 flex gap-2 justify-center" onPaste={handleOtpBoxPaste}>
+                    <div
+                      className="mt-1 flex gap-2 justify-center"
+                      onPaste={handleOtpBoxPaste}
+                    >
                       {otpDigits.map((digit, idx) => (
                         <input
                           key={idx}
-                          ref={el => otpInputsRef.current[idx] = el}
+                          ref={(el) => (otpInputsRef.current[idx] = el)}
                           type="text"
                           inputMode="numeric"
                           maxLength={1}
                           pattern="[0-9]"
                           autoComplete="one-time-code"
-                          className={`w-10 h-12 text-center text-xl font-bold border-2 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${digit ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-white"}`}
+                          className={`w-10 h-12 text-center text-xl font-bold border-2 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                            digit
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-300 bg-white"
+                          }`}
                           value={digit}
-                          onChange={e => handleOtpBoxChange(idx, e.target.value)}
-                          onKeyDown={e => handleOtpBoxKeyDown(idx, e)}
+                          onChange={(e) =>
+                            handleOtpBoxChange(idx, e.target.value)
+                          }
+                          onKeyDown={(e) => handleOtpBoxKeyDown(idx, e)}
                           disabled={otpTimer === 0}
                         />
                       ))}
                     </div>
                     <p className="mt-2 text-xs text-gray-500 text-center">
-                      Check your email for the OTP. It may take a few minutes to arrive.
+                      Check your email for the OTP. It may take a few minutes to
+                      arrive.
                     </p>
                     {otpTimer === 0 && (
                       <button
                         type="button"
-                        className={`mt-2 w-full py-2 px-4 rounded-md font-semibold transition ${loading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-100 text-blue-700 hover:bg-blue-200 cursor-pointer'}`}
+                        className={`mt-2 w-full py-2 px-4 rounded-md font-semibold transition ${
+                          loading
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : "bg-blue-100 text-blue-700 hover:bg-blue-200 cursor-pointer"
+                        }`}
                         onClick={handleEmailSubmit}
                         disabled={loading}
                       >
-                        {loading ? 'Sending OTP...' : 'Resend OTP'}
+                        {loading ? "Sending OTP..." : "Resend OTP"}
                       </button>
                     )}
                   </div>
@@ -415,7 +454,11 @@ const { checkAuthStatus } = useAuth();
                   <div className="flex items-center justify-between">
                     <button
                       type="button"
-                      onClick={() => { setStep(1); setOtpDigits(["", "", "", "", "", ""]); setOtp(""); }}
+                      onClick={() => {
+                        setStep(1);
+                        setOtpDigits(["", "", "", "", "", ""]);
+                        setOtp("");
+                      }}
                       className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-500 flex items-center"
                       disabled={loading}
                     >
@@ -458,16 +501,16 @@ const { checkAuthStatus } = useAuth();
       <button
         onClick={async () => {
           const result = await Swal.fire({
-            title: 'Go to Homepage?',
-            text: 'Are you sure you want to leave this page?',
-            icon: 'question',
+            title: "Go to Homepage?",
+            text: "Are you sure you want to leave this page?",
+            icon: "question",
             showCancelButton: true,
-            confirmButtonText: 'Yes',
-            cancelButtonText: 'No',
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
             reverseButtons: true,
           });
           if (result.isConfirmed) {
-            window.location.href = '/';
+            window.location.href = "/";
           }
         }}
         className="fixed cursor-pointer bottom-6 right-24 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 group"

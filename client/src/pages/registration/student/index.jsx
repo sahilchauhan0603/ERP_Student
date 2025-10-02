@@ -439,10 +439,10 @@ const StudentRegistration = () => {
           confirmButtonColor: "#3B82F6",
           allowOutsideClick: false,
           allowEscapeKey: false,
-    }).then((result) => {
+        }).then((result) => {
           if (result.isConfirmed) {
-      // Allow navigation without unload warning
-      skipUnloadRef.current = true;
+            // Allow navigation without unload warning
+            skipUnloadRef.current = true;
             // Redirect to homepage
             window.location.href = "/";
           }
@@ -521,10 +521,7 @@ const StudentRegistration = () => {
     {
       label: "Review",
       component: (
-        <ReviewSubmit 
-          formData={formData} 
-          incompleteFields={incompleteFields} 
-        />
+        <ReviewSubmit formData={formData} incompleteFields={incompleteFields} />
       ),
     },
   ];
@@ -540,56 +537,73 @@ const StudentRegistration = () => {
         minHeight: "100vh",
       }}
     >
-      {/* Header */}
-      <header
-        className="w-full bg-white border-t-4 border-b-4 border-red-500 shadow-lg flex flex-col md:flex-row items-center justify-between px-2 md:px-10 py-3 relative z-20"
-        style={{ minHeight: 100, borderRadius: "0 0 1.5rem 1.5rem" }}
-      >
-        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full md:w-auto">
-          <div className="flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-1 md:p-2 shadow-sm border border-blue-200">
-            <img
-              src={bpitLogo}
-              alt="BPIT Logo"
-              className="h-14 sm:h-16 w-auto object-contain drop-shadow-md"
-              style={{ minWidth: 56 }}
-            />
-          </div>
-          <div className="flex flex-col justify-center items-center sm:items-start text-center sm:text-left w-full">
-            <h1
-              className="text-lg xs:text-xl md:text-3xl font-extrabold text-blue-900 leading-tight tracking-tight drop-shadow-sm"
-              style={{ fontFamily: "serif", letterSpacing: 0.5 }}
-            >
-              Bhagwan Parshuram Institute of Technology
-            </h1>
-            <div
-              className="text-sm xs:text-base md:text-lg font-bold text-red-600 leading-tight mt-0.5 md:mt-1"
-              style={{ fontFamily: "serif", letterSpacing: 0.2 }}
-            >
-              <span className="tracking-wide">
-                A Unit of Bhartiya Brahmin Charitable Trust (Regd.)
-              </span>
+      {/* BPIT Modern Header */}
+      <header className="w-full bg-gradient-to-r from-red-50 via-white/95 to-red-50 backdrop-blur-sm border-b border-gray-200 shadow-xl relative z-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo and Institution Info */}
+            <div className="flex items-center space-x-4">
+              {/* Logo */}
+              <div className="flex-shrink-0">
+                <div className="h-16 rounded-2xl p-2 shadow-sm border border-blue-200 hover:shadow-md transition-shadow duration-200">
+                  <img
+                    src={bpitLogo}
+                    alt="BPIT Logo"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              </div>
+
+              {/* Institution Text */}
+              <div className="hidden sm:block border rounded-2xl border-gray-300 bg-white/50 backdrop-blur-sm p-1 pl-8 pr-40 relative border-r-4 border-r-gradient-to-b border-r-blue-600 shadow-sm">
+                <div className="absolute right-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-600 via-red-500 to-blue-600 rounded-r-xl"></div>
+                <h1 className="text-xl md:text-xl lg:text-2xl font-bold text-gray-900 leading-tight">
+                  <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
+                    Bhagwan Parshuram Institute of Technology
+                  </span>
+                </h1>
+                <div className="flex flex-col mt-1 space-y-0.5">
+                  <p className="text-sm md:text-base text-red-600 font-semibold">
+                    A Unit of Bhartiya Brahmin Charitable Trust (Regd.)
+                  </p>
+                  <div className="text-xs md:text-sm text-gray-600 space-y-0.5">
+                    <p>
+                      (Approved by AICTE, Ministry of Education) • Affiliated to
+                      GGSIPU, Delhi
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Institution Text */}
+              <div className="sm:hidden">
+                <h1 className="text-lg font-bold text-gray-900 leading-tight">
+                  <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
+                    BPIT
+                  </span>
+                </h1>
+                <p className="text-sm text-red-600 font-semibold">BBCT Unit</p>
+                <p className="text-xs text-gray-600">
+                  AICTE Approved • GGSIPU Affiliated
+                </p>
+              </div>
             </div>
-            <div
-              className="text-xs md:text-sm text-blue-700 font-medium mt-0.5 md:mt-1"
-              style={{ fontFamily: "serif" }}
-            >
-              <span className="block">
-                (Approved by AICTE, Ministry of Education (MoE))
-              </span>
-              <span className="block">
-                Affiliated to Guru Gobind Singh Indraprastha University, Delhi
-              </span>
+
+            {/* Right Side - Accreditation Logo */}
+            <div className="flex-shrink-0">
+              <div className="h-16 rounded-2xl border border-gray-200 shadow-sm p-2 hover:shadow-md transition-shadow duration-200">
+                <img
+                  src="https://bpitindia.ac.in/wp-content/uploads/2024/03/Header-1-1-300x88-1.jpg"
+                  alt="G20 & Accreditation Logos"
+                  className="w-full h-full object-contain"
+                />
+              </div>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 mt-3 md:mt-0 md:ml-4">
-          <img
-            src="https://bpitindia.ac.in/wp-content/uploads/2024/03/Header-1-1-300x88-1.jpg"
-            alt="G20 Logo"
-            className="h-16 sm:h-20 md:h-24 w-auto object-contain bg-white rounded-lg border border-blue-100 shadow-sm p-1"
-            style={{ minWidth: 40 }}
-          />
-        </div>
+
+        {/* Decorative Bottom Border */}
+        <div className="h-1 bg-gradient-to-r from-blue-600 via-red-500 to-blue-600"></div>
       </header>
 
       {/* Main Content */}
@@ -603,7 +617,6 @@ const StudentRegistration = () => {
         />
         <div className="max-w-6xl mx-auto">
           <div className="bg-white py-6 sm:py-8 px-4 sm:px-6 shadow-lg rounded-2xl ">
-            
             {/* Headings */}
             <div className="text-center mb-6 sm:mb-8">
               <div className="relative mb-3 sm:mb-4">
@@ -645,8 +658,18 @@ const StudentRegistration = () => {
                 disabled={currentStep === 0 || isSubmitting}
                 className="flex items-center cursor-pointer justify-center px-6 sm:px-8 py-3 sm:py-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed font-semibold transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-4 focus:ring-gray-300 transform hover:scale-105 disabled:hover:scale-100"
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
                 Previous
               </button>
@@ -659,8 +682,18 @@ const StudentRegistration = () => {
                     className="flex items-center cursor-pointer justify-center px-6 sm:px-8 py-3 sm:py-4 bg-black text-white rounded-xl hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed font-semibold transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-4 focus:ring-gray-400 shadow-lg hover:shadow-xl transform hover:scale-105"
                   >
                     Next
-                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <svg
+                      className="w-4 h-4 ml-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
                     </svg>
                   </button>
                 )
@@ -701,8 +734,18 @@ const StudentRegistration = () => {
                   ) : (
                     <>
                       <span>Submit Registration</span>
-                      <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        className="w-4 h-4 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                     </>
                   )}
@@ -756,14 +799,14 @@ const StudentRegistration = () => {
       <button
         onClick={() => {
           Swal.fire({
-            title: 'Do you want to leave this page?',
-            text: 'Your data might not be saved',
-            icon: 'warning',
+            title: "Do you want to leave this page?",
+            text: "Your data might not be saved",
+            icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Leave',
-            cancelButtonText: 'Cancel',
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Leave",
+            cancelButtonText: "Cancel",
             reverseButtons: true,
           }).then((result) => {
             if (result.isConfirmed) {

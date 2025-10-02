@@ -1090,3 +1090,43 @@ exports.checkAbcIdExists = (req, res) => {
     }
   );
 };
+
+// Get public statistics for homepage
+exports.getPublicStats = (req, res) => {
+  const queries = [
+    "SELECT COUNT(*) as total FROM students",
+    "SELECT COUNT(*) as pending FROM students WHERE status = 'pending'",
+    "SELECT COUNT(*) as approved FROM students WHERE status = 'approved'",
+  ];
+
+  Promise.all(
+    queries.map(
+      (query) =>
+        new Promise((resolve, reject) => {
+          db.query(query, (err, results) => {
+            if (err) reject(err);
+            else resolve(results[0]);
+          });
+        })
+    )
+  )
+    .then((results) => {
+      res.json({
+        success: true,
+        total:
+          results[0].total || results[0].pending || results[0].approved || 0,
+        pending:
+          results[1].pending || results[1].total || results[1].approved || 0,
+        approved:
+          results[2].approved || results[2].total || results[2].pending || 0,
+      });
+    })
+    .catch((error) => {
+      console.error("Stats query error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch statistics",
+        error: error.message,
+      });
+    });
+};

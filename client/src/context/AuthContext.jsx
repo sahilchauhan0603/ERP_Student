@@ -11,46 +11,53 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const checkAuthStatus = async () => {
-    // Checking authentication status
+    // Check if there are any cookies first to avoid unnecessary API calls
+    const hasCookies = document.cookie && document.cookie.includes('token');
+    
+    if (!hasCookies) {
+      // No authentication cookies found, user is not logged in
+      setIsAuthenticated(false);
+      setUserRole(null);
+      return false;
+    }
     
     try {
       // Check admin authentication
-      // Checking admin authentication
       const adminResponse = await axios.get(`${import.meta.env.VITE_API_URL}/admin/auth-check`, {
         withCredentials: true,
       });
-      // Admin auth response received
+      
       if (adminResponse.data.authenticated) {
         setIsAuthenticated(true);
         setUserRole('admin');
-        // Admin authenticated
         return true;
       }
     } catch (adminError) {
-      // Admin not authenticated
-      // Admin not authenticated, try student
+      // Only log if it's not a 401 (which is expected for non-admin users)
+      if (adminError.response?.status !== 401) {
+        console.error('Admin auth check error:', adminError);
+      }
     }
 
     try {
       // Check student authentication
-      // Checking student authentication
       const studentResponse = await axios.get(`${import.meta.env.VITE_API_URL}/student/auth-check`, {
         withCredentials: true,
       });
-      // Student auth response received
+      
       if (studentResponse.data.authenticated) {
         setIsAuthenticated(true);
         setUserRole('student');
-        // Student authenticated
         return true;
       }
     } catch (studentError) {
-      // Student not authenticated
-      // Student not authenticated
+      // Only log if it's not a 401 (which is expected for non-student users)
+      if (studentError.response?.status !== 401) {
+        console.error('Student auth check error:', studentError);
+      }
     }
 
     // Neither admin nor student is authenticated
-    // No user authenticated
     setIsAuthenticated(false);
     setUserRole(null);
     return false;

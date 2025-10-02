@@ -77,6 +77,9 @@ router.post("/logout", studentController.logout);
 router.get("/check-email", studentController.checkEmailExists);
 router.get("/check-abcid", studentController.checkAbcIdExists);
 
+// Public statistics endpoint for homepage
+router.get("/stats", studentController.getPublicStats);
+
 // Public testing endpoint: get all students (name, email, batch, branch)
 router.get('/test/all', async (req, res) => {
   try {

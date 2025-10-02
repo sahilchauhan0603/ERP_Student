@@ -14,11 +14,12 @@ export default function AIChatLauncher({ studentData = null }) {
         onMouseLeave={() => setIsHovered(false)}
         className="fixed cursor-pointer bottom-6 right-6 z-40 bg-gradient-to-br from-blue-600 via-blue-500 to-red-500 hover:from-blue-700 hover:to-red-600 text-white p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 group flex items-center justify-center"
         aria-label="AI Chatbot"
-        style={{ 
-          boxShadow: "0 6px 30px rgba(37, 99, 235, 0.3), 0 2px 10px rgba(239, 68, 68, 0.2)",
-          background: open 
-            ? "linear-gradient(135deg, #1e40af 0%, #dc2626 100%)" 
-            : "linear-gradient(135deg, #2563eb 0%, #ef4444 100%)"
+        style={{
+          boxShadow:
+            "0 6px 30px rgba(37, 99, 235, 0.3), 0 2px 10px rgba(239, 68, 68, 0.2)",
+          background: open
+            ? "linear-gradient(135deg, #1e40af 0%, #dc2626 100%)"
+            : "linear-gradient(135deg, #2563eb 0%, #ef4444 100%)",
         }}
       >
         {open ? (
@@ -26,12 +27,12 @@ export default function AIChatLauncher({ studentData = null }) {
         ) : (
           <FaRobot className="w-6 h-6 transition-transform duration-300" />
         )}
-        
+
         {/* Pulsing effect when not open */}
         {!open && (
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-red-400 animate-ping opacity-75 z-[-1]"></div>
         )}
-        
+
         {/* Tooltip */}
         <div className="absolute bottom-full right-0 mb-3 px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap shadow-lg">
           AI Assistant
@@ -45,17 +46,17 @@ export default function AIChatLauncher({ studentData = null }) {
       </button>
 
       {open && (
-        <div 
+        <div
           id="ai-chatbot-popup"
           style={{
-            animation: "fadeIn 0.3s ease-out"
+            animation: "fadeIn 0.3s ease-out",
           }}
         >
           <AIChat onClose={() => setOpen(false)} studentData={studentData} />
         </div>
       )}
 
-      <style jsx>{`
+      <style jsx="true">{`
         @keyframes fadeIn {
           from {
             opacity: 0;
