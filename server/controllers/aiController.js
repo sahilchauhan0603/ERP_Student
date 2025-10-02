@@ -333,21 +333,21 @@ module.exports.getQuickHelp = async (req, res) => {
       registration: {
         title: "Student Registration Help",
         items: [
-          "Complete all 6 steps: Instructions → Personal → Academic → Parents → Documents → Review",
-          "Upload documents in PDF, JPG, or PNG format (max 5MB each)",
-          "Use permanent address same as current address feature if applicable",
-          "Save progress automatically - you can return anytime",
-          "Check email for confirmation after successful submission",
+          "**Complete all 6 steps**: Instructions → Personal → Academic → Parents → Documents → Review",
+          "**Upload documents** in PDF, JPG, or PNG format (max 5MB each)",
+          "**Use permanent address** same as current address feature if applicable",
+          "**Save progress automatically** - you can return anytime",
+          "**Check email** for confirmation after successful submission",
         ],
       },
       documents: {
         title: "Document Upload Guide",
         items: [
-          "Required: Photo, IPU Registration, Allotment Letter, Admit Card, Score Card",
-          "Academic: Class X & XII marksheets and passing certificates",
-          "Identity: Aadhar card, Character certificate, Medical certificate",
-          "Category: Category certificate (if applicable)",
-          "Optional: Migration certificate, special certificates, fee receipts",
+          "**Required**: Photo, IPU Registration, Allotment Letter, Admit Card, Score Card",
+          "**Academic**: Class X & XII marksheets and passing certificates",
+          "**Identity**: Aadhar card, Character certificate, Medical certificate",
+          "**Category**: Category certificate (if applicable)",
+          "**Optional**: Migration certificate, special certificates, fee receipts",
         ],
       },
       status: {
@@ -356,18 +356,18 @@ module.exports.getQuickHelp = async (req, res) => {
           "**Pending**: Under review by admin team",
           "**Approved**: Application accepted, full access granted",
           "**Declined**: Issues found, check red-highlighted fields",
-          "Login to dashboard to check current status",
-          "Update declined fields and resubmit if needed",
+          "**Dashboard**: Login to dashboard to check current status",
+          "**Updates**: Update declined fields and resubmit if needed",
         ],
       },
       admin: {
         title: "Admin Portal Features",
         items: [
-          "View all students with filtering by status (Pending/Approved/Declined)",
-          "Search students by name, email, course, or ID",
-          "Review applications section by section",
-          "Use AI Review for automated analysis",
-          "Approve/decline with specific field feedback",
+          "**View Students**: Filter by status (Pending/Approved/Declined)",
+          "**Search Function**: Find students by name, email, course, or ID",
+          "**Manual Review**: Review applications section by section",
+          "**AI Review**: Use automated analysis for quick decisions",
+          "**Decision Making**: Approve/decline with specific field feedback",
         ],
       },
     };
@@ -375,10 +375,10 @@ module.exports.getQuickHelp = async (req, res) => {
     const help = quickHelp[category] || {
       title: "General Help",
       items: [
-        "Ask specific questions about registration, documents, or status",
-        "Use the search feature to find information quickly",
-        "Contact support if you encounter technical issues",
-        "Check the FAQ section for common questions",
+        "**Ask Questions**: Specific questions about registration, documents, or status",
+        "**Search Feature**: Use the search feature to find information quickly",
+        "**Technical Support**: Contact support if you encounter technical issues",
+        "**FAQ Section**: Check the FAQ section for common questions",
       ],
     };
 

@@ -279,7 +279,7 @@ const HomePage = () => {
                 </h1>
                 <p className="text-sm text-red-600 font-semibold">BBCT Unit</p>
                 <p className="text-xs text-gray-600">
-                  AICTE Approved • GGSIPU Affiliated
+                  AICTE Approved <br/> GGSIPU Affiliated
                 </p>
               </div>
             </div>
