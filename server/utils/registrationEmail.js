@@ -1,4 +1,7 @@
-const sendRegistrationEmail = (studentEmail, studentName, studentId) => {
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+async function sendRegistrationEmail(studentEmail, studentName, studentId) {
   const emailTemplate = `
     <!DOCTYPE html>
     <html lang="en">
@@ -211,7 +214,22 @@ const sendRegistrationEmail = (studentEmail, studentName, studentId) => {
     </html>
   `;
 
-  return emailTemplate;
-};
+  const msg = {
+    to: studentEmail,
+    from: `"BPIT Admissions" <${process.env.EMAIL_USER}>`,
+    subject: 'Registration Confirmation - Welcome to BPIT! 🎓',
+    html: emailTemplate,
+    text: `Dear ${studentName},\n\nYour registration (ID: ${studentId}) was successful. Welcome to BPIT!\n\nBest regards,\nBPIT Admissions Team`
+  };
 
-module.exports = { sendRegistrationEmail }; 
+  try {
+    await sgMail.send(msg);
+    console.log(`Registration confirmation email sent to ${studentEmail}`);
+    return true;
+  } catch (error) {
+    console.error('Registration email SendGrid error:', error);
+    return false;
+  }
+}
+
+module.exports = sendRegistrationEmail; 
