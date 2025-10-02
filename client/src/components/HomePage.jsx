@@ -233,14 +233,14 @@ const HomePage = () => {
       />
 
       {/* BPIT Modern Header */}
-      <header className="w-full bg-gradient-to-r from-red-50 via-white/95 to-red-50 backdrop-blur-sm border-b border-gray-200 shadow-xl relative z-20">
+      <header className="w-full bg-gradient-to-r from-red-50 to-red-50 backdrop-blur-sm border-b border-gray-200 shadow-xl relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             {/* Logo and Institution Info */}
             <div className="flex items-center space-x-4">
               {/* Logo */}
               <div className="flex-shrink-0">
-                <div className="h-16 rounded-2xl p-2 shadow-sm border border-blue-200 hover:shadow-md transition-shadow duration-200">
+                <div className="h-20 rounded-2xl p-2 shadow-sm border border-blue-200 hover:shadow-md transition-shadow duration-200">
                   <img
                     src={bpitLogo}
                     alt="BPIT Logo"
@@ -250,7 +250,7 @@ const HomePage = () => {
               </div>
 
               {/* Institution Text */}
-              <div className="hidden sm:block border rounded-2xl border-gray-300 bg-white/50 backdrop-blur-sm p-1 pl-8 pr-40 relative border-r-4 border-r-gradient-to-b border-r-blue-600 shadow-sm">
+              <div className="hidden sm:block border rounded-2xl border-gray-300 bg-white/50 backdrop-blur-sm p-1 pl-8 pr-44 relative border-r-4 border-r-gradient-to-b border-r-blue-600 shadow-sm">
                 <div className="absolute right-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-600 via-red-500 to-blue-600 rounded-r-xl"></div>
                 <h1 className="text-xl md:text-xl lg:text-2xl font-bold text-gray-900 leading-tight">
                   <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
@@ -286,7 +286,7 @@ const HomePage = () => {
 
             {/* Right Side - Accreditation Logo */}
             <div className="flex-shrink-0">
-              <div className="h-16 rounded-2xl border border-gray-200 shadow-sm p-2 hover:shadow-md transition-shadow duration-200">
+              <div className="h-20 rounded-3xl border border-gray-200 shadow-md hover:shadow-md transition-shadow duration-200">
                 <img
                   src="https://bpitindia.ac.in/wp-content/uploads/2024/03/Header-1-1-300x88-1.jpg"
                   alt="G20 & Accreditation Logos"

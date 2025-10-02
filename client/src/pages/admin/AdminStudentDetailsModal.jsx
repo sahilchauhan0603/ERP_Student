@@ -56,11 +56,6 @@ export default function AdminStudentDetailsModal({
 
   const [progress, setProgress] = useState(0);
   const [reviewing, setReviewing] = useState(false);
-  // const handleClick = () => {
-  //   setShowMessage(true);
-  //   // Hide the message after 2 seconds
-  //   setTimeout(() => setShowMessage(false), 2000);
-  // };
 
   // Parse declined fields - handle both string and array formats
   const parseDeclinedFields = (fields) => {
