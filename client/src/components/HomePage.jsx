@@ -303,7 +303,7 @@ const HomePage = () => {
 
       {/* News Ticker / Announcements */}
       <div className="w-full bg-gradient-to-r from-blue-50 via-white to-red-50 border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1">
           {newsLoading ? (
             <div className="flex items-center justify-center space-x-4">
               <div className="animate-pulse flex space-x-4 w-full max-w-4xl">
@@ -439,7 +439,7 @@ const HomePage = () => {
       <AIChatLauncher />
 
       {/* Custom CSS for animations */}
-      <style jsx>{`
+      <style jsx="true">{`
         @keyframes scroll {
           0% {
             transform: translateX(100%);
