@@ -1,12 +1,17 @@
 const sendStatusEmail = require("../utils/sendStatusEmail");
 const adminOTPMailer = require("../utils/adminOTPMailer");
 const { signToken } = require("../utils/jwt");
+const db = require("../config/db");
+
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
   .split(",")
   .map((e) => e.trim())
   .filter(Boolean);
 const rateLimit = require("express-rate-limit");
 
+
+/* ADMIN AUTH CONTROLLER */
+// Rate limiter for OTP requests - max 15 requests per 30 minutes per IP
 const otpLimiter = rateLimit({
   windowMs: 30 * 60 * 1000, // 30 minutes
   max: 15, // limit each IP to 15 requests per windowMs
@@ -15,10 +20,17 @@ const otpLimiter = rateLimit({
   legacyHeaders: false,
 });
 module.exports.otpLimiter = otpLimiter;
-const db = require("../config/db");
 
-const adminOtpStore = {};
-
+const adminOtpStore = {}; // In-memory store for OTPs (for demo purposes only)
+// Sending OTP to admin email
+// how this works
+// 1. Admin sends email to /admin/send-otp
+// 2. If email is in ADMIN_EMAILS, generate OTP, store in adminOtpStore with expiry, send email
+// 3. Admin sends email+OTP to /admin/verify-otp
+// 4. If OTP matches and not expired, issue JWT and set as HTTP-only cookie
+// 5. Admin can access protected routes with JWT in cookie
+// 6. Admin can logout which clears the cookie
+// Note: In production, use a persistent store like Redis for OTPs and implement better security measures like rate limiting, IP checks, etc.
 exports.sendAdminOtp = async (req, res) => {
   const { email } = req.body;
 
@@ -36,7 +48,7 @@ exports.sendAdminOtp = async (req, res) => {
     res.status(500).json({ message: "Failed to send OTP", error: e });
   }
 };
-
+// Verify OTP and issue JWT
 exports.verifyAdminOtp = (req, res) => {
   const { email, otp } = req.body;
   if (!email || !otp)
@@ -63,7 +75,7 @@ exports.verifyAdminOtp = (req, res) => {
   });
   res.json({ message: "Login successful" });
 };
-
+// Admin logout
 exports.logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
@@ -73,6 +85,9 @@ exports.logout = (req, res) => {
   res.json({ message: "Logged out successfully" });
 };
 
+
+/* ADMIN DASHBOARD CONTROLLERS */
+// Get overall student statistics
 exports.getStudentStats = (req, res) => {
   const stats = {};
   db.query("SELECT COUNT(*) as total FROM students", (err, totalResult) => {
@@ -107,7 +122,6 @@ exports.getStudentStats = (req, res) => {
     );
   });
 };
-
 // Get batch-wise student statistics
 exports.getBatchStats = (req, res) => {
   const query = `
@@ -127,7 +141,6 @@ exports.getBatchStats = (req, res) => {
     res.json(results);
   });
 };
-
 // Get branch-wise student statistics within a specific batch
 exports.getBranchStats = (req, res) => {
   const { batchYear } = req.query;
@@ -156,6 +169,9 @@ exports.getBranchStats = (req, res) => {
   });
 };
 
+
+/* ADMIN STUDENT MANAGEMENT CONTROLLERS */
+// All-Students table with pagination
 exports.listAllStudents = (req, res) => {
   let { page = 1, limit = 10, batch = "" } = req.query;
   page = parseInt(page);
@@ -183,7 +199,7 @@ exports.listAllStudents = (req, res) => {
     });
   });
 };
-
+// Admin Reviews student and updates status email notification is sent
 exports.updateStudentStatus = (req, res) => {
   const { studentId, status, declinedFields } = req.body;
   if (!studentId || !["approved", "declined", "pending"].includes(status)) {
@@ -352,8 +368,8 @@ exports.updateStudentStatus = (req, res) => {
     }
   );
 };
-
 // List students by status (pending, approved, declined)
+// Pending, Approved and Declined Tables
 exports.listStudentsByStatus = (req, res) => {
   const { status } = req.params;
   let { page = 1, limit = 10, batch = "" } = req.query;
@@ -393,6 +409,9 @@ exports.listStudentsByStatus = (req, res) => {
   );
 };
 
+
+/* SEARCH CONTROLLER */
+// Search students with filters and pagination
 exports.searchStudents = (req, res) => {
   const { q = "", gender = "", course = "", batch = "", page = 1 } = req.query;
   const pageSize = 10;
@@ -456,6 +475,8 @@ exports.searchStudents = (req, res) => {
   });
 };
 
+
+/* STUDENT DETAILS CONTROLLER */
 // Get full details of a student (all registration sections) - for admin
 exports.getStudentFullDetails = (req, res) => {
   const { studentId } = req.params;
@@ -582,6 +603,8 @@ exports.getStudentFullDetails = (req, res) => {
   );
 };
 
+
+/* ADMIN PROFILE CONTROLLERS */
 exports.getAdminProfile = (req, res) => {
   if (!req.user || !req.user.email) {
     return res.status(401).json({ message: "No admin email found in token" });
@@ -589,6 +612,14 @@ exports.getAdminProfile = (req, res) => {
   res.json({ email: req.user.email });
 };
 
+
+/* AI REVIEW CONTROLLER */
+// AI-based review of student data (mock implementation)
+// In real scenario, integrate with an AI service to validate data
+// Here, we just check for presence of required fields and return a mock review
+// This endpoint can be used by admin to get an AI-generated review of a student's data
+// It returns which fields are valid and which are missing/invalid
+// The admin can then use this review to make decisions
 exports.aiReviewStudent = (req, res) => {
   const { student } = req.body;
   if (!student) {
@@ -750,6 +781,8 @@ exports.aiReviewStudent = (req, res) => {
   return res.json({ status, declinedFields, verifications });
 };
 
+
+/* DELETE STUDENT CONTROLLER */
 // Delete student by ID
 exports.deleteStudent = (req, res) => {
   const { studentId } = req.params;

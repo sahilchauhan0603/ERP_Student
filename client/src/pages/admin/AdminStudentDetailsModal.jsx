@@ -398,11 +398,11 @@ export default function AdminStudentDetailsModal({
       clearInterval(interval);
       setProgress(100); // finish progress
 
-      setTimeout(() => {
+      setTimeout(async () => {
         setReviewing(false);
-        refresh?.();
-        onClose();
-        Swal.fire({
+        
+        // Show confirmation dialog asking what to do next
+        const nextAction = await Swal.fire({
           icon: status === "approved" ? "success" : "info",
           title: "AI Review Completed",
           text: `${student.firstName} ${student.lastName} has been ${status}.${
@@ -410,9 +410,33 @@ export default function AdminStudentDetailsModal({
               ? ` ${declinedFields.length} fields need attention.`
               : ""
           }`,
-          timer: 3000,
-          showConfirmButton: false,
+          showCancelButton: true,
+          confirmButtonText: "Finish Review & Close",
+          cancelButtonText: "Continue Manual Review",
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#6c757d",
+          reverseButtons: true,
         });
+
+        if (nextAction.isConfirmed) {
+          // User chose to finish review - close modal and refresh
+          refresh?.();
+          onClose();
+        } else {
+          // User chose to continue manual review - update verifications state and keep modal open
+          if (verifications) {
+            setVerifications(verifications);
+          }
+          
+          // Show success message without closing
+          Swal.fire({
+            icon: "info",
+            title: "Continue Manual Review",
+            text: "AI review complete. You can now continue reviewing manually. The Done button will remain active.",
+            timer: 2500,
+            showConfirmButton: false,
+          });
+        }
       }, 500);
     } catch (e) {
       console.error("AI Review Error:", e);

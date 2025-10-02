@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
-import { FaPaperPlane, FaRobot, FaTimes, FaUser, FaRegCopy, FaThumbsUp, FaThumbsDown, FaRedoAlt, FaSmile, FaCheck, FaHeart } from "react-icons/fa";
+import { FaPaperPlane, FaRobot, FaTimes, FaUser, FaRegCopy, FaThumbsUp, FaThumbsDown, FaRedoAlt, FaSmile, FaCheck, FaHeart, FaQuestionCircle, FaBook, FaFileAlt, FaUserShield } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
 
 const INITIAL_MESSAGE = {
   role: "assistant",
-  content: "Hi! I'm your AI assistant. Ask me anything about registration, login, or using the ERP portal.",
+  content: "Hi! I'm your AI assistant for the College ERP Portal. I can help you with registration, document uploads, application status, admin features, and much more. What would you like to know?",
 };
 
-export default function AIChat({ onClose }) {
+export default function AIChat({ onClose, studentData = null }) {
   const [messages, setMessages] = useState([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,8 +21,24 @@ export default function AIChat({ onClose }) {
   const [showEmoji, setShowEmoji] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [feedbackStates, setFeedbackStates] = useState({});
+  const [showQuickHelp, setShowQuickHelp] = useState(false);
 
+  const { userRole, isAuthenticated } = useAuth();
   const apiBase = import.meta.env.VITE_API_URL;
+
+  // Quick help categories based on user role
+  const quickHelpCategories = userRole === 'admin' 
+    ? [
+        { key: 'admin', label: 'Admin Features', icon: <FaUserShield /> },
+        { key: 'registration', label: 'Registration Process', icon: <FaBook /> },
+        { key: 'documents', label: 'Document Management', icon: <FaFileAlt /> },
+        { key: 'status', label: 'Status System', icon: <FaQuestionCircle /> }
+      ]
+    : [
+        { key: 'registration', label: 'Registration Help', icon: <FaBook /> },
+        { key: 'documents', label: 'Document Upload', icon: <FaFileAlt /> },
+        { key: 'status', label: 'Application Status', icon: <FaQuestionCircle /> }
+      ];
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -90,11 +107,25 @@ export default function AIChat({ onClose }) {
       // Add a single assistant placeholder that our dots animation will update
       setMessages((prev) => [...prev, { role: "assistant", content: "Thinking" }]);
 
-      // Non-streaming request using axios
+      // Enhanced API call with user context
+      const requestData = {
+        messages: newMessages.map(({ role, content }) => ({ role, content })),
+        userRole: isAuthenticated ? userRole : null,
+        studentData: userRole === 'student' && studentData ? {
+          status: studentData.status,
+          declinedFields: studentData.declinedFields || []
+        } : null
+      };
+
       const { data } = await axios.post(
         `${apiBase}/ai/chat`,
-        { messages: newMessages.map(({ role, content }) => ({ role, content })) },
-        { signal: controller.signal, withCredentials: true, headers: { "Content-Type": "application/json" } }
+        requestData,
+        { 
+          signal: controller.signal, 
+          withCredentials: true, 
+          headers: { "Content-Type": "application/json" },
+          timeout: 30000 // 30 second timeout
+        }
       );
 
       const reply = data?.reply || data?.message || "Sorry, I couldn't generate a response.";
@@ -115,12 +146,32 @@ export default function AIChat({ onClose }) {
       if (err?.name === 'AbortError') {
         // Silent stop
       } else {
-        const msg = err?.response?.data?.message || err?.message || "There was an error contacting the AI service.";
-        setMessages((prev) => [...prev, { role: "assistant", content: msg }]);
+        console.error('AI Chat Error:', err);
+        
+        let errorMessage = "There was an error contacting the AI service.";
+        
+        if (err?.code === 'ECONNABORTED' || err?.message?.includes('timeout')) {
+          errorMessage = "Request timed out. The AI service might be busy. Please try again.";
+        } else if (err?.response?.status === 429) {
+          errorMessage = "Too many requests. Please wait a moment before trying again.";
+        } else if (err?.response?.status === 401) {
+          errorMessage = "Authentication required. Please login and try again.";
+        } else if (err?.response?.status >= 500) {
+          errorMessage = "AI service is temporarily unavailable. Please try again later.";
+        } else if (err?.response?.data?.message) {
+          errorMessage = err.response.data.message;
+        }
+        
+        setMessages((prev) => [...prev, { 
+          role: "assistant", 
+          content: `❌ **Error**: ${errorMessage}\n\nYou can try:\n• Rephrasing your question\n• Asking something simpler\n• Trying again in a few moments` 
+        }]);
       }
     } finally {
       setIsLoading(false);
       abortRef.current = null;
+      // Hide Quick Help options when AI finishes responding
+      setShowQuickHelp(false);
       if (stoppedRef.current) {
         // Show a small system note indicating the stop
         setHasReceivedChunk(true);
@@ -136,6 +187,62 @@ export default function AIChat({ onClose }) {
       }
     }
   }
+
+  // Quick help function
+  async function getQuickHelp(category) {
+    setIsLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${apiBase}/ai/help?category=${category}`,
+        { withCredentials: true, timeout: 10000 }
+      );
+
+      if (data.success && data.help) {
+        const helpMessage = {
+          role: "assistant",
+          content: `## ${data.help.title}\n\n${data.help.items.map(item => `• ${item}`).join('\n')}\n\n*Need more specific help? Just ask me a question!*`
+        };
+        setMessages(prev => [...prev, helpMessage]);
+      }
+    } catch (err) {
+      const errorMsg = err?.response?.data?.message || "Failed to get help information";
+      setMessages(prev => [...prev, { role: "assistant", content: `Sorry, ${errorMsg}. Please try asking a specific question instead.` }]);
+    } finally {
+      setIsLoading(false);
+      setShowQuickHelp(false);
+    }
+  }
+
+  // Suggested questions based on user role and context
+  const getSuggestedQuestions = () => {
+    if (userRole === 'admin') {
+      return [
+        "How do I review student applications?",
+        "What does the AI review feature do?",
+        "How do I filter students by status?",
+        "How do I approve multiple students?",
+        "What are the different sections in student profiles?"
+      ];
+    } else if (userRole === 'student') {
+      const suggestions = ["How do I complete my registration?", "What documents do I need to upload?"];
+      
+      if (studentData?.status === 'declined') {
+        suggestions.unshift("Why is my application declined?", "How do I update my declined fields?");
+      } else if (studentData?.status === 'pending') {
+        suggestions.unshift("What does pending status mean?", "How long does review take?");
+      }
+      
+      return suggestions;
+    } else {
+      return [
+        "How do I register as a student?",
+        "What is this ERP portal?",
+        "How do I login?",
+        "What documents are required?",
+        "How does the admission process work?"
+      ];
+    }
+  };
 
   function handleCopy(text, messageIndex) {
     try { 
@@ -307,6 +414,54 @@ export default function AIChat({ onClose }) {
         {/* No separate loading bubble; thinking text animates inside the placeholder bubble */}
       </div>
 
+      {/* Quick Help Section - Only show when toggled */}
+      {showQuickHelp && !isLoading && (
+        <div className="px-4 py-2 bg-gray-50 border-t border-gray-100">
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-gray-600">Quick Help</span>
+              <button
+                onClick={() => setShowQuickHelp(!showQuickHelp)}
+                className="text-xs cursor-pointer text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                Hide Options
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              {quickHelpCategories.map((category) => (
+                <button
+                  key={category.key}
+                  onClick={() => getQuickHelp(category.key)}
+                  className="flex cursor-pointer items-center gap-2 p-2 text-xs bg-white border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
+                >
+                  <span className="text-blue-600">{category.icon}</span>
+                  <span className="text-gray-700">{category.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <span className="text-xs font-medium text-gray-600 block mb-2">Suggested Questions</span>
+            <div className="space-y-1 max-h-20 overflow-y-auto">
+              {getSuggestedQuestions().slice(0, 3).map((question, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setInput(question);
+                    setTimeout(() => sendMessage({ preventDefault: () => {} }), 100);
+                  }}
+                  className="block cursor-pointer w-full text-left text-xs text-gray-600 hover:text-blue-600 p-1 hover:bg-blue-50 rounded transition-colors duration-150 truncate"
+                >
+                  • {question}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Input Area */}
       <form 
         id="ai-chat-form" 
@@ -355,6 +510,16 @@ export default function AIChat({ onClose }) {
             ))}
           </div>
         )}
+        
+        {/* Quick Help Button */}
+        <button
+          type="button"
+          onClick={() => setShowQuickHelp(!showQuickHelp)}
+          className="bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-700 rounded-xl px-3 py-3 cursor-pointer flex items-center gap-1 transition-all duration-200"
+          title="Quick Help"
+        >
+          <FaQuestionCircle className="text-sm" />
+        </button>
         
         <button
           type={isLoading ? "button" : "submit"}

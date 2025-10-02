@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaRobot, FaTimes } from "react-icons/fa";
 import AIChat from "./AIChat";
 
-export default function AIChatLauncher() {
+export default function AIChatLauncher({ studentData = null }) {
   const [open, setOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -51,7 +51,7 @@ export default function AIChatLauncher() {
             animation: "fadeIn 0.3s ease-out"
           }}
         >
-          <AIChat onClose={() => setOpen(false)} />
+          <AIChat onClose={() => setOpen(false)} studentData={studentData} />
         </div>
       )}
 
