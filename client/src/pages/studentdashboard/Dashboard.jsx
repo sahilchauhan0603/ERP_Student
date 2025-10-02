@@ -1774,12 +1774,12 @@ const StudentDetailsDashboard = () => {
       </div>
       
       {/* AI Chat Launcher with student context */}
-      <AIChatLauncher 
+      {/* <AIChatLauncher 
         studentData={{
           status: details?.status,
           declinedFields: declinedFields
         }} 
-      />
+      /> */}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 // src/App.js
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import HomePage from './components/HomePage';
 import StudentRegistration from './pages/registration/student/index';
 import FacultyRegistration from './pages/registration/faculty/FacultyRegistration';
@@ -19,71 +19,6 @@ import AdminAllStudents from './pages/admin/AdminAllStudents';
 import PendingStudents from './pages/admin/PendingStudents';
 import ApprovedStudents from './pages/admin/ApprovedStudents';
 import DeclinedStudents from './pages/admin/DeclinedStudents';
-import Swal from 'sweetalert2';
-import axios from 'axios';
-
-function AuthRoute({ children, role }) {
-  const { isAuthenticated, userRole, loading } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      // Show SweetAlert before redirecting
-      Swal.fire({
-        icon: "error",
-        title: "Unauthorized Access",
-        text: role === 'admin' 
-          ? "This page can only be accessed by authorized admins. Please log in as an admin."
-          : "This page can only be accessed by authorized students. Please log in as a student.",
-        timer: 3000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      }).then(() => {
-        if (role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/login');
-        }
-      });
-    } else if (!loading && isAuthenticated && userRole !== role) {
-      // User is authenticated but with wrong role
-      Swal.fire({
-        icon: "error",
-        title: "Unauthorized Access",
-        text: role === 'admin' 
-          ? "This page can only be accessed by authorized admins. Please log in as an admin."
-          : "This page can only be accessed by authorized students. Please log in as a student.",
-        timer: 3000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      }).then(() => {
-        if (role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/login');
-        }
-      });
-    }
-  }, [isAuthenticated, userRole, loading, role, navigate, location.pathname]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="h-12 w-12 bg-blue-200 rounded-full mb-4"></div>
-          <div className="h-4 w-32 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated || userRole !== role) {
-    return null;
-  }
-
-  return children;
-}
 
 function AppContent() {
   const location = useLocation();
@@ -124,12 +59,8 @@ function AppContent() {
       <Route path="/login" element={<StudentLogin />} />
       <Route path="/admin" element={<AdminLogin />} />
 
-      {/* Student Routes with Sidebar Layout */}
-      <Route element={
-        <AuthRoute role="student">
-          <StudentLayout />
-        </AuthRoute>
-      }>
+      {/* Student Routes - Authentication handled at StudentLayout level */}
+      <Route element={<StudentLayout />}>
         <Route path="/student/me" element={<StudentDetailsDashboard />} />
         <Route path="/student/sar" element={<SARBooklet />} />
         <Route path="/student/help" element={<Help />} />

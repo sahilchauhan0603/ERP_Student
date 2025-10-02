@@ -121,27 +121,31 @@ const StudentLogin = () => {
 
   // Verify OTP handler
   const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    setLoading(true);
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/student/verify-login-otp`,
-        { email, otp },
-        { withCredentials: true }
-      );
-      setSuccess("Login successful! Redirecting...");
+  e.preventDefault();
+  setError("");
+  setSuccess("");
+  setLoading(true);
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}/student/verify-login-otp`,
+      { email, otp },
+      { withCredentials: true }
+    );
+    setSuccess("Login successful! Redirecting...");
 
-      // Update authentication state
-      await checkAuthStatus();
+    // Update authentication state
+    await checkAuthStatus();
 
-      if (
-        response.data.success &&
-        response.data.student &&
-        response.data.student.id
-      ) {
-        // Fetch student details to get status
+    if (
+      response.data.success &&
+      response.data.student &&
+      response.data.student.id
+    ) {
+      // Navigate to dashboard first
+      navigate("/student/me");
+      
+      // Then fetch student details and show status alert after navigation
+      setTimeout(async () => {
         try {
           const detailsRes = await axios.get(
             `${import.meta.env.VITE_API_URL}/student/students/me/details`,
@@ -151,6 +155,7 @@ const StudentLogin = () => {
             detailsRes.data?.data?.personal?.status ||
             detailsRes.data?.personal?.status ||
             "pending";
+          
           if (status === "approved") {
             await Swal.fire({
               icon: "success",
@@ -173,19 +178,22 @@ const StudentLogin = () => {
               confirmButtonColor: "#ef4444",
             });
           }
-        } catch {}
-        navigate("/student/me");
-      } else {
-        setError(
-          "Login successful but unable to redirect. Please contact support."
-        );
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || "Invalid OTP");
-    } finally {
-      setLoading(false);
+        } catch (error) {
+          console.error("Failed to fetch student status:", error);
+        }
+      }, 500); // 500ms delay to ensure dashboard is rendered
+      
+    } else {
+      setError(
+        "Login successful but unable to redirect. Please contact support."
+      );
     }
-  };
+  } catch (err) {
+    setError(err.response?.data?.message || "Invalid OTP");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div

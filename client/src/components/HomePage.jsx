@@ -314,6 +314,20 @@ const HomePage = () => {
             </div>
           ) : (
             <div className="flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0">
+              {/* Exclusive Admin Label */}
+              <div className="flex-shrink-0 mr-4">
+                <div className="relative">
+                  <div className="bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg border-2 border-red-500 animate-pulse">
+                    <span className="flex items-center space-x-1">
+                      <span>👑</span>
+                      <span>Exclusive for Admins</span>
+                      <span>👑</span>
+                    </span>
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+                </div>
+              </div>
+
               {/* News Ticker */}
               <div className="flex-1 overflow-hidden">
                 <div className="flex items-center space-x-8 animate-scroll">
@@ -322,7 +336,7 @@ const HomePage = () => {
                       🎉 New
                     </span>
                     <span className="text-sm font-medium text-gray-800">
-                      Register now and enjoy advanced portal features making
+                      Students can register now and enjoy advanced portal features, making
                       profile management easier than ever!
                     </span>
                   </div>

@@ -1,10 +1,51 @@
-import React from "react";
-import { Outlet } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import StudentSidebar from "./StudentSidebar";
+import { useAuth } from "../context/AuthContext";
+import Swal from "sweetalert2";
 
 export default function StudentLayout() {
-  const [sidebarOpen, setSidebarOpen] = React.useState(true);
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const { isAuthenticated, userRole, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Only show unauthorized message if not loading and not authenticated
+    if (!loading && (!isAuthenticated || userRole !== 'student')) {
+      // Don't show the message if we're already on the login page
+      if (location.pathname !== '/login') {
+        Swal.fire({
+          icon: "error",
+          title: "Unauthorized Access",
+          text: "This page can only be accessed by authenticated students. Please log in as a student.",
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        }).then(() => {
+          navigate('/login');
+        });
+      }
+    }
+  }, [isAuthenticated, userRole, loading, navigate, location.pathname]);
+
+  // Show loading spinner while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="h-12 w-12 bg-sky-200 rounded-full mb-4"></div>
+          <div className="h-4 w-32 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated or wrong role
+  if (!isAuthenticated || userRole !== 'student') {
+    return null;
+  }
 
   return (
     <>
