@@ -12,14 +12,14 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     // Check if there are any cookies first to avoid unnecessary API calls
-    const hasCookies = document.cookie && document.cookie.includes('token');
+    // const hasCookies = document.cookie && document.cookie.includes('token');
     
-    if (!hasCookies) {
-      // No authentication cookies found, user is not logged in
-      setIsAuthenticated(false);
-      setUserRole(null);
-      return false;
-    }
+    // if (!hasCookies) {
+    //   // No authentication cookies found, user is not logged in
+    //   setIsAuthenticated(false);
+    //   setUserRole(null);
+    //   return false;
+    // }
     
     try {
       // Check admin authentication
@@ -33,10 +33,10 @@ export const AuthProvider = ({ children }) => {
         return true;
       }
     } catch (adminError) {
-      // Only log if it's not a 401 (which is expected for non-admin users)
-      if (adminError.response?.status !== 401) {
-        console.error('Admin auth check error:', adminError);
-      }
+      // // Only log if it's not a 401 (which is expected for non-admin users)
+      // if (adminError.response?.status !== 401) {
+      //   console.error('Admin auth check error:', adminError);
+      // }
     }
 
     try {
@@ -51,10 +51,10 @@ export const AuthProvider = ({ children }) => {
         return true;
       }
     } catch (studentError) {
-      // Only log if it's not a 401 (which is expected for non-student users)
-      if (studentError.response?.status !== 401) {
-        console.error('Student auth check error:', studentError);
-      }
+      // // Only log if it's not a 401 (which is expected for non-student users)
+      // if (studentError.response?.status !== 401) {
+      //   console.error('Student auth check error:', studentError);
+      // }
     }
 
     // Neither admin nor student is authenticated
