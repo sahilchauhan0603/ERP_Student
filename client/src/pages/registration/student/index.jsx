@@ -538,73 +538,91 @@ const StudentRegistration = () => {
       }}
     >
       {/* BPIT Modern Header */}
-      <header className="w-full bg-gradient-to-r from-red-50 via-white/95 to-red-50 backdrop-blur-sm border-b border-gray-200 shadow-xl relative z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo and Institution Info */}
-            <div className="flex items-center space-x-4">
-              {/* Logo */}
-              <div className="flex-shrink-0">
-                <div className="h-20 rounded-2xl p-2 shadow-sm border border-blue-200 hover:shadow-md transition-shadow duration-200">
-                  <img
-                    src={bpitLogo}
-                    alt="BPIT Logo"
-                    className="w-full h-full object-contain"
-                  />
+            <header className="w-full bg-gradient-to-r from-red-50 to-red-50 backdrop-blur-sm border-b border-gray-200 shadow-xl relative z-20">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                {/* Desktop Layout - Horizontal */}
+                <div className="hidden sm:flex items-center justify-between">
+                  {/* Logo and Institution Info */}
+                  <div className="flex items-center space-x-4">
+                    {/* Logo */}
+                    <div className="flex-shrink-0">
+                      <div className="h-20 rounded-2xl p-2 shadow-sm border border-blue-200 hover:shadow-md transition-shadow duration-200">
+                        <img
+                          src={bpitLogo}
+                          alt="BPIT Logo"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    </div>
+      
+                    {/* Institution Text */}
+                    <div className="border rounded-2xl border-gray-300 bg-white/50 backdrop-blur-sm p-1 pl-8 pr-44 relative border-r-4 border-r-gradient-to-b border-r-blue-600 shadow-sm">
+                      <div className="absolute right-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-600 via-red-500 to-blue-600 rounded-r-xl"></div>
+                      <h1 className="text-xl md:text-xl lg:text-2xl font-bold text-gray-900 leading-tight">
+                        <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
+                          Bhagwan Parshuram Institute of Technology
+                        </span>
+                      </h1>
+                      <div className="flex flex-col mt-1 space-y-0.5">
+                        <p className="text-sm md:text-base text-red-600 font-semibold">
+                          A Unit of Bhartiya Brahmin Charitable Trust (Regd.)
+                        </p>
+                        <div className="text-xs md:text-sm text-gray-600 space-y-0.5">
+                          <p>
+                            (Approved by AICTE, Ministry of Education) • Affiliated to
+                            GGSIPU, Delhi
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+      
+                  {/* Right Side - Accreditation Logo */}
+                  <div className="flex-shrink-0">
+                    <div className="h-20 rounded-3xl border border-gray-200 shadow-md hover:shadow-md transition-shadow duration-200">
+                      <img
+                        src="https://bpitindia.ac.in/wp-content/uploads/2024/03/Header-1-1-300x88-1.jpg"
+                        alt="G20 & Accreditation Logos"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              {/* Institution Text */}
-              <div className="hidden sm:block border rounded-2xl border-gray-300 bg-white/50 backdrop-blur-sm p-1 pl-8 pr-44 relative border-r-4 border-r-gradient-to-b border-r-blue-600 shadow-sm">
-                <div className="absolute right-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-600 via-red-500 to-blue-600 rounded-r-xl"></div>
-                <h1 className="text-xl md:text-xl lg:text-2xl font-bold text-gray-900 leading-tight">
-                  <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
-                    Bhagwan Parshuram Institute of Technology
-                  </span>
-                </h1>
-                <div className="flex flex-col mt-1 space-y-0.5">
-                  <p className="text-sm md:text-base text-red-600 font-semibold">
-                    A Unit of Bhartiya Brahmin Charitable Trust (Regd.)
-                  </p>
-                  <div className="text-xs md:text-sm text-gray-600 space-y-0.5">
-                    <p>
-                      (Approved by AICTE, Ministry of Education) • Affiliated to
-                      GGSIPU, Delhi
+      
+                {/* Mobile Layout - Logo and Text */}
+                <div className="sm:hidden flex flex-col items-center space-y-3">
+                  {/* BPIT Logo */}
+                  <div className="flex-shrink-0">
+                    <div className="h-16 rounded-2xl p-2 shadow-sm border border-blue-200 hover:shadow-md transition-shadow duration-200">
+                      <img
+                        src={bpitLogo}
+                        alt="BPIT Logo"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  </div>
+      
+                  {/* Institution Text */}
+                  <div className="text-center">
+                    <h1 className="text-lg font-bold text-gray-900 leading-tight">
+                      <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
+                        Bhagwan Parshuram Institute of Technology
+                      </span>
+                    </h1>
+                    <p className="text-sm text-red-600 font-semibold mt-1">
+                      A Unit of Bhartiya Brahmin Charitable Trust (Regd.)
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      (Approved by AICTE, Ministry of Education) <br />
+                      Affiliated to GGSIPU, Delhi
                     </p>
                   </div>
                 </div>
               </div>
-
-              {/* Mobile Institution Text */}
-              <div className="sm:hidden">
-                <h1 className="text-lg font-bold text-gray-900 leading-tight">
-                  <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
-                    BPIT
-                  </span>
-                </h1>
-                <p className="text-sm text-red-600 font-semibold">BBCT Unit</p>
-                <p className="text-xs text-gray-600">
-                  AICTE Approved • GGSIPU Affiliated
-                </p>
-              </div>
-            </div>
-
-            {/* Right Side - Accreditation Logo */}
-            <div className="flex-shrink-0">
-              <div className="h-20 rounded-3xl border border-gray-200 shadow-md hover:shadow-md transition-shadow duration-200">
-                <img
-                  src="https://bpitindia.ac.in/wp-content/uploads/2024/03/Header-1-1-300x88-1.jpg"
-                  alt="G20 & Accreditation Logos"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Decorative Bottom Border */}
-        <div className="h-1 bg-gradient-to-r from-blue-600 via-red-500 to-blue-600"></div>
-      </header>
+      
+              {/* Decorative Bottom Border */}
+              <div className="h-1 bg-gradient-to-r from-blue-600 via-red-500 to-blue-600"></div>
+            </header>
 
       {/* Main Content */}
       <div className="flex-1 py-4 sm:py-6 lg:py-8 px-2 sm:px-4 lg:px-8">

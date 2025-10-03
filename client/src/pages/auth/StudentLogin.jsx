@@ -121,79 +121,78 @@ const StudentLogin = () => {
 
   // Verify OTP handler
   const handleVerifyOtp = async (e) => {
-  e.preventDefault();
-  setError("");
-  setSuccess("");
-  setLoading(true);
-  try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/student/verify-login-otp`,
-      { email, otp },
-      { withCredentials: true }
-    );
-    setSuccess("Login successful! Redirecting...");
-
-    // Update authentication state
-    await checkAuthStatus();
-
-    if (
-      response.data.success &&
-      response.data.student &&
-      response.data.student.id
-    ) {
-      // Navigate to dashboard first
-      navigate("/student/me");
-      
-      // Then fetch student details and show status alert after navigation
-      setTimeout(async () => {
-        try {
-          const detailsRes = await axios.get(
-            `${import.meta.env.VITE_API_URL}/student/students/me/details`,
-            { withCredentials: true }
-          );
-          const status =
-            detailsRes.data?.data?.personal?.status ||
-            detailsRes.data?.personal?.status ||
-            "pending";
-          
-          if (status === "approved") {
-            await Swal.fire({
-              icon: "success",
-              title: "Congratulations!",
-              text: "Your profile is approved. You have full access to the portal.",
-              confirmButtonColor: "#22c55e",
-            });
-          } else if (status === "pending") {
-            await Swal.fire({
-              icon: "info",
-              title: "Profile Pending",
-              text: "Your profile is under review. Please wait for approval.",
-              confirmButtonColor: "#f59e42",
-            });
-          } else if (status === "declined") {
-            await Swal.fire({
-              icon: "warning",
-              title: "Profile Declined",
-              text: "Your profile was declined. Please update the required information.",
-              confirmButtonColor: "#ef4444",
-            });
-          }
-        } catch (error) {
-          console.error("Failed to fetch student status:", error);
-        }
-      }, 500); // 500ms delay to ensure dashboard is rendered
-      
-    } else {
-      setError(
-        "Login successful but unable to redirect. Please contact support."
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/student/verify-login-otp`,
+        { email, otp },
+        { withCredentials: true }
       );
+      setSuccess("Login successful! Redirecting...");
+
+      // Update authentication state
+      await checkAuthStatus();
+
+      if (
+        response.data.success &&
+        response.data.student &&
+        response.data.student.id
+      ) {
+        // Navigate to dashboard first
+        navigate("/student/me");
+
+        // Then fetch student details and show status alert after navigation
+        setTimeout(async () => {
+          try {
+            const detailsRes = await axios.get(
+              `${import.meta.env.VITE_API_URL}/student/students/me/details`,
+              { withCredentials: true }
+            );
+            const status =
+              detailsRes.data?.data?.personal?.status ||
+              detailsRes.data?.personal?.status ||
+              "pending";
+
+            if (status === "approved") {
+              await Swal.fire({
+                icon: "success",
+                title: "Congratulations!",
+                text: "Your profile is approved. You have full access to the portal.",
+                confirmButtonColor: "#22c55e",
+              });
+            } else if (status === "pending") {
+              await Swal.fire({
+                icon: "info",
+                title: "Profile Pending",
+                text: "Your profile is under review. Please wait for approval.",
+                confirmButtonColor: "#f59e42",
+              });
+            } else if (status === "declined") {
+              await Swal.fire({
+                icon: "warning",
+                title: "Profile Declined",
+                text: "Your profile was declined. Please update the required information.",
+                confirmButtonColor: "#ef4444",
+              });
+            }
+          } catch (error) {
+            console.error("Failed to fetch student status:", error);
+          }
+        }, 500); // 500ms delay to ensure dashboard is rendered
+      } else {
+        setError(
+          "Login successful but unable to redirect. Please contact support."
+        );
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid OTP");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    setError(err.response?.data?.message || "Invalid OTP");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div
@@ -207,9 +206,10 @@ const StudentLogin = () => {
       }}
     >
       {/* BPIT Modern Header */}
-      <header className="w-full bg-gradient-to-r from-red-50 via-white/95 to-red-50 backdrop-blur-sm border-b border-gray-200 shadow-xl relative z-20">
+      <header className="w-full bg-gradient-to-r from-red-50 to-red-50 backdrop-blur-sm border-b border-gray-200 shadow-xl relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
+          {/* Desktop Layout - Horizontal */}
+          <div className="hidden sm:flex items-center justify-between">
             {/* Logo and Institution Info */}
             <div className="flex items-center space-x-4">
               {/* Logo */}
@@ -224,7 +224,7 @@ const StudentLogin = () => {
               </div>
 
               {/* Institution Text */}
-              <div className="hidden sm:block border rounded-2xl border-gray-300 bg-white/50 backdrop-blur-sm p-1 pl-8 pr-44 relative border-r-4 border-r-gradient-to-b border-r-blue-600 shadow-sm">
+              <div className="border rounded-2xl border-gray-300 bg-white/50 backdrop-blur-sm p-1 pl-8 pr-44 relative border-r-4 border-r-gradient-to-b border-r-blue-600 shadow-sm">
                 <div className="absolute right-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-600 via-red-500 to-blue-600 rounded-r-xl"></div>
                 <h1 className="text-xl md:text-xl lg:text-2xl font-bold text-gray-900 leading-tight">
                   <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
@@ -243,19 +243,6 @@ const StudentLogin = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Mobile Institution Text */}
-              <div className="sm:hidden">
-                <h1 className="text-lg font-bold text-gray-900 leading-tight">
-                  <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
-                    BPIT
-                  </span>
-                </h1>
-                <p className="text-sm text-red-600 font-semibold">BBCT Unit</p>
-                <p className="text-xs text-gray-600">
-                  AICTE Approved • GGSIPU Affiliated
-                </p>
-              </div>
             </div>
 
             {/* Right Side - Accreditation Logo */}
@@ -267,6 +254,36 @@ const StudentLogin = () => {
                   className="w-full h-full object-contain"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Mobile Layout - Logo and Text */}
+          <div className="sm:hidden flex flex-col items-center space-y-3">
+            {/* BPIT Logo */}
+            <div className="flex-shrink-0">
+              <div className="h-16 rounded-2xl p-2 shadow-sm border border-blue-200 hover:shadow-md transition-shadow duration-200">
+                <img
+                  src={bpitLogo}
+                  alt="BPIT Logo"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
+
+            {/* Institution Text */}
+            <div className="text-center">
+              <h1 className="text-lg font-bold text-gray-900 leading-tight">
+                <span className="bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
+                  Bhagwan Parshuram Institute of Technology
+                </span>
+              </h1>
+              <p className="text-sm text-red-600 font-semibold mt-1">
+                A Unit of Bhartiya Brahmin Charitable Trust (Regd.)
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                (Approved by AICTE, Ministry of Education) <br />
+                Affiliated to GGSIPU, Delhi
+              </p>
             </div>
           </div>
         </div>
