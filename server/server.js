@@ -67,7 +67,7 @@ app.use('/api/ai', require('./routes/ai'));
 
 // Test route
 app.get('/', (req, res) => {
-  res.send('✅ MySQL API is running....');
+  res.send('✅ MySQL API is running.....');
 });
 
 // Start server

@@ -378,17 +378,8 @@ export default function AdminStudentDetailsModal({
 
       const { status, declinedFields, verifications } = res.data;
 
-      // Step 2: Save result via verify-student endpoint
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/admin/verify-student`,
-        {
-          studentId: student.id,
-          status,
-          declinedFields: declinedFields || [],
-          verifications: verifications || {},
-        },
-        { withCredentials: true }
-      );
+      // Note: We no longer automatically call verify-student here
+      // Instead, we show results to admin and let them confirm
 
       clearInterval(interval);
       setProgress(100); // finish progress
@@ -396,39 +387,131 @@ export default function AdminStudentDetailsModal({
       setTimeout(async () => {
         setReviewing(false);
         
-        // Show confirmation dialog asking what to do next
-        const nextAction = await Swal.fire({
-          icon: status === "approved" ? "success" : "info",
-          title: "AI Review Completed",
-          text: `${student.firstName} ${student.lastName} has been ${status}.${
-            status === "declined" && declinedFields?.length > 0
-              ? ` ${declinedFields.length} fields need attention.`
-              : ""
-          }`,
+        // Prepare detailed AI review results
+        const verifiedFieldsCount = Object.values(verifications || {}).reduce((count, section) => {
+          return count + Object.values(section || {}).filter(field => field === true).length;
+        }, 0);
+        
+        const declinedFieldsCount = declinedFields?.length || 0;
+        const totalFieldsReviewed = verifiedFieldsCount + declinedFieldsCount;
+
+        // Show detailed AI review results
+        const reviewResult = await Swal.fire({
+          icon: status === "approved" ? "success" : "warning",
+          title: "🤖 AI Review Complete",
+          html: `
+            <div style="text-align: left; margin: 20px 0;">
+              <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <h4 style="margin: 0 0 10px 0; color: #333;">Student: ${student.firstName} ${student.lastName}</h4>
+                <p style="margin: 5px 0; color: #666;"><strong>Email:</strong> ${student.email}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>Course:</strong> ${student.course || 'N/A'}</p>
+              </div>
+              
+              <div style="background: ${status === 'approved' ? '#d4edda' : '#f8d7da'}; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <h4 style="margin: 0 0 10px 0; color: ${status === 'approved' ? '#155724' : '#721c24'};">
+                  AI Decision: <strong>${status.toUpperCase()}</strong>
+                </h4>
+              </div>
+
+              <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div style="flex: 1; background: #e8f5e8; padding: 12px; border-radius: 6px; text-align: center;">
+                  <div style="font-size: 24px; font-weight: bold; color: #28a745;">${verifiedFieldsCount}</div>
+                  <div style="font-size: 12px; color: #666;">Verified Fields</div>
+                </div>
+                <div style="flex: 1; background: #ffeaa7; padding: 12px; border-radius: 6px; text-align: center;">
+                  <div style="font-size: 24px; font-weight: bold; color: #f39c12;">${totalFieldsReviewed}</div>
+                  <div style="font-size: 12px; color: #666;">Total Reviewed</div>
+                </div>
+                <div style="flex: 1; background: #ffebee; padding: 12px; border-radius: 6px; text-align: center;">
+                  <div style="font-size: 24px; font-weight: bold; color: #dc3545;">${declinedFieldsCount}</div>
+                  <div style="font-size: 12px; color: #666;">Declined Fields</div>
+                </div>
+              </div>
+
+              ${declinedFieldsCount > 0 ? `
+                <div style="background: #fff3cd; padding: 12px; border-radius: 6px; border-left: 4px solid #ffc107;">
+                  <strong>Fields requiring attention:</strong>
+                  <ul style="margin: 8px 0 0 20px; font-size: 13px;">
+                    ${declinedFields.slice(0, 5).map(field => `<li>${field}</li>`).join('')}
+                    ${declinedFields.length > 5 ? `<li>... and ${declinedFields.length - 5} more</li>` : ''}
+                  </ul>
+                </div>
+              ` : ''}
+            </div>
+          `,
           showCancelButton: true,
-          confirmButtonText: "Finish Review & Close",
-          cancelButtonText: "Continue Manual Review",
-          confirmButtonColor: "#3085d6",
+          confirmButtonText: "✅ Complete Review",
+          cancelButtonText: "❌ Cancel AI Review", 
+          confirmButtonColor: status === "approved" ? "#28a745" : "#ffc107",
           cancelButtonColor: "#6c757d",
           reverseButtons: true,
+          width: '650px',
+          customClass: {
+            popup: 'swal-wide'
+          },
+          didOpen: () => {
+            // Add custom styles for better appearance
+            const style = document.createElement('style');
+            style.textContent = `
+              .swal-wide {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+              }
+              .swal-wide .swal2-html-container {
+                line-height: 1.5 !important;
+              }
+            `;
+            document.head.appendChild(style);
+          }
         });
 
-        if (nextAction.isConfirmed) {
-          // User chose to finish review - close modal and refresh
-          refresh?.();
-          onClose();
+        if (reviewResult.isConfirmed) {
+          // Admin confirmed AI review - call verify-student endpoint
+          try {
+            setActionLoading(true);
+            await axios.post(
+              `${import.meta.env.VITE_API_URL}/admin/verify-student`,
+              {
+                studentId: student.id,
+                status,
+                declinedFields: declinedFields || [],
+                verifications: verifications || {},
+              },
+              { withCredentials: true }
+            );
+
+            // Close modal and refresh
+            refresh?.();
+            onClose();
+            
+            // Show completion message
+            Swal.fire({
+              icon: status === "approved" ? "success" : "info",
+              title: "Review Completed",
+              text: `${student.firstName} ${student.lastName} has been ${status} by AI review.`,
+              timer: 3000,
+              showConfirmButton: false,
+            });
+          } catch (error) {
+            console.error("Error completing AI review:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Review Failed",
+              text: "Failed to complete the AI review. Please try again.",
+            });
+          } finally {
+            setActionLoading(false);
+          }
         } else {
-          // User chose to continue manual review - update verifications state and keep modal open
+          // Admin cancelled AI review - continue with manual review
           if (verifications) {
             setVerifications(verifications);
           }
           
-          // Show success message without closing
           Swal.fire({
             icon: "info",
-            title: "Continue Manual Review",
-            text: "AI review complete. You can now continue reviewing manually. The Done button will remain active.",
-            timer: 2500,
+            title: "AI Review Cancelled",
+            text: "You can now manually review the student. The AI suggestions have been loaded for your reference.",
+            timer: 3000,
             showConfirmButton: false,
           });
         }
