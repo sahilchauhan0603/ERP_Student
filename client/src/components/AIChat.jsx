@@ -13,6 +13,7 @@ export default function AIChat({ onClose, studentData = null }) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const containerRef = useRef(null);
+  const emojiRef = useRef(null);
   const abortRef = useRef(null);
   const stoppedRef = useRef(false);
   const [hasReceivedChunk, setHasReceivedChunk] = useState(false);
@@ -54,6 +55,22 @@ export default function AIChat({ onClose, studentData = null }) {
       return () => clearInterval(id);
     }
   }, [isLoading, hasReceivedChunk]);
+
+  // Close emoji keyboard when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showEmoji && emojiRef.current && !emojiRef.current.contains(event.target)) {
+        setShowEmoji(false);
+      }
+    };
+
+    if (showEmoji) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showEmoji]);
 
   // Reflect dots into the last assistant bubble while waiting
   useEffect(() => {
@@ -291,11 +308,12 @@ export default function AIChat({ onClose, studentData = null }) {
 
   return (
     <div
-      className="fixed bottom-24 right-6 z-50 w-[26rem] max-w-[90vw] bg-white border border-blue-200 rounded-2xl flex flex-col overflow-hidden transition-all duration-300"
+      className="ai-chat-container fixed bottom-24 right-2 sm:right-6 z-50 w-[min(26rem,calc(100vw-1rem))] sm:w-[26rem] sm:max-w-[90vw] bg-white border border-blue-200 rounded-2xl flex flex-col overflow-hidden transition-all duration-300"
       style={{ 
         boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.07)",
         background: "linear-gradient(to bottom, #ffffff, #f9fafb)",
-        height: "520px"
+        height: "640px",
+        maxHeight: "calc(100vh - 110px)"
       }}
     >
       {/* Header */}
@@ -323,7 +341,7 @@ export default function AIChat({ onClose, studentData = null }) {
       {/* Messages Container */}
       <div
         ref={containerRef}
-        className="ai-scroll flex-1 px-5 py-4 h-72 overflow-y-auto bg-gradient-to-b from-gray-50 to-gray-100/30 scroll-smooth pr-2"
+        className="ai-scroll flex-1 px-5 py-4 min-h-0 overflow-y-auto bg-gradient-to-b from-gray-50 to-gray-100/30 scroll-smooth pr-2"
         onScroll={(e) => {
           const el = e.currentTarget;
           const atBottom = el.scrollTop >= el.scrollHeight - el.clientHeight - 20;
@@ -486,30 +504,32 @@ export default function AIChat({ onClose, studentData = null }) {
             style={{ minHeight: '44px', maxHeight: '140px', overflowY: 'auto' }}
             maxLength={2000}
           />
-          <button
-            type="button"
-            onClick={() => setShowEmoji((v) => !v)}
-            className="absolute right-5 top-1/2 transform -translate-y-1/2 text-yellow-400 hover:text-yellow-600 transition-colors duration-150"
-            title="Add emoji"
-            style={{ fontSize: '1rem', lineHeight: 1 }}
-          >
-            <FaSmile style={{ fontSize: '1.5rem', lineHeight: 1 }} />
-          </button>
-        </div>
-        
-        {showEmoji && (
-          <div className="absolute bottom-16 left-4 bg-white border border-gray-200 rounded-xl shadow-lg p-3 grid grid-cols-5 gap-1 z-50">
-            {EMOJIS.map((e) => (
-              <button 
-                key={e} 
-                className="hover:bg-gray-100 rounded-lg p-2 transition-colors duration-150 text-lg" 
-                onClick={() => { setInput((v) => v + e); setShowEmoji(false); }}
-              >
-                {e}
-              </button>
-            ))}
+          <div ref={emojiRef}>
+            <button
+              type="button"
+              onClick={() => setShowEmoji((v) => !v)}
+              className="absolute right-5 top-1/2 transform -translate-y-1/2 text-yellow-400 hover:text-yellow-600 transition-colors duration-150"
+              title="Add emoji"
+              style={{ fontSize: '1rem', lineHeight: 1 }}
+            >
+              <FaSmile style={{ fontSize: '1.5rem', lineHeight: 1 }} />
+            </button>
+            
+            {showEmoji && (
+              <div className="absolute bottom-16 left-4 bg-white border border-gray-200 rounded-xl shadow-lg p-3 grid grid-cols-5 gap-1 z-50">
+                {EMOJIS.map((e) => (
+                  <button 
+                    key={e} 
+                    className="hover:bg-gray-100 rounded-lg p-2 transition-colors duration-150 text-lg" 
+                    onClick={() => { setInput((v) => v + e); setShowEmoji(false); }}
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </div>
         
         {/* Quick Help Button */}
         <button
@@ -573,6 +593,16 @@ export default function AIChat({ onClose, studentData = null }) {
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(5px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Ensure chat widget stays within viewport bounds */
+        @media (max-width: 640px) {
+          .ai-chat-container {
+            left: 0.25rem !important;
+            right: 0.25rem !important;
+            width: calc(100vw - 0.5rem) !important;
+            max-width: none !important;
+          }
         }
       `}</style>
     </div>

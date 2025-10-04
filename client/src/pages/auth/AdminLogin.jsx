@@ -246,270 +246,207 @@ const AdminLogin = () => {
 
       <div className="flex-1 flex flex-col justify-center items-center py-8 px-2 sm:px-4 mt-2 md:mt-6">
         <div className="w-full max-w-md mx-auto">
-          <div className="bg-gradient-to-br from-white via-blue-50 to-red-50 p-1 rounded-2xl shadow-lg">
-            <div className="bg-white py-8 px-6 shadow-lg rounded-2xl border-2 border-blue-200/40 relative">
-              <div className="flex flex-col items-center mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-16 w-16 text-blue-600 mb-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"
-                  />
-                </svg>
-                <h2 className="text-2xl md:text-3xl font-extrabold text-blue-900 mb-1">
-                  Admin Portal Login
-                </h2>
-                <p className="text-sm text-blue-700">
-                  Secure access for administrators
-                </p>
-              </div>
-              {error && (
-                <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center">
+          {/* Enhanced Login Card */}
+          <div className="relative">
+            {/* Glowing Background Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-red-400 rounded-3xl blur-xl opacity-20 animate-pulse"></div>
+            
+            {/* Main Card */}
+            <div className="relative bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl border border-white/50 overflow-hidden">
+              {/* Card Header with Gradient */}
+              <div className="bg-red-50 px-8 py-6 text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-black/20 backdrop-blur-sm rounded-full mb-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                    className="h-10 w-10 text-black"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
                     <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                      clipRule="evenodd"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                     />
                   </svg>
-                  {error}
                 </div>
-              )}
-              {success && (
-                <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center justify-between">
-                  <span className="flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-2"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    {success}
-                  </span>
-                  {step === 2 && otpTimer > 0 && (
-                    <span className="ml-2 text-xs font-semibold text-blue-700">
-                      OTP valid for {Math.floor(otpTimer / 60)}:
-                      {(otpTimer % 60).toString().padStart(2, "0")} min
-                    </span>
-                  )}
-                  {step === 2 && otpTimer === 0 && (
-                    <span className="ml-2 text-xs font-semibold text-red-600">
-                      OTP expired
-                    </span>
-                  )}
-                </div>
-              )}
-
-              <div className="bg-blue-50 p-4 rounded-lg mb-6 border border-blue-200 flex items-start">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mt-0.5 mr-2 flex-shrink-0 text-blue-600"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-blue-800 text-sm">
-                  Please use your registered admin email address. If you don't
-                  receive the OTP, check your spam folder or contact support.
-                </span>
+                <h2 className="text-3xl font-black text-black mb-2">
+                  Admin Portal
+                </h2>
+                <p className="text-blue-900 font-medium">
+                  Secure Administrator Access
+                </p>
               </div>
 
-              {step === 1 && (
-                <form className="space-y-6" onSubmit={handleEmailSubmit}>
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Admin Email address
-                    </label>
-                    <div className="mt-1 relative rounded-md shadow-sm">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg
-                          className="h-5 w-5 text-gray-400"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+              {/* Card Content */}
+              <div className="px-8 py-8">
+                {/* Enhanced Alert Messages */}
+                {error && (
+                  <div className="mb-6 p-4 bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-2 sm:text-sm border-gray-300 rounded-md"
-                        placeholder="admin@email.com"
-                        disabled={loading}
-                      />
+                      <div className="ml-3">
+                        <p className="text-red-800 font-medium">{error}</p>
+                      </div>
                     </div>
                   </div>
+                )}
 
-                  <div>
+                {success && (
+                  <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-100 border-l-4 border-green-500 rounded-lg shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <svg className="h-5 w-5 text-green-500 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <p className="text-green-800 font-medium">{success}</p>
+                      </div>
+                      {step === 2 && otpTimer > 0 && (
+                        <span className="text-xs font-bold text-green-700 bg-green-200 px-2 py-1 rounded-full">
+                          {Math.floor(otpTimer / 60)}:{(otpTimer % 60).toString().padStart(2, "0")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Enhanced Info Box */}
+                <div className="mb-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-100 border border-blue-200 rounded-xl">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-blue-600 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-blue-800 text-sm font-medium">
+                        Please use your registered admin email address. Check spam folder if OTP doesn't arrive.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Enhanced Forms */}
+                {step === 1 && (
+                  <form className="space-y-6" onSubmit={handleEmailSubmit}>
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-3">
+                        Administrator Email Address
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                          </svg>
+                        </div>
+                        <input
+                          id="email"
+                          type="email"
+                          required
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 bg-white/80 text-gray-900 placeholder-gray-500 font-medium"
+                          placeholder="admin@bpitindia.edu.in"
+                          disabled={loading}
+                        />
+                      </div>
+                    </div>
+
                     <button
                       type="submit"
                       disabled={loading}
-                      className={`w-full flex justify-center cursor-pointer py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                        loading ? "opacity-75 cursor-not-allowed" : ""
-                      }`}
+                      className="w-full relative cursor-pointer overflow-hidden bg-red-100 hover:bg-red-300 text-black font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
                       {loading ? (
-                        <>
-                          <svg
-                            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
+                        <div className="flex items-center justify-center">
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
                           Sending OTP...
-                        </>
+                        </div>
                       ) : (
-                        "Send OTP"
+                        "Send OTP Code"
                       )}
                     </button>
-                  </div>
-                </form>
-              )}
+                  </form>
+                )}
 
-              {step === 2 && (
-                <form className="space-y-6" onSubmit={handleOtpSubmit}>
-                  <div>
-                    <label
-                      htmlFor="otp"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Enter 6-digit OTP
-                    </label>
-                    <div
-                      className="mt-1 flex gap-2 justify-center"
-                      onPaste={handleOtpBoxPaste}
-                    >
-                      {otpDigits.map((digit, idx) => (
-                        <input
-                          key={idx}
-                          ref={(el) => (otpInputsRef.current[idx] = el)}
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={1}
-                          pattern="[0-9]"
-                          autoComplete="one-time-code"
-                          className={`w-10 h-12 text-center text-xl font-bold border-2 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
-                            digit
-                              ? "border-blue-500 bg-blue-50"
-                              : "border-gray-300 bg-white"
-                          }`}
-                          value={digit}
-                          onChange={(e) =>
-                            handleOtpBoxChange(idx, e.target.value)
-                          }
-                          onKeyDown={(e) => handleOtpBoxKeyDown(idx, e)}
-                          disabled={otpTimer === 0}
-                        />
-                      ))}
+                {step === 2 && (
+                  <form className="space-y-8" onSubmit={handleOtpSubmit}>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-4 text-center">
+                        Enter 6-Digit Verification Code
+                      </label>
+                      <div className="flex gap-3 justify-center" onPaste={handleOtpBoxPaste}>
+                        {otpDigits.map((digit, idx) => (
+                          <input
+                            key={idx}
+                            ref={(el) => (otpInputsRef.current[idx] = el)}
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={1}
+                            className={`w-12 h-14 text-center text-2xl font-black border-2 rounded-xl shadow-sm focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
+                              digit ? "border-blue-500 bg-blue-50 text-blue-600" : "border-gray-300 bg-white text-gray-900"
+                            }`}
+                            value={digit}
+                            onChange={(e) => handleOtpBoxChange(idx, e.target.value)}
+                            onKeyDown={(e) => handleOtpBoxKeyDown(idx, e)}
+                            disabled={otpTimer === 0}
+                          />
+                        ))}
+                      </div>
+                      
+                      <p className="mt-4 text-xs text-gray-600 text-center">
+                        Check your email for the verification code
+                      </p>
+                      
+                      {otpTimer === 0 && (
+                        <button
+                          type="button"
+                          className="mt-4 w-full py-3 px-4 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-blue-100 hover:to-blue-200 text-gray-700 hover:text-blue-700 font-bold rounded-xl transition-all duration-200"
+                          onClick={handleEmailSubmit}
+                          disabled={loading}
+                        >
+                          {loading ? "Resending..." : "Resend OTP"}
+                        </button>
+                      )}
                     </div>
-                    <p className="mt-2 text-xs text-gray-500 text-center">
-                      Check your email for the OTP. It may take a few minutes to
-                      arrive.
-                    </p>
-                    {otpTimer === 0 && (
+
+                    <div className="flex items-center justify-between">
                       <button
                         type="button"
-                        className={`mt-2 w-full py-2 px-4 rounded-md font-semibold transition ${
-                          loading
-                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                            : "bg-blue-100 text-blue-700 hover:bg-blue-200 cursor-pointer"
-                        }`}
-                        onClick={handleEmailSubmit}
+                        onClick={() => {
+                          setStep(1);
+                          setOtpDigits(["", "", "", "", "", ""]);
+                          setOtp("");
+                        }}
+                        className="flex cursor-pointer items-center text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors duration-200"
                         disabled={loading}
                       >
-                        {loading ? "Sending OTP..." : "Resend OTP"}
+                        <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Change Email
                       </button>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setStep(1);
-                        setOtpDigits(["", "", "", "", "", ""]);
-                        setOtp("");
-                      }}
-                      className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-500 flex items-center"
-                      disabled={loading}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                      
+                      <button
+                        type="submit"
+                        disabled={loading || otp.length !== 6 || otpTimer === 0}
+                        className="bg-red-200 hover:bg-red-300 text-black font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl cursor-pointer transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                        />
-                      </svg>
-                      Change Email
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading || otp.length !== 6 || otpTimer === 0}
-                      className={`ml-3 inline-flex justify-center py-2 cursor-pointer px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                        loading || otp.length !== 6 || otpTimer === 0
-                          ? "opacity-75 cursor-not-allowed"
-                          : ""
-                      }`}
-                    >
-                      {loading ? "Verifying..." : "Login"}
-                    </button>
-                  </div>
-                </form>
-              )}
+                        {loading ? "Verifying..." : "Access Portal"}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
             </div>
           </div>
         </div>
