@@ -217,7 +217,7 @@ export default function AdminSidebar({ open, onClose }) {
           ))}
           
           {/* Compact Section divider */}
-          <div className="my-4 mx-3 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+          <div className="my-3 mx-3 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
         </nav>
 
         {/* Compact AI Assistant Button */}
@@ -314,9 +314,9 @@ export default function AdminSidebar({ open, onClose }) {
           </button>
           
           {/* Compact Footer info */}
-          <div className="mt-3 text-center">
+          {/* <div className="mt-3 text-center">
             <p className="text-xs text-slate-400">v1.0.0 • © BPIT</p>
-          </div>
+          </div> */}
         </div>
       </aside>
 
