@@ -133,6 +133,9 @@ const StudentLogin = () => {
       );
       setSuccess("Login successful! Redirecting...");
 
+      // Set login time when user successfully logs in
+      localStorage.setItem('studentLoginTime', Date.now().toString());
+
       // Update authentication state
       await checkAuthStatus();
 

@@ -72,21 +72,25 @@ export default function AdminSidebar({ open, onClose }) {
     fetchAdminEmail();
 
     // Set login time and start session duration tracking
-    const loginTimeStamp = localStorage.getItem('adminLoginTime') || Date.now();
-    if (!localStorage.getItem('adminLoginTime')) {
+    let loginTimeStamp = localStorage.getItem('adminLoginTime');
+    
+    // If no login time exists, set it to current time (user just logged in)
+    if (!loginTimeStamp) {
+      loginTimeStamp = Date.now().toString();
       localStorage.setItem('adminLoginTime', loginTimeStamp);
     }
     
     const updateTime = () => {
-      const now = new Date();
-      setLoginTime(now.toLocaleTimeString('en-US', { 
+      const loginDate = new Date(parseInt(loginTimeStamp));
+      setLoginTime(loginDate.toLocaleTimeString('en-US', { 
         hour: '2-digit', 
         minute: '2-digit',
         hour12: true 
       }));
       
+      const now = Date.now();
       const sessionStart = parseInt(loginTimeStamp);
-      const duration = Math.floor((now.getTime() - sessionStart) / 1000);
+      const duration = Math.floor((now - sessionStart) / 1000);
       const hours = Math.floor(duration / 3600);
       const minutes = Math.floor((duration % 3600) / 60);
       setSessionDuration(`${hours}h ${minutes}m`);
@@ -109,6 +113,8 @@ export default function AdminSidebar({ open, onClose }) {
       confirmButtonText: "Yes, logout!",
     });
     if (result.isConfirmed) {
+      // Clear login time on logout
+      localStorage.removeItem('adminLoginTime');
       await logout("admin");
     }
   };

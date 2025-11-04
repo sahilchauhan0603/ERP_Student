@@ -78,10 +78,14 @@ export const AuthProvider = ({ children }) => {
         await axios.post(`${import.meta.env.VITE_API_URL}/admin/logout`, {}, {
           withCredentials: true,
         });
+        // Clear admin login time if exists
+        localStorage.removeItem('adminLoginTime');
       } else {
         await axios.post(`${import.meta.env.VITE_API_URL}/student/logout`, {}, {
           withCredentials: true,
         });
+        // Clear student login time on logout
+        localStorage.removeItem('studentLoginTime');
       }
     } catch (error) {
       // Logout error

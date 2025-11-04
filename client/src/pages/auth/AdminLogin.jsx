@@ -135,6 +135,9 @@ const AdminLogin = () => {
       );
       setSuccess("Login successful! Redirecting...");
 
+      // Set login time when admin successfully logs in
+      localStorage.setItem('adminLoginTime', Date.now().toString());
+
       // Update authentication state
       await checkAuthStatus();
 

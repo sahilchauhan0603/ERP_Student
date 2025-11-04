@@ -5,6 +5,7 @@ import { FiLogOut, FiHelpCircle } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import Swal from "sweetalert2";
 import AIChat from "./AIChat";
+import defaultProfileImg from "../assets/icons/student.svg";
 
 const navItems = [
   {
@@ -58,21 +59,25 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
     fetchStudentInfo();
 
     // Set login time and start session duration tracking
-    const loginTimeStamp = localStorage.getItem('studentLoginTime') || Date.now();
-    if (!localStorage.getItem('studentLoginTime')) {
+    let loginTimeStamp = localStorage.getItem('studentLoginTime');
+    
+    // If no login time exists, set it to current time (user just logged in)
+    if (!loginTimeStamp) {
+      loginTimeStamp = Date.now().toString();
       localStorage.setItem('studentLoginTime', loginTimeStamp);
     }
     
     const updateTime = () => {
-      const now = new Date();
-      setLoginTime(now.toLocaleTimeString('en-US', { 
+      const loginDate = new Date(parseInt(loginTimeStamp));
+      setLoginTime(loginDate.toLocaleTimeString('en-US', { 
         hour: '2-digit', 
         minute: '2-digit',
         hour12: true 
       }));
       
+      const now = Date.now();
       const sessionStart = parseInt(loginTimeStamp);
-      const duration = Math.floor((now.getTime() - sessionStart) / 1000);
+      const duration = Math.floor((now - sessionStart) / 1000);
       const hours = Math.floor(duration / 3600);
       const minutes = Math.floor((duration % 3600) / 60);
       setSessionDuration(`${hours}h ${minutes}m`);
@@ -96,6 +101,8 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
     });
     if (result.isConfirmed) {
       try {
+        // Clear login time on logout
+        localStorage.removeItem('studentLoginTime');
         await logout("student");
         navigate("/login");
       } catch (e) {}
@@ -341,9 +348,20 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
               {/* Compact Student Profile Card */}
               <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 mb-3 border border-white/10 shadow-lg">
                 <div className="flex items-center space-x-2 mb-2">
-                  {/* Compact Avatar */}
+                  {/* Profile Image */}
                   <div className="relative">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                    {studentInfo?.profileImage ? (
+                      <img
+                        src={studentInfo.profileImage}
+                        alt="Profile"
+                        className="w-10 h-10 rounded-xl object-cover shadow-lg border-2 border-green-400/50"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg ${studentInfo?.profileImage ? 'hidden' : 'flex'}`}>
                       {studentInfo?.firstName
                         ? studentInfo.firstName.charAt(0).toUpperCase()
                         : "S"}
@@ -352,17 +370,18 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
                     <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-slate-800 animate-pulse"></div>
                   </div>
                   
-                  {/* Compact User Info */}
+                  {/* User Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-1">
-                      <p className="font-bold text-white text-sm">
+                    <div className="flex items-center space-x-1 mb-1">
+                      <p className="font-bold text-white text-sm truncate">
                         {studentInfo?.firstName || "Student"} {studentInfo?.lastName || ""}
                       </p>
                       <span className="px-1.5 py-0.5 text-xs font-medium bg-gradient-to-r from-green-500/20 to-blue-500/20 text-green-200 rounded-md border border-green-500/20">
                         Active
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 truncate">
+                    {/* Full email display with proper wrapping */}
+                    <p className="text-xs text-slate-300 break-all leading-tight">
                       {studentInfo?.email || "student@bpit.ac.in"}
                     </p>
                   </div>
@@ -395,7 +414,18 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
               {/* Collapsed Avatar */}
               <div className="flex justify-center mb-3">
                 <div className="relative">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                  {studentInfo?.profileImage ? (
+                    <img
+                      src={studentInfo.profileImage}
+                      alt="Profile"
+                      className="w-10 h-10 rounded-xl object-cover shadow-lg border-2 border-green-400/50"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg ${studentInfo?.profileImage ? 'hidden' : 'flex'}`}>
                     {studentInfo?.firstName
                       ? studentInfo.firstName.charAt(0).toUpperCase()
                       : "S"}

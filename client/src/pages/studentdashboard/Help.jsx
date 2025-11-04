@@ -43,7 +43,7 @@ export default function Help() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50 py-10 px-6">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto px-7">
         {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

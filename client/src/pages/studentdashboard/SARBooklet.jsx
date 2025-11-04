@@ -185,8 +185,8 @@ export default function SARBooklet() {
   }
 
   return (
-    <div className="pt-8 pb-12 bg-gradient-to-br from-gray-25 to-gray-50 min-h-screen">
-      <div className="max-w-5xl mx-auto px-4">
+    <div className="pt-8 pb-12 bg-gradient-to-br from-indigo-50 via-white to-blue-50 min-h-screen">
+      <div className="max-w-6xl mx-auto px-7">
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-100">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">SAR Booklet</h1>
           <p className="text-lg text-gray-800 mb-3 font-bold font-serif">
