@@ -54,7 +54,7 @@ export default function Help() {
           <h1 className="text-4xl font-bold text-gray-900 mb-3">
             Help & Support
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 font-serif">
             Find answers to common questions and get support for your Student
             Portal.
           </p>

@@ -1312,7 +1312,7 @@ const StudentDetailsDashboard = () => {
                     section="personal"
                   />
                   <DetailItem
-                    label="Fee Reimbursement"
+                    label="Fee Reimb."
                     value={formData.personal?.feeReimbursement}
                     field="feeReimbursement"
                     section="personal"

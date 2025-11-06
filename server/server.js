@@ -64,6 +64,7 @@ app.use((err, req, res, next) => {
 app.use('/api/student', require('./routes/student'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/ai', require('./routes/ai'));
+app.use('/api/sar', require('./routes/sar'));
 
 // Test route
 app.get('/', (req, res) => {

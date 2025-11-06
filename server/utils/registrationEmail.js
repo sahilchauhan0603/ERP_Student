@@ -224,7 +224,6 @@ async function sendRegistrationEmail(studentEmail, studentName, studentId) {
 
   try {
     await sgMail.send(msg);
-    console.log(`Registration confirmation email sent to ${studentEmail}`);
     return true;
   } catch (error) {
     console.error('Registration email SendGrid error:', error);

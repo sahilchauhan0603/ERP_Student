@@ -22,26 +22,33 @@ module.exports.otpLimiter = otpLimiter;
 exports.sendLoginOtp = async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ message: "Email is required" });
-  db.query(
-    "SELECT * FROM students WHERE email = ?",
-    [email],
-    async (err, results) => {
-      if (err) return res.status(500).json({ message: "DB error", error: err });
-      if (!results || results.length === 0)
-        return res
-          .status(404)
-          .json({ message: "No student found with this email" });
-      // Generate 6-digit OTP
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
-      try {
-        await sendOtpMail(email, otp);
-        res.json({ message: "OTP sent to email" });
-      } catch (e) {
-        res.status(500).json({ message: "Failed to send OTP", error: e });
-      }
+  
+  // Check for student with regular email or Microsoft email
+  const query = `
+    SELECT s.*, sar.microsoft_email 
+    FROM students s 
+    LEFT JOIN Student_SAR sar ON s.id = sar.student_id 
+    WHERE s.email = ? OR sar.microsoft_email = ?
+  `;
+  
+  db.query(query, [email, email], async (err, results) => {
+    if (err) return res.status(500).json({ message: "DB error", error: err });
+    if (!results || results.length === 0)
+      return res
+        .status(404)
+        .json({ message: "No student found with this email" });
+    
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
+    
+    try {
+      await sendOtpMail(email, otp);
+      res.json({ message: "OTP sent to email" });
+    } catch (e) {
+      res.status(500).json({ message: "Failed to send OTP", error: e });
     }
-  );
+  });
 };
 // Verify OTP and issue JWT if valid - 2 hour expiry
 exports.verifyLoginOtp = (req, res) => {
@@ -65,10 +72,15 @@ exports.verifyLoginOtp = (req, res) => {
     return res.status(400).json({ message: "Invalid OTP" });
   }
 
-  // Query the MySQL database for student
-  const query =
-    "SELECT id, email, firstName, lastName, status FROM students WHERE email = ?";
-  db.query(query, [email], (err, results) => {
+  // Query the MySQL database for student (check both regular and Microsoft email)
+  const query = `
+    SELECT s.id, s.email, s.firstName, s.lastName, s.status, sar.microsoft_email 
+    FROM students s 
+    LEFT JOIN Student_SAR sar ON s.id = sar.student_id 
+    WHERE s.email = ? OR sar.microsoft_email = ?
+  `;
+  
+  db.query(query, [email, email], (err, results) => {
     if (err) {
       // MySQL error occurred
       return res

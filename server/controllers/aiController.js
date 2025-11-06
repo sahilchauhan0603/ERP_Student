@@ -295,13 +295,6 @@ module.exports.chatWithGemini = async (req, res) => {
       result?.response?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "I apologize, but I couldn't generate a response. Please try rephrasing your question.";
 
-    // Log successful interactions for debugging
-    console.log(
-      `AI Chat - User Role: ${userRole || "unknown"}, Query Length: ${
-        messages[messages.length - 1]?.content?.length || 0
-      }`
-    );
-
     return res.json({ success: true, reply: responseText });
   } catch (err) {
     console.error("Gemini chat error:", err);

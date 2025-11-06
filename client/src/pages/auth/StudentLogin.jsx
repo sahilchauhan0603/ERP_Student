@@ -402,10 +402,13 @@ const StudentLogin = () => {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 bg-white/80 text-gray-900 placeholder-gray-500 font-medium"
-                          placeholder="student@bpitindia.edu.in"
+                          placeholder="your.email@example.com"
                           disabled={loading}
                         />
                       </div>
+                      <p className="mt-2 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
+                        💡 <strong>Tip:</strong> You can login with either your personal email or Microsoft email (if registered in your SAR profile)
+                      </p>
                     </div>
 
                   <div>
