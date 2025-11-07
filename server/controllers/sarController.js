@@ -1,4 +1,5 @@
 const db = require('../config/db').promise;
+const cloudinary = require('../config/cloudinary');
 
 // Helper function to safely parse JSON fields
 const safeJsonParse = (jsonString, defaultValue = []) => {
@@ -242,7 +243,7 @@ const sarController = {
   },
 
 
-  
+
   // Get Academic Records
   getAcademicRecords: async (req, res) => {
     try {
@@ -685,7 +686,7 @@ const sarController = {
         work_mode, description, key_responsibilities, skills_learned,
         technologies_used, supervisor_name, supervisor_designation,
         supervisor_email, supervisor_phone, performance_rating,
-        final_presentation, offer_letter_received, status
+        final_presentation, offer_letter_received, offer_letter, status
       } = req.body;
 
       // Validate required fields
@@ -722,9 +723,9 @@ const sarController = {
           duration_months, duration_weeks, stipend, currency, location, work_mode,
           description, key_responsibilities, skills_learned, technologies_used,
           supervisor_name, supervisor_designation, supervisor_email, supervisor_phone,
-          performance_rating, final_presentation, offer_letter_received, status,
+          performance_rating, final_presentation, offer_letter_received, offer_letter, status,
           created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
         [
           sarId, company_name, position, internship_type || 'summer',
           start_date || null, end_date || null, duration_months || null,
@@ -735,7 +736,7 @@ const sarController = {
           supervisor_designation || null, supervisor_email || null,
           supervisor_phone || null, performance_rating || null,
           final_presentation || false, offer_letter_received || false,
-          status || 'applied'
+          offer_letter || null, status || 'applied'
         ]
       );
 
@@ -794,7 +795,7 @@ const sarController = {
         work_mode, description, key_responsibilities, skills_learned,
         technologies_used, supervisor_name, supervisor_designation,
         supervisor_email, supervisor_phone, performance_rating,
-        final_presentation, offer_letter_received, status
+        final_presentation, offer_letter_received, offer_letter, status
       } = req.body;
 
       // Update internship record (removed media_urls field as it's not in schema)
@@ -806,7 +807,7 @@ const sarController = {
           key_responsibilities = ?, skills_learned = ?, technologies_used = ?,
           supervisor_name = ?, supervisor_designation = ?, supervisor_email = ?,
           supervisor_phone = ?, performance_rating = ?, final_presentation = ?,
-          offer_letter_received = ?, status = ?, updated_at = NOW()
+          offer_letter_received = ?, offer_letter = ?, status = ?, updated_at = NOW()
          WHERE internship_id = ? AND SAR_id = ?`,
         [
           company_name, position, internship_type || 'summer', start_date || null,
@@ -817,7 +818,7 @@ const sarController = {
           supervisor_name || null, supervisor_designation || null,
           supervisor_email || null, supervisor_phone || null,
           performance_rating || null, final_presentation || false,
-          offer_letter_received || false, status || 'applied',
+          offer_letter_received || false, offer_letter || null, status || 'applied',
           recordId, sarId
         ]
       );
@@ -1295,6 +1296,36 @@ const sarController = {
       res.status(500).json({
         success: false,
         message: 'Internal server error'
+      });
+    }
+  },
+
+  // Generate Cloudinary upload signature
+  generateUploadSignature: async (req, res) => {
+    try {
+      const timestamp = Math.round(new Date().getTime() / 1000);
+      
+      // Only include parameters that are supported for signature generation
+      const params = {
+        timestamp: timestamp,
+        folder: 'internship-documents'
+      };
+
+      const signature = cloudinary.utils.api_sign_request(params, process.env.CLOUDINARY_API_SECRET);
+
+      res.json({
+        success: true,
+        signature,
+        timestamp,
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        folder: params.folder
+      });
+    } catch (error) {
+      console.error('Error generating upload signature:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to generate upload signature'
       });
     }
   }

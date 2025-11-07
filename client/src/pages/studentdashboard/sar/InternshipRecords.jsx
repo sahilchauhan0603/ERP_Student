@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaBriefcase, FaMapMarkerAlt, FaCalendarAlt, FaStar, FaExclamationCircle, FaCheckCircle, FaSpinner } from "react-icons/fa";
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 export default function InternshipRecords({ internships, addRecord, updateRecord, deleteRecord }) {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -35,12 +36,79 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
     performance_rating: "",
     final_presentation: false,
     offer_letter_received: false,
+    offer_letter: "",
     status: "applied"
   });
 
   // Input states for dynamic arrays
   const [skillInput, setSkillInput] = useState("");
   const [technologyInput, setTechnologyInput] = useState("");
+  const [offerLetterFile, setOfferLetterFile] = useState(null);
+  const [uploadingOfferLetter, setUploadingOfferLetter] = useState(false);
+
+  // Modal state for viewing images
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState("");
+  const [modalImageTitle, setModalImageTitle] = useState("");
+
+  // Image Modal Component
+  const ImageModal = () => {
+    if (!showImageModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/40 bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div className="relative max-w-4xl max-h-[90vh] bg-white rounded-lg overflow-hidden">
+          {/* Modal Header */}
+          <div className="flex justify-between items-center p-4 border-b bg-gray-50">
+            <h3 className="text-lg font-semibold text-gray-800">{modalImageTitle}</h3>
+            <button
+              onClick={() => setShowImageModal(false)}
+              className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+            >
+              <FaTimes size={20} />
+            </button>
+          </div>
+          
+          {/* Modal Body */}
+          <div className="p-4">
+            <img
+              src={modalImageUrl}
+              alt={modalImageTitle}
+              className="max-w-full max-h-[70vh] object-contain mx-auto"
+              onError={(e) => {
+                e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9zdmc+';
+              }}
+            />
+          </div>
+          
+          {/* Modal Footer */}
+          <div className="flex justify-end gap-3 p-4 border-t bg-gray-50">
+            <a
+              href={modalImageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Open in New Tab
+            </a>
+            <button
+              onClick={() => setShowImageModal(false)}
+              className="px-4 py-2 bg-gray-600 text-white cursor-pointer rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Function to open image modal
+  const openImageModal = (imageUrl, title) => {
+    setModalImageUrl(imageUrl);
+    setModalImageTitle(title);
+    setShowImageModal(true);
+  };
 
 
 
@@ -97,6 +165,110 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
     return newErrors;
   };
 
+  // Direct Cloudinary signed upload function with axios
+  const uploadToCloudinary = async (file) => {
+    try {
+      // Step 1: Get upload signature from backend using axios
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const signatureResponse = await axios.post(`${apiUrl}/sar/upload-signature`, {}, {
+        withCredentials: true
+      });
+
+      const signatureData = signatureResponse.data;
+      
+      if (!signatureData.success) {
+        throw new Error('Failed to generate upload signature');
+      }
+
+      // Step 2: Upload to Cloudinary with signature using axios
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('signature', signatureData.signature);
+      formData.append('timestamp', signatureData.timestamp);
+      formData.append('api_key', signatureData.api_key);
+      formData.append('folder', signatureData.folder);
+
+      const uploadResponse = await axios.post(
+        `https://api.cloudinary.com/v1_1/${signatureData.cloud_name}/image/upload`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      
+      return uploadResponse.data.secure_url;
+    } catch (error) {
+      console.error('Error uploading to Cloudinary:', error);
+      
+      // Handle axios error responses
+      if (error.response) {
+        const errorMessage = error.response.data?.error?.message || 
+                           error.response.data?.message || 
+                           'Upload failed';
+        throw new Error(errorMessage);
+      }
+      
+      throw new Error('Failed to upload file. Please try again.');
+    }
+  };
+
+  const handleOfferLetterUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type - only images
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid File Type',
+        text: 'Please upload only image files (JPEG, PNG, GIF).',
+        confirmButtonColor: '#dc3545'
+      });
+      return;
+    }
+
+    // Validate file size (2MB max for images)
+    if (file.size > 2 * 1024 * 1024) {
+      Swal.fire({
+        icon: 'error',
+        title: 'File Too Large',
+        text: 'Please upload an image smaller than 2MB.',
+        confirmButtonColor: '#dc3545'
+      });
+      return;
+    }
+
+    setUploadingOfferLetter(true);
+    setOfferLetterFile(file);
+
+    try {
+      const uploadedUrl = await uploadToCloudinary(file);
+      console.log('Upload successful, URL received:', uploadedUrl); // Debug log
+      setNewInternship(prev => ({ ...prev, offer_letter: uploadedUrl }));
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Upload Successful',
+        text: 'Offer letter uploaded successfully!',
+        confirmButtonColor: '#28a745'
+      });
+    } catch (error) {
+      console.error('Upload error:', error); // Debug log
+      Swal.fire({
+        icon: 'error',
+        title: 'Upload Failed',
+        text: error.message,
+        confirmButtonColor: '#dc3545'
+      });
+      setOfferLetterFile(null);
+    } finally {
+      setUploadingOfferLetter(false);
+    }
+  };
+
   const resetForm = () => {
     setNewInternship({
       company_name: "",
@@ -121,11 +293,13 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
       performance_rating: "",
       final_presentation: false,
       offer_letter_received: false,
+      offer_letter: "",
       status: "applied"
     });
     setShowAddForm(false);
     setSkillInput("");
     setTechnologyInput("");
+    setOfferLetterFile(null);
     setErrors({});
   };
 
@@ -183,6 +357,8 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
     setIsSubmitting(true);
     
     try {
+      console.log('Submitting internship data:', newInternship); // Debug log
+      console.log('Offer letter URL:', newInternship.offer_letter); // Debug log
       await addRecord(newInternship);
       
       // Show success message with SweetAlert2
@@ -255,9 +431,14 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
     setEditRecord({
       ...record,
       id: recordId,
+      // Format dates properly for input fields
+      start_date: formatDateForInput(record.start_date),
+      end_date: formatDateForInput(record.end_date),
       // Ensure arrays are properly initialized
       skills_learned: record.skills_learned || [],
-      technologies_used: record.technologies_used || []
+      technologies_used: record.technologies_used || [],
+      // Ensure offer_letter field is included
+      offer_letter: record.offer_letter || ""
     });
     setErrors({});
   };
@@ -318,6 +499,14 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString('en-GB');
+  };
+
+  // Helper function to format date for input fields (YYYY-MM-DD)
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "";
+    return date.toISOString().split('T')[0];
   };
 
   const getStatusColor = (status) => {
@@ -652,6 +841,81 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
             </div>
           </div>
 
+          {/* Offer Letter Upload */}
+          <div className="bg-white rounded-lg p-4 mb-6 border">
+            <h4 className="text-md font-semibold text-gray-800 mb-3">Offer Letter</h4>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Upload Offer Letter Image
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleOfferLetterUpload}
+                    disabled={uploadingOfferLetter}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    id="offer-letter-upload"
+                  />
+                  <label
+                    htmlFor="offer-letter-upload"
+                    className="block w-full px-4 py-3 border-2 border-dashed border-gray-400 rounded-xl transition-colors duration-300 cursor-pointer bg-white hover:border-blue-500"
+                  >
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <svg
+                        className="w-8 h-8 text-gray-400 mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                        />
+                      </svg>
+                      <span className="text-sm text-gray-600 font-medium">
+                        {newInternship.offer_letter ? (
+                          <span className="text-green-600">Offer letter uploaded!</span>
+                        ) : (
+                          "Click to upload offer letter"
+                        )}
+                      </span>
+                      <span className="text-xs text-gray-500 mt-1">
+                        JPEG, PNG, or GIF (max 2MB)
+                      </span>
+                    </div>
+                  </label>
+                </div>
+                {uploadingOfferLetter && (
+                  <div className="flex items-center justify-center gap-2 mt-2 text-blue-600">
+                    <FaSpinner className="animate-spin" />
+                    <span className="text-sm">Uploading...</span>
+                  </div>
+                )}
+                {newInternship.offer_letter && (
+                  <div className="mt-3 flex flex-col items-center space-y-2">
+                    <button
+                      onClick={() => openImageModal(newInternship.offer_letter, "Offer Letter")}
+                      className="inline-flex items-center cursor-pointer px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      📄 View Document
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewInternship(prev => ({ ...prev, offer_letter: "" }))}
+                      className="text-xs cursor-pointer text-red-600 hover:text-red-800"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Additional Information */}
           <div className="flex gap-4 mb-6">
             <label className="flex items-center gap-2">
@@ -924,6 +1188,130 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
             </div>
           </div>
 
+          {/* Offer Letter Upload for Edit */}
+          <div className="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-200">
+            <h4 className="text-md font-semibold text-amber-800 mb-3">Offer Letter</h4>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Upload Offer Letter Image
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={async (event) => {
+                      const file = event.target.files[0];
+                      if (!file) return;
+
+                      // Validate file type - only images
+                      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                      if (!allowedTypes.includes(file.type)) {
+                        Swal.fire({
+                          icon: 'error',
+                          title: 'Invalid File Type',
+                          text: 'Please upload only image files (JPEG, PNG, GIF).',
+                          confirmButtonColor: '#dc3545'
+                        });
+                        return;
+                      }
+
+                      // Validate file size (2MB max for images)
+                      if (file.size > 2 * 1024 * 1024) {
+                        Swal.fire({
+                          icon: 'error',
+                          title: 'File Too Large',
+                          text: 'Please upload an image smaller than 2MB.',
+                          confirmButtonColor: '#dc3545'
+                        });
+                        return;
+                      }
+
+                      setUploadingOfferLetter(true);
+
+                      try {
+                        const uploadedUrl = await uploadToCloudinary(file);
+                        setEditRecord(prev => ({ ...prev, offer_letter: uploadedUrl }));
+                        
+                        Swal.fire({
+                          icon: 'success',
+                          title: 'Upload Successful',
+                          text: 'Offer letter uploaded successfully!',
+                          confirmButtonColor: '#28a745'
+                        });
+                      } catch (error) {
+                        Swal.fire({
+                          icon: 'error',
+                          title: 'Upload Failed',
+                          text: error.message,
+                          confirmButtonColor: '#dc3545'
+                        });
+                      } finally {
+                        setUploadingOfferLetter(false);
+                      }
+                    }}
+                    disabled={uploadingOfferLetter}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    id="edit-offer-letter-upload"
+                  />
+                  <label
+                    htmlFor="edit-offer-letter-upload"
+                    className="block w-full px-4 py-3 border-2 border-dashed border-amber-400 rounded-xl transition-colors duration-300 cursor-pointer bg-amber-50 hover:border-amber-500"
+                  >
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <svg
+                        className="w-8 h-8 text-amber-400 mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                        />
+                      </svg>
+                      <span className="text-sm text-gray-600 font-medium">
+                        {editRecord.offer_letter ? (
+                          <span className="text-green-600">Offer letter uploaded!</span>
+                        ) : (
+                          "Click to upload offer letter"
+                        )}
+                      </span>
+                      <span className="text-xs text-gray-500 mt-1">
+                        JPEG, PNG, or GIF (max 2MB)
+                      </span>
+                    </div>
+                  </label>
+                </div>
+                {uploadingOfferLetter && (
+                  <div className="flex items-center justify-center gap-2 mt-2 text-amber-600">
+                    <FaSpinner className="animate-spin" />
+                    <span className="text-sm">Uploading...</span>
+                  </div>
+                )}
+                {editRecord.offer_letter && (
+                  <div className="mt-3 flex flex-col items-center space-y-2">
+                    <button
+                      onClick={() => openImageModal(editRecord.offer_letter, "Offer Letter")}
+                      className="inline-flex items-center cursor-pointer px-3 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors"
+                    >
+                      📄 View Document
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditRecord(prev => ({ ...prev, offer_letter: "" }))}
+                      className="text-xs cursor-pointer text-red-600 hover:text-red-800"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="flex gap-3">
             <button
               onClick={handleUpdateRecord}
@@ -1092,6 +1480,24 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                 </div>
               )}
 
+              {(internship.offer_letter || internship.offer_letter_received) && (
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Offer Letter</h4>
+                  {internship.offer_letter ? (
+                    <button
+                      onClick={() => openImageModal(internship.offer_letter, `Offer Letter - ${internship.company_name}`)}
+                      className="inline-flex items-center cursor-pointer gap-2 text-sm text-blue-600 hover:underline bg-blue-50 px-3 py-2 rounded-lg transition-colors hover:bg-blue-100"
+                    >
+                      📄 View Offer Letter
+                    </button>
+                  ) : (
+                    <div className="text-sm text-gray-500 italic bg-gray-50 px-3 py-2 rounded-lg">
+                      Offer letter received but not uploaded to system
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="flex gap-4 mt-4 text-xs text-gray-500">
                 {internship.final_presentation && <span>✓ Final Presentation Given</span>}
                 {internship.offer_letter_received && <span>✓ Offer Letter Received</span>}
@@ -1100,6 +1506,9 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
           ))
         )}
       </div>
+
+      {/* Image Modal */}
+      <ImageModal />
     </div>
   );
 }

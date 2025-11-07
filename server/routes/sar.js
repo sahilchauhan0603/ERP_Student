@@ -6,6 +6,9 @@ const { authenticate } = require("../middleware/auth");
 // Apply authentication middleware to all SAR routes
 router.use(authenticate);
 
+// Cloudinary signed upload route
+router.post('/upload-signature', sarController.generateUploadSignature);
+
 // SAR Overview Routes
 router.get('/overview', sarController.getSAROverview);
 router.put('/overview', sarController.updateSAROverview);
