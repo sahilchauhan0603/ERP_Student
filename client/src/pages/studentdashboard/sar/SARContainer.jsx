@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Swal from 'sweetalert2';
 import SAROverview from "./SAROverview";
 import AcademicRecords from "./AcademicRecords";
 import InternshipRecords from "./InternshipRecords";
 import AchievementRecords from "./AchievementRecords";
 import CompleteSAR from "./CompleteSAR";
+import ErrorBoundary from "../../../components/ErrorBoundary";
 
-export default function SARContainer() {
+function SARContainerContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [student, setStudent] = useState(null);
@@ -91,27 +93,7 @@ export default function SARContainer() {
     }));
   };
 
-  // Add new record functions
-  const addAcademicRecord = async (record) => {
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9080/api';
-      const response = await axios.post(`${apiUrl}/sar/academic`, record, { withCredentials: true });
-      
-      if (response.data.success) {
-        // Refetch academic records to get the latest data
-        const academicRes = await axios.get(`${apiUrl}/sar/academic`, { withCredentials: true });
-        if (academicRes.data.success) {
-          setSarData(prev => ({
-            ...prev,
-            academicRecords: academicRes.data.data
-          }));
-        }
-      }
-    } catch (error) {
-      console.error('Error adding academic record:', error);
-      alert('Failed to add academic record. Please try again.');
-    }
-  };
+  // Legacy functions - will be replaced by improved versions below
 
   const addInternshipRecord = async (record) => {
     try {
@@ -129,7 +111,13 @@ export default function SARContainer() {
       }
     } catch (error) {
       console.error('Error adding internship record:', error);
-      alert('Failed to add internship record. Please try again.');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to add internship record. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#EF4444',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -149,17 +137,90 @@ export default function SARContainer() {
       }
     } catch (error) {
       console.error('Error adding achievement record:', error);
-      alert('Failed to add achievement record. Please try again.');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to add achievement record. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#EF4444',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
-  // Update record functions
+  // Add new record functions with improved error handling
+  const addAcademicRecord = async (record) => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9080/api';
+      const response = await axios.post(`${apiUrl}/sar/academic`, record, { withCredentials: true });
+      
+      if (response.data.success) {
+        Swal.fire({
+          title: 'Success!',
+          text: 'Academic record created successfully!',
+          icon: 'success',
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+        
+        // Refresh academic records
+        const academicRes = await axios.get(`${apiUrl}/sar/academic`, { withCredentials: true });
+        if (academicRes.data.success) {
+          setSarData(prev => ({
+            ...prev,
+            academicRecords: academicRes.data.data
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error adding academic record:', error);
+      
+      // Handle specific error types
+      const errorMessage = error.response?.data?.message || 'Failed to create academic record. Please try again.';
+      const errorCode = error.response?.data?.errorCode;
+      
+      let alertMessage = errorMessage;
+      if (errorCode === 'DUPLICATE_SEMESTER_RECORD') {
+        alertMessage = 'Academic record already exists for this semester. Please edit the existing record instead.';
+      } else if (errorCode === 'INVALID_SEMESTER_RANGE') {
+        alertMessage = 'Please select a valid semester between 1 and 8.';
+      } else if (errorCode === 'MISSING_REQUIRED_FIELDS') {
+        alertMessage = 'Please fill in all required fields: semester and academic year.';
+      }
+      
+      Swal.fire({
+        title: 'Error!',
+        text: alertMessage,
+        icon: 'error',
+        confirmButtonColor: '#EF4444',
+        confirmButtonText: 'OK'
+      });
+      
+      // Re-throw error so component can handle it
+      throw new Error(errorMessage);
+    }
+  };
+
   const updateAcademicRecord = async (id, updatedRecord) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9080/api';
       const response = await axios.put(`${apiUrl}/sar/academic/${id}`, updatedRecord, { withCredentials: true });
       
       if (response.data.success) {
+        Swal.fire({
+          title: 'Success!',
+          text: 'Academic record updated successfully!',
+          icon: 'success',
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+        
+        // Refresh academic records
         const academicRes = await axios.get(`${apiUrl}/sar/academic`, { withCredentials: true });
         if (academicRes.data.success) {
           setSarData(prev => ({
@@ -170,7 +231,32 @@ export default function SARContainer() {
       }
     } catch (error) {
       console.error('Error updating academic record:', error);
-      alert('Failed to update academic record. Please try again.');
+      
+      // Handle specific error types
+      const errorMessage = error.response?.data?.message || 'Failed to update academic record. Please try again.';
+      const errorCode = error.response?.data?.errorCode;
+      
+      let alertMessage = errorMessage;
+      if (errorCode === 'DUPLICATE_SEMESTER_RECORD') {
+        alertMessage = 'Academic record already exists for this semester. Please use a different semester.';
+      } else if (errorCode === 'RECORD_NOT_FOUND') {
+        alertMessage = 'Academic record not found. It may have been deleted.';
+      } else if (errorCode === 'INVALID_SEMESTER_RANGE') {
+        alertMessage = 'Please select a valid semester between 1 and 8.';
+      } else if (errorCode === 'MISSING_REQUIRED_FIELDS') {
+        alertMessage = 'Please fill in all required fields: semester and academic year.';
+      }
+      
+      Swal.fire({
+        title: 'Error!',
+        text: alertMessage,
+        icon: 'error',
+        confirmButtonColor: '#EF4444',
+        confirmButtonText: 'OK'
+      });
+      
+      // Re-throw error so component can handle it
+      throw new Error(errorMessage);
     }
   };
 
@@ -190,7 +276,13 @@ export default function SARContainer() {
       }
     } catch (error) {
       console.error('Error updating internship record:', error);
-      alert('Failed to update internship record. Please try again.');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to update internship record. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#EF4444',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -210,7 +302,13 @@ export default function SARContainer() {
       }
     } catch (error) {
       console.error('Error updating achievement record:', error);
-      alert('Failed to update achievement record. Please try again.');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to update achievement record. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#EF4444',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -221,6 +319,16 @@ export default function SARContainer() {
       const response = await axios.delete(`${apiUrl}/sar/academic/${id}`, { withCredentials: true });
       
       if (response.data.success) {
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Academic record deleted successfully!',
+          icon: 'success',
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
         setSarData(prev => ({
           ...prev,
           academicRecords: prev.academicRecords.filter(record => record.id !== id)
@@ -228,7 +336,28 @@ export default function SARContainer() {
       }
     } catch (error) {
       console.error('Error deleting academic record:', error);
-      alert('Failed to delete academic record. Please try again.');
+      
+      // Handle specific error types
+      const errorMessage = error.response?.data?.message || 'Failed to delete academic record. Please try again.';
+      const errorCode = error.response?.data?.errorCode;
+      
+      let alertMessage = errorMessage;
+      if (errorCode === 'RECORD_NOT_FOUND') {
+        alertMessage = 'Academic record not found. It may have been already deleted.';
+      } else if (errorCode === 'CANNOT_DELETE_VERIFIED') {
+        alertMessage = 'Cannot delete verified academic records. Please contact administrator.';
+      }
+      
+      Swal.fire({
+        title: 'Error!',
+        text: alertMessage,
+        icon: 'error',
+        confirmButtonColor: '#EF4444',
+        confirmButtonText: 'OK'
+      });
+      
+      // Re-throw error so component can handle it
+      throw new Error(errorMessage);
     }
   };
 
@@ -245,7 +374,13 @@ export default function SARContainer() {
       }
     } catch (error) {
       console.error('Error deleting internship record:', error);
-      alert('Failed to delete internship record. Please try again.');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete internship record. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#EF4444',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -262,7 +397,13 @@ export default function SARContainer() {
       }
     } catch (error) {
       console.error('Error deleting achievement record:', error);
-      alert('Failed to delete achievement record. Please try again.');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete achievement record. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#EF4444',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -273,6 +414,16 @@ export default function SARContainer() {
       const response = await axios.put(`${apiUrl}/sar/overview`, updatedInfo, { withCredentials: true });
       
       if (response.data.success) {
+        Swal.fire({
+          title: 'Success!',
+          text: 'SAR overview updated successfully!',
+          icon: 'success',
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
         setSarData(prev => ({
           ...prev,
           sarInfo: {
@@ -283,7 +434,30 @@ export default function SARContainer() {
       }
     } catch (error) {
       console.error('Error updating SAR overview:', error);
-      alert('Failed to update SAR overview. Please try again.');
+      
+      // Handle specific error types
+      const errorMessage = error.response?.data?.message || 'Failed to update SAR overview. Please try again.';
+      const errorCode = error.response?.data?.errorCode;
+      
+      let alertMessage = errorMessage;
+      if (errorCode === 'DUPLICATE_ENROLLMENT') {
+        alertMessage = 'This enrollment number is already in use by another student.';
+      } else if (errorCode === 'INVALID_EMAIL_FORMAT') {
+        alertMessage = 'Please provide a valid email address.';
+      } else if (errorCode === 'MISSING_REQUIRED_FIELDS') {
+        alertMessage = 'Please fill in all required fields.';
+      }
+      
+      Swal.fire({
+        title: 'Error!',
+        text: alertMessage,
+        icon: 'error',
+        confirmButtonColor: '#EF4444',
+        confirmButtonText: 'OK'
+      });
+      
+      // Re-throw error so component can handle it
+      throw new Error(errorMessage);
     }
   };
 
@@ -404,3 +578,14 @@ export default function SARContainer() {
     </div>
   );
 }
+
+// Main container component wrapped with ErrorBoundary only
+function SARContainer() {
+  return (
+    <ErrorBoundary>
+      <SARContainerContent />
+    </ErrorBoundary>
+  );
+}
+
+export default SARContainer;

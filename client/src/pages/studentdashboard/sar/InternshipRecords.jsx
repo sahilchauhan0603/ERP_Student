@@ -1,9 +1,14 @@
 import React, { useState } from "react";
-import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaBriefcase, FaMapMarkerAlt, FaCalendarAlt, FaStar } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaBriefcase, FaMapMarkerAlt, FaCalendarAlt, FaStar, FaExclamationCircle, FaCheckCircle, FaSpinner } from "react-icons/fa";
+import Swal from 'sweetalert2';
 
 export default function InternshipRecords({ internships, addRecord, updateRecord, deleteRecord }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  
+  // Error and loading states
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // New Internship Form
   const [newInternship, setNewInternship] = useState({
@@ -36,6 +41,61 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
   const [skillInput, setSkillInput] = useState("");
   const [technologyInput, setTechnologyInput] = useState("");
 
+
+
+  // Validation function
+  const validateInternship = (internship) => {
+    const newErrors = {};
+    
+    // Required fields
+    if (!internship.company_name.trim()) {
+      newErrors.company_name = "Company name is required";
+    }
+    
+    if (!internship.position.trim()) {
+      newErrors.position = "Position/Role is required";
+    }
+    
+    // Date validation
+    if (internship.start_date && internship.end_date) {
+      const startDate = new Date(internship.start_date);
+      const endDate = new Date(internship.end_date);
+      
+      if (endDate <= startDate) {
+        newErrors.end_date = "End date must be after start date";
+      }
+    }
+    
+    // Numeric validation
+    if (internship.duration_months && (isNaN(internship.duration_months) || internship.duration_months < 0)) {
+      newErrors.duration_months = "Duration must be a positive number";
+    }
+    
+    if (internship.duration_weeks && (isNaN(internship.duration_weeks) || internship.duration_weeks < 0)) {
+      newErrors.duration_weeks = "Duration must be a positive number";
+    }
+    
+    if (internship.stipend && isNaN(internship.stipend)) {
+      newErrors.stipend = "Stipend must be a valid number";
+    }
+    
+    if (internship.performance_rating && (isNaN(internship.performance_rating) || internship.performance_rating < 1 || internship.performance_rating > 5)) {
+      newErrors.performance_rating = "Rating must be between 1 and 5";
+    }
+    
+    // Email validation
+    if (internship.supervisor_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(internship.supervisor_email)) {
+      newErrors.supervisor_email = "Please enter a valid email address";
+    }
+    
+    // Phone validation (basic)
+    if (internship.supervisor_phone && !/^\+?[\d\s\-\(\)]{10,}$/.test(internship.supervisor_phone)) {
+      newErrors.supervisor_phone = "Please enter a valid phone number";
+    }
+    
+    return newErrors;
+  };
+
   const resetForm = () => {
     setNewInternship({
       company_name: "",
@@ -65,6 +125,7 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
     setShowAddForm(false);
     setSkillInput("");
     setTechnologyInput("");
+    setErrors({});
   };
 
   const handleAddSkill = () => {
@@ -101,9 +162,89 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
     }));
   };
 
-  const handleSubmitInternship = () => {
-    addRecord(newInternship);
-    resetForm();
+  const handleSubmitInternship = async () => {
+    const internshipErrors = validateInternship(newInternship);
+    
+    if (Object.keys(internshipErrors).length > 0) {
+      setErrors(internshipErrors);
+      
+      // Show validation errors with SweetAlert2
+      const errorList = Object.values(internshipErrors).join('\n');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: `Please fix the following errors:\n${errorList}`,
+        confirmButtonColor: '#dc3545'
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      await addRecord(newInternship);
+      
+      // Show success message with SweetAlert2
+      await Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Internship record created successfully!',
+        confirmButtonColor: '#28a745'
+      });
+      
+      resetForm();
+    } catch (error) {
+      console.error("Error creating internship record:", error);
+      
+      // Show error message with SweetAlert2
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message || "Failed to create internship record. Please try again.",
+        confirmButtonColor: '#dc3545'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteRecord = async (recordId) => {
+    // Show confirmation dialog with SweetAlert2
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "This internship record will be permanently deleted. This action cannot be undone.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+    
+    try {
+      await deleteRecord(recordId);
+      
+      // Show success message with SweetAlert2
+      Swal.fire({
+        icon: 'success',
+        title: 'Deleted!',
+        text: 'Internship record deleted successfully!',
+        confirmButtonColor: '#28a745'
+      });
+    } catch (error) {
+      console.error("Error deleting internship record:", error);
+      
+      // Show error message with SweetAlert2
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message || "Failed to delete internship record. Please try again.",
+        confirmButtonColor: '#dc3545'
+      });
+    }
   };
 
   const internshipTypes = ["summer", "winter", "part-time", "full-time", "remote", "research"];
@@ -144,6 +285,8 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
         </button>
       </div>
 
+
+
       {/* Add Internship Form */}
       {showAddForm && (
         <div className="bg-gray-50 rounded-lg p-6 mb-6 border">
@@ -157,10 +300,18 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                 type="text"
                 value={newInternship.company_name}
                 onChange={(e) => setNewInternship(prev => ({ ...prev, company_name: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                  errors.company_name ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                }`}
                 placeholder="Enter company name"
                 required
               />
+              {errors.company_name && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <FaExclamationCircle className="text-xs" />
+                  {errors.company_name}
+                </p>
+              )}
             </div>
 
             <div>
@@ -464,17 +615,35 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
           <div className="flex gap-3">
             <button
               onClick={handleSubmitInternship}
-              className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              disabled={!newInternship.company_name || !newInternship.position}
+              disabled={isSubmitting || !newInternship.company_name || !newInternship.position}
+              className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                isSubmitting 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'
+              } text-white`}
             >
-              <FaSave className="inline mr-2" />
-              Save Internship
+              {isSubmitting ? (
+                <>
+                  <FaSpinner className="animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <FaSave />
+                  Save Internship
+                </>
+              )}
             </button>
             <button
               onClick={resetForm}
-              className="px-4 py-2 cursor-pointer bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              disabled={isSubmitting}
+              className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                isSubmitting 
+                  ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
+                  : 'bg-gray-600 hover:bg-gray-700 cursor-pointer text-white'
+              }`}
             >
-              <FaTimes className="inline mr-2" />
+              <FaTimes />
               Cancel
             </button>
           </div>
@@ -521,8 +690,9 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                     <FaEdit />
                   </button>
                   <button
-                    onClick={() => deleteRecord(internship.id)}
-                    className="text-red-600 hover:text-red-800 p-2 cursor-pointer"
+                    onClick={() => handleDeleteRecord(internship.internship_id)}
+                    className="text-red-600 hover:text-red-800 p-2 cursor-pointer hover:bg-red-50 rounded transition-colors"
+                    title="Delete Record"
                   >
                     <FaTrash />
                   </button>

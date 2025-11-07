@@ -3,9 +3,6 @@ const router = express.Router();
 const sarController = require("../controllers/sarController");
 const { authenticate } = require("../middleware/auth");
 
-// Test route (no auth needed for debugging)
-router.get('/test', sarController.testConnection);
-
 // Apply authentication middleware to all SAR routes
 router.use(authenticate);
 

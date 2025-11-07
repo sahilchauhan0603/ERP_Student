@@ -1,9 +1,14 @@
 import React, { useState } from "react";
-import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaTrophy, FaMedal, FaCertificate, FaAward } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaTrophy, FaMedal, FaCertificate, FaAward, FaExclamationCircle, FaCheckCircle, FaSpinner } from "react-icons/fa";
+import Swal from 'sweetalert2';
 
 export default function AchievementRecords({ achievements, addRecord, updateRecord, deleteRecord }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  
+  // Error and loading states
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // New Achievement Form
   const [newAchievement, setNewAchievement] = useState({
@@ -42,6 +47,50 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
   const [technologyInput, setTechnologyInput] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [mediaUrlInput, setMediaUrlInput] = useState("");
+
+
+
+  // Validation function
+  const validateAchievement = (achievement) => {
+    const newErrors = {};
+    
+    if (!achievement.title.trim()) {
+      newErrors.title = "Achievement title is required";
+    }
+    
+    if (!achievement.organization.trim()) {
+      newErrors.organization = "Organization name is required";
+    }
+    
+    if (!achievement.achievement_date) {
+      newErrors.achievement_date = "Achievement date is required";
+    }
+    
+    // Date validation
+    if (achievement.event_start_date && achievement.event_end_date) {
+      const startDate = new Date(achievement.event_start_date);
+      const endDate = new Date(achievement.event_end_date);
+      
+      if (endDate < startDate) {
+        newErrors.event_end_date = "End date must be after start date";
+      }
+    }
+    
+    // Numeric validation
+    if (achievement.total_participants && (isNaN(achievement.total_participants) || achievement.total_participants < 1)) {
+      newErrors.total_participants = "Total participants must be a positive number";
+    }
+    
+    if (achievement.team_size && (isNaN(achievement.team_size) || achievement.team_size < 1)) {
+      newErrors.team_size = "Team size must be at least 1";
+    }
+    
+    if (achievement.prize_amount && isNaN(achievement.prize_amount)) {
+      newErrors.prize_amount = "Prize amount must be a valid number";
+    }
+    
+    return newErrors;
+  };
 
   const resetForm = () => {
     setNewAchievement({
@@ -166,9 +215,152 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
     }));
   };
 
-  const handleSubmitAchievement = () => {
-    addRecord(newAchievement);
-    resetForm();
+  const handleSubmitAchievement = async () => {
+    try {
+      // Clear previous errors
+      setErrors({});
+      
+      // Validate achievement data
+      const validationErrors = validateAchievement(newAchievement);
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        
+        // Show validation errors with SweetAlert2
+        const errorList = Object.values(validationErrors).join('\n');
+        Swal.fire({
+          icon: 'error',
+          title: 'Validation Error',
+          text: `Please correct the following errors:\n${errorList}`,
+          confirmButtonColor: '#dc3545'
+        });
+        return;
+      }
+
+      setIsSubmitting(true);
+      
+      // Call the parent component's addRecord function
+      await addRecord(newAchievement);
+      
+      // Show success message with SweetAlert2
+      await Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Achievement record added successfully!',
+        confirmButtonColor: '#28a745'
+      });
+      
+      resetForm();
+      
+    } catch (error) {
+      console.error('Error adding achievement record:', error);
+      
+      let errorMessage = "Failed to add achievement record. Please try again.";
+      
+      // Handle specific error types
+      if (error.response?.data?.errorCode) {
+        switch (error.response.data.errorCode) {
+          case 'DUPLICATE_ACHIEVEMENT':
+            errorMessage = "This achievement already exists. Please check your records.";
+            break;
+          case 'INVALID_DATE_RANGE':
+            errorMessage = "Invalid date range. Please check your dates.";
+            setErrors({ event_end_date: "End date must be after start date" });
+            break;
+          case 'MISSING_REQUIRED_FIELDS':
+            errorMessage = "Please fill in all required fields.";
+            break;
+          default:
+            errorMessage = error.response.data.message || "Failed to add achievement record. Please try again.";
+        }
+      } else if (error.response?.status === 400) {
+        errorMessage = "Invalid data provided. Please check your entries and try again.";
+      } else if (error.response?.status === 401) {
+        errorMessage = "You are not authorized to perform this action. Please log in again.";
+      } else if (error.response?.status >= 500) {
+        errorMessage = "Server error occurred. Please try again later.";
+      } else {
+        errorMessage = "Failed to add achievement record. Please check your connection and try again.";
+      }
+      
+      // Show error message with SweetAlert2
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorMessage,
+        confirmButtonColor: '#dc3545'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteAchievement = async (achievementId) => {
+    try {
+      // Show confirmation dialog with SweetAlert2
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "This achievement record will be permanently deleted. This action cannot be undone.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      setIsSubmitting(true);
+
+      // Call the parent component's deleteRecord function
+      await deleteRecord(achievementId);
+      
+      // Show success message with SweetAlert2
+      Swal.fire({
+        icon: 'success',
+        title: 'Deleted!',
+        text: 'Achievement record deleted successfully!',
+        confirmButtonColor: '#28a745'
+      });
+      
+    } catch (error) {
+      console.error('Error deleting achievement record:', error);
+      
+      let errorMessage = "Failed to delete achievement record. Please try again.";
+      
+      // Handle specific error types
+      if (error.response?.data?.errorCode) {
+        switch (error.response.data.errorCode) {
+          case 'RECORD_NOT_FOUND':
+            errorMessage = "Achievement record not found. It may have been already deleted.";
+            break;
+          case 'CANNOT_DELETE_VERIFIED':
+            errorMessage = "Cannot delete verified achievement records. Please contact administrator.";
+            break;
+          default:
+            errorMessage = error.response.data.message || "Failed to delete achievement record. Please try again.";
+        }
+      } else if (error.response?.status === 401) {
+        errorMessage = "You are not authorized to delete this record. Please log in again.";
+      } else if (error.response?.status === 404) {
+        errorMessage = "Achievement record not found. It may have been already deleted.";
+      } else if (error.response?.status >= 500) {
+        errorMessage = "Server error occurred. Please try again later.";
+      } else {
+        errorMessage = "Failed to delete achievement record. Please check your connection and try again.";
+      }
+      
+      // Show error message with SweetAlert2
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorMessage,
+        confirmButtonColor: '#dc3545'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const categories = ["academic", "technical", "sports", "cultural", "social", "leadership", "research", "entrepreneurship"];
@@ -243,6 +435,8 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
         </button>
       </div>
 
+
+
       {/* Add Achievement Form */}
       {showAddForm && (
         <div className="bg-gray-50 rounded-lg p-6 mb-6 border">
@@ -256,10 +450,19 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                 type="text"
                 value={newAchievement.title}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full p-3 border rounded-lg focus:ring-2 ${
+                  errors.title
+                    ? 'border-red-400 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-blue-500'
+                }`}
                 placeholder="Enter achievement title"
                 required
               />
+              {errors.title && (
+                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <FaExclamationCircle /> {errors.title}
+                </p>
+              )}
             </div>
 
             <div>
@@ -317,13 +520,23 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Achievement Date</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Achievement Date *</label>
               <input
                 type="date"
                 value={newAchievement.achievement_date}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, achievement_date: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full p-3 border rounded-lg focus:ring-2 ${
+                  errors.achievement_date
+                    ? 'border-red-400 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-blue-500'
+                }`}
+                required
               />
+              {errors.achievement_date && (
+                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <FaExclamationCircle /> {errors.achievement_date}
+                </p>
+              )}
             </div>
 
             <div>
@@ -341,14 +554,24 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Organization</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Organization *</label>
               <input
                 type="text"
                 value={newAchievement.organization}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, organization: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full p-3 border rounded-lg focus:ring-2 ${
+                  errors.organization
+                    ? 'border-red-400 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-blue-500'
+                }`}
                 placeholder="Organizing body/institution"
+                required
               />
+              {errors.organization && (
+                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <FaExclamationCircle /> {errors.organization}
+                </p>
+              )}
             </div>
 
             <div>
@@ -428,8 +651,17 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                 type="date"
                 value={newAchievement.event_end_date}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, event_end_date: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full p-3 border rounded-lg focus:ring-2 ${
+                  errors.event_end_date
+                    ? 'border-red-400 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-blue-500'
+                }`}
               />
+              {errors.event_end_date && (
+                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <FaExclamationCircle /> {errors.event_end_date}
+                </p>
+              )}
             </div>
           </div>
 
@@ -701,11 +933,15 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
           <div className="flex gap-3">
             <button
               onClick={handleSubmitAchievement}
-              className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              disabled={!newAchievement.title}
+              className={`px-4 py-2 cursor-pointer rounded-lg transition-colors flex items-center gap-2 ${
+                isSubmitting || !newAchievement.title
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              } text-white`}
+              disabled={isSubmitting || !newAchievement.title}
             >
-              <FaSave className="inline mr-2" />
-              Save Achievement
+              {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaSave />}
+              {isSubmitting ? 'Saving...' : 'Save Achievement'}
             </button>
             <button
               onClick={resetForm}
@@ -757,10 +993,11 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                     <FaEdit />
                   </button>
                   <button
-                    onClick={() => deleteRecord(achievement.id)}
+                    onClick={() => handleDeleteAchievement(achievement.id)}
                     className="text-red-600 hover:text-red-800 p-2 cursor-pointer"
+                    disabled={isSubmitting}
                   >
-                    <FaTrash />
+                    {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaTrash />}
                   </button>
                 </div>
               </div>

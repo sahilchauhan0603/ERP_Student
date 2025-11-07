@@ -1,36 +1,130 @@
 const db = require('../config/db').promise;
 
-const sarController = {
-  // Test database connection
-  testConnection: async (req, res) => {
-    try {
-      const [rows] = await db.execute('SELECT 1 as test');
-      
-      // Check table structures
-      const [sarAcademicStructure] = await db.execute('DESCRIBE SARacademic');
-      const [sarInternStructure] = await db.execute('DESCRIBE SARintern');
-      const [sarAchievementsStructure] = await db.execute('DESCRIBE SARAchievements');
-      
-      res.json({
-        success: true,
-        message: 'Database connection working',
-        data: rows,
-        tableStructures: {
-          SARacademic: sarAcademicStructure,
-          SARintern: sarInternStructure,
-          SARAchievements: sarAchievementsStructure
-        }
-      });
-    } catch (error) {
-      console.error('Database test error:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Database connection failed',
-        error: error.message
-      });
+// Helper function to safely parse JSON fields
+const safeJsonParse = (jsonString, defaultValue = []) => {
+  if (!jsonString) return defaultValue;
+  
+  try {
+    // Handle different input types
+    let stringToParse;
+    
+    if (typeof jsonString === 'string') {
+      stringToParse = jsonString.trim();
+    } else if (typeof jsonString === 'object') {
+      // If it's already an object/array, return it
+      return Array.isArray(jsonString) ? jsonString : defaultValue;
+    } else {
+      stringToParse = jsonString.toString().trim();
     }
-  },
+    
+    if (!stringToParse || stringToParse === 'null' || stringToParse === '' || stringToParse === 'undefined') {
+      return defaultValue;
+    }
+    
+    const parsed = JSON.parse(stringToParse);
+    return Array.isArray(parsed) ? parsed : defaultValue;
+  } catch (error) {
+    return defaultValue;
+  }
+};
 
+// Helper function to validate enhanced subject structure
+const validateEnhancedSubject = (subject) => {
+  const errors = {};
+  
+  // Validate required fields
+  if (!subject.subject_code || !subject.subject_code.trim()) {
+    errors.subject_code = 'Subject code is required';
+  }
+  
+  if (!subject.subject_name || !subject.subject_name.trim()) {
+    errors.subject_name = 'Subject name is required';
+  }
+  
+  // Validate numeric fields
+  const numericFields = [
+    'credits', 'internal_theory', 'external_theory', 'total_theory',
+    'internal_practical', 'external_practical', 'total_practical',
+    'grade_points', 'theory_grade_points', 'practical_grade_points'
+  ];
+  
+  numericFields.forEach(field => {
+    if (subject[field] !== undefined && subject[field] !== null && subject[field] !== '') {
+      const value = parseFloat(subject[field]);
+      if (isNaN(value) || value < 0) {
+        errors[field] = `${field.replace('_', ' ')} must be a positive number`;
+      }
+    }
+  });
+  
+  // Validate theory marks consistency (if provided)
+  if (subject.internal_theory && subject.external_theory && subject.total_theory) {
+    const internalTheory = parseFloat(subject.internal_theory) || 0;
+    const externalTheory = parseFloat(subject.external_theory) || 0;
+    const totalTheory = parseFloat(subject.total_theory) || 0;
+    
+    if (Math.abs((internalTheory + externalTheory) - totalTheory) > 0.01) {
+      errors.total_theory = 'Total theory marks should equal internal + external theory marks';
+    }
+  }
+  
+  // Validate practical marks consistency (if provided)
+  if (subject.internal_practical && subject.external_practical && subject.total_practical) {
+    const internalPractical = parseFloat(subject.internal_practical) || 0;
+    const externalPractical = parseFloat(subject.external_practical) || 0;
+    const totalPractical = parseFloat(subject.total_practical) || 0;
+    
+    if (Math.abs((internalPractical + externalPractical) - totalPractical) > 0.01) {
+      errors.total_practical = 'Total practical marks should equal internal + external practical marks';
+    }
+  }
+  
+  return errors;
+};
+
+// Helper function to transform old subject format to new enhanced format
+const transformSubjectToEnhancedFormat = (subject) => {
+  // If already in new format, return as is
+  if (subject.internal_theory !== undefined || subject.external_theory !== undefined) {
+    return subject;
+  }
+  
+  // Transform old format to new format
+  const transformed = { ...subject };
+  
+  // Map old fields to new fields (if they exist)
+  if (subject.theory_marks) {
+    // Split theory marks equally between internal and external (estimation)
+    const theoryMarks = parseFloat(subject.theory_marks) || 0;
+    transformed.internal_theory = (theoryMarks * 0.3).toString(); // 30% internal
+    transformed.external_theory = (theoryMarks * 0.7).toString(); // 70% external
+    transformed.total_theory = theoryMarks.toString();
+    delete transformed.theory_marks;
+  }
+  
+  if (subject.practical_marks) {
+    // Split practical marks equally between internal and external (estimation)
+    const practicalMarks = parseFloat(subject.practical_marks) || 0;
+    transformed.internal_practical = (practicalMarks * 0.5).toString(); // 50% internal
+    transformed.external_practical = (practicalMarks * 0.5).toString(); // 50% external
+    transformed.total_practical = practicalMarks.toString();
+    delete transformed.practical_marks;
+  }
+  
+  if (subject.internal_marks && subject.external_marks) {
+    // If we have internal/external marks but no theory/practical breakdown
+    // Assume they refer to theory marks
+    transformed.internal_theory = subject.internal_marks;
+    transformed.external_theory = subject.external_marks;
+    transformed.total_theory = (parseFloat(subject.internal_marks) + parseFloat(subject.external_marks)).toString();
+    delete transformed.internal_marks;
+    delete transformed.external_marks;
+  }
+  
+  return transformed;
+};
+
+const sarController = {
   // Get SAR Overview
   getSAROverview: async (req, res) => {
     try {
@@ -74,7 +168,8 @@ const sarController = {
       if (studentRows.length === 0) {
         return res.status(404).json({
           success: false,
-          message: 'Student not found'
+          message: 'Student profile not found. Please ensure you are logged in correctly.',
+          errorCode: 'STUDENT_NOT_FOUND'
         });
       }
 
@@ -146,6 +241,8 @@ const sarController = {
     }
   },
 
+
+  
   // Get Academic Records
   getAcademicRecords: async (req, res) => {
     try {
@@ -172,11 +269,29 @@ const sarController = {
         [sarId]
       );
 
-      // Parse JSON subjects field for each record
-      const academicRecords = rows.map(record => ({
-        ...record,
-        subjects: record.subjects ? JSON.parse(record.subjects) : []
-      }));
+      // Handle JSON subjects field for each record
+      const academicRecords = rows.map(record => {
+        let subjects = [];
+        
+        // MySQL JSON fields are already parsed as objects/arrays
+        if (record.subjects) {
+          if (Array.isArray(record.subjects)) {
+            // Already an array, use it directly
+            subjects = record.subjects;
+          } else if (typeof record.subjects === 'object') {
+            // Single object, convert to array
+            subjects = [record.subjects];
+          } else {
+            // String, try to parse
+            subjects = safeJsonParse(record.subjects, []);
+          }
+        }
+        
+        return {
+          ...record,
+          subjects: subjects.map(subject => transformSubjectToEnhancedFormat(subject))
+        };
+      });
 
       res.json({
         success: true,
@@ -206,7 +321,9 @@ const sarController = {
       if (!semester || !academic_year) {
         return res.status(400).json({
           success: false,
-          message: 'Semester and academic year are required'
+          message: 'Please provide both semester number and academic year (e.g., "2024-25") to create the record.',
+          errorCode: 'MISSING_REQUIRED_FIELDS',
+          fields: ['semester', 'academic_year']
         });
       }
 
@@ -214,7 +331,26 @@ const sarController = {
       if (semester < 1 || semester > 8) {
         return res.status(400).json({
           success: false,
-          message: 'Invalid semester. Must be between 1 and 8'
+          message: 'Please select a valid semester between 1 and 8.',
+          errorCode: 'INVALID_SEMESTER_RANGE',
+          validRange: { min: 1, max: 8 }
+        });
+      }
+
+      // Validate numeric fields if provided
+      if (sgpa && (isNaN(sgpa) || sgpa < 0 || sgpa > 10)) {
+        return res.status(400).json({
+          success: false,
+          message: 'SGPA must be a number between 0 and 10.',
+          errorCode: 'INVALID_SGPA'
+        });
+      }
+
+      if (cgpa && (isNaN(cgpa) || cgpa < 0 || cgpa > 10)) {
+        return res.status(400).json({
+          success: false,
+          message: 'CGPA must be a number between 0 and 10.',
+          errorCode: 'INVALID_CGPA'
         });
       }
 
@@ -244,10 +380,36 @@ const sarController = {
       );
 
       if (existingRows.length > 0) {
-        return res.status(400).json({
+        return res.status(409).json({
           success: false,
-          message: 'Academic record for this semester already exists'
+          message: `You already have an academic record for Semester ${semester}. Please edit the existing record instead of creating a new one.`,
+          errorCode: 'DUPLICATE_SEMESTER_RECORD',
+          existingRecordId: existingRows[0].academic_id
         });
+      }
+
+      // Validate subjects if provided (enhanced structure validation)
+      if (subjects && Array.isArray(subjects) && subjects.length > 0) {
+        const subjectValidationErrors = [];
+        
+        subjects.forEach((subject, index) => {
+          const errors = validateEnhancedSubject(subject);
+          if (Object.keys(errors).length > 0) {
+            subjectValidationErrors.push({
+              subjectIndex: index,
+              subjectCode: subject.subject_code || 'Unknown',
+              errors: errors
+            });
+          }
+        });
+        
+        if (subjectValidationErrors.length > 0) {
+          return res.status(400).json({
+            success: false,
+            message: 'Subject validation failed',
+            validationErrors: subjectValidationErrors
+          });
+        }
       }
 
       // Insert new academic record
@@ -273,9 +435,28 @@ const sarController = {
 
     } catch (error) {
       console.error('Error creating academic record:', error);
+      
+      // Handle specific database errors
+      if (error.code === 'ER_DUP_ENTRY') {
+        return res.status(409).json({
+          success: false,
+          message: 'A record with this information already exists.',
+          errorCode: 'DUPLICATE_ENTRY'
+        });
+      }
+      
+      if (error.code === 'ER_DATA_TOO_LONG') {
+        return res.status(400).json({
+          success: false,
+          message: 'One of the provided values is too long. Please check your input.',
+          errorCode: 'DATA_TOO_LONG'
+        });
+      }
+      
       res.status(500).json({
         success: false,
-        message: 'Internal server error'
+        message: 'Unable to create academic record due to a server error. Please try again later.',
+        errorCode: 'INTERNAL_SERVER_ERROR'
       });
     }
   },
@@ -319,6 +500,53 @@ const sarController = {
         });
       }
 
+      // Properly handle subjects data
+      let subjectsJson = '[]'; // Default to empty array
+      
+      if (subjects) {
+        if (Array.isArray(subjects)) {
+          // If it's already an array, stringify it
+          subjectsJson = JSON.stringify(subjects);
+        } else if (typeof subjects === 'string') {
+          // If it's a string, try to parse and re-stringify to validate
+          try {
+            const parsed = JSON.parse(subjects);
+            subjectsJson = JSON.stringify(Array.isArray(parsed) ? parsed : []);
+          } catch (e) {
+            subjectsJson = '[]';
+          }
+        } else if (typeof subjects === 'object') {
+          // If it's an object (but not array), wrap it in an array
+          subjectsJson = JSON.stringify([subjects]);
+        } else {
+          subjectsJson = '[]';
+        }
+      }
+
+      // Validate subjects if provided (enhanced structure validation)
+      if (subjects && Array.isArray(subjects) && subjects.length > 0) {
+        const subjectValidationErrors = [];
+        
+        subjects.forEach((subject, index) => {
+          const errors = validateEnhancedSubject(subject);
+          if (Object.keys(errors).length > 0) {
+            subjectValidationErrors.push({
+              subjectIndex: index,
+              subjectCode: subject.subject_code || 'Unknown',
+              errors: errors
+            });
+          }
+        });
+        
+        if (subjectValidationErrors.length > 0) {
+          return res.status(400).json({
+            success: false,
+            message: 'Subject validation failed',
+            validationErrors: subjectValidationErrors
+          });
+        }
+      }
+
       // Update academic record
       await db.execute(
         `UPDATE SARacademic SET
@@ -331,7 +559,7 @@ const sarController = {
           semester, academic_year, sgpa || null, cgpa || null, total_credits || null,
           earned_credits || null, attendance_percentage || null, backlog_count || 0,
           semester_result || 'ongoing', exam_month || null, exam_year || null,
-          remarks || null, JSON.stringify(subjects || []), recordId, sarId
+          remarks || null, subjectsJson, recordId, sarId
         ]
       );
 
@@ -397,6 +625,8 @@ const sarController = {
     }
   },
 
+
+
   // Get Internship Records
   getInternshipRecords: async (req, res) => {
     try {
@@ -426,9 +656,9 @@ const sarController = {
       // Parse JSON fields for each record
       const internshipRecords = rows.map(record => ({
         ...record,
-        skills_learned: record.skills_learned ? JSON.parse(record.skills_learned) : [],
-        technologies_used: record.technologies_used ? JSON.parse(record.technologies_used) : [],
-        media_urls: record.media_urls ? JSON.parse(record.media_urls) : []
+        skills_learned: safeJsonParse(record.skills_learned),
+        technologies_used: safeJsonParse(record.technologies_used),
+        media_urls: safeJsonParse(record.media_urls)
       }));
 
       res.json({
@@ -682,11 +912,11 @@ const sarController = {
       // Parse JSON fields for each record
       const achievementRecords = rows.map(record => ({
         ...record,
-        team_members: record.team_members ? JSON.parse(record.team_members) : [],
-        skills_demonstrated: record.skills_demonstrated ? JSON.parse(record.skills_demonstrated) : [],
-        technologies_used: record.technologies_used ? JSON.parse(record.technologies_used) : [],
-        media_urls: record.media_urls ? JSON.parse(record.media_urls) : [],
-        tags: record.tags ? JSON.parse(record.tags) : []
+        team_members: safeJsonParse(record.team_members),
+        skills_demonstrated: safeJsonParse(record.skills_demonstrated),
+        technologies_used: safeJsonParse(record.technologies_used),
+        media_urls: safeJsonParse(record.media_urls),
+        tags: safeJsonParse(record.tags)
       }));
 
       res.json({
@@ -964,23 +1194,23 @@ const sarController = {
       // Parse JSON fields
       const academicRecords = academicRows.map(record => ({
         ...record,
-        subjects: record.subjects ? JSON.parse(record.subjects) : []
+        subjects: safeJsonParse(record.subjects)
       }));
 
       const internshipRecords = internshipRows.map(record => ({
         ...record,
-        skills_learned: record.skills_learned ? JSON.parse(record.skills_learned) : [],
-        technologies_used: record.technologies_used ? JSON.parse(record.technologies_used) : [],
-        media_urls: record.media_urls ? JSON.parse(record.media_urls) : []
+        skills_learned: safeJsonParse(record.skills_learned),
+        technologies_used: safeJsonParse(record.technologies_used),
+        media_urls: safeJsonParse(record.media_urls)
       }));
 
       const achievementRecords = achievementRows.map(record => ({
         ...record,
-        team_members: record.team_members ? JSON.parse(record.team_members) : [],
-        skills_demonstrated: record.skills_demonstrated ? JSON.parse(record.skills_demonstrated) : [],
-        technologies_used: record.technologies_used ? JSON.parse(record.technologies_used) : [],
-        media_urls: record.media_urls ? JSON.parse(record.media_urls) : [],
-        tags: record.tags ? JSON.parse(record.tags) : []
+        team_members: safeJsonParse(record.team_members),
+        skills_demonstrated: safeJsonParse(record.skills_demonstrated),
+        technologies_used: safeJsonParse(record.technologies_used),
+        media_urls: safeJsonParse(record.media_urls),
+        tags: safeJsonParse(record.tags)
       }));
 
       res.json({
