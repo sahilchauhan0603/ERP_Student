@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 export default function InternshipRecords({ internships, addRecord, updateRecord, deleteRecord }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [editRecord, setEditRecord] = useState(null);
   
   // Error and loading states
   const [errors, setErrors] = useState({});
@@ -245,6 +246,67 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
         confirmButtonColor: '#dc3545'
       });
     }
+  };
+
+  const handleEditRecord = (record) => {
+    // Use internship_id as the primary ID
+    const recordId = record.internship_id || record.id;
+    setEditingId(recordId);
+    setEditRecord({
+      ...record,
+      id: recordId,
+      // Ensure arrays are properly initialized
+      skills_learned: record.skills_learned || [],
+      technologies_used: record.technologies_used || []
+    });
+    setErrors({});
+  };
+
+  const handleUpdateRecord = async () => {
+    const recordErrors = validateInternship(editRecord);
+    
+    if (Object.keys(recordErrors).length > 0) {
+      setErrors({ record: recordErrors });
+      Swal.fire({
+        title: 'Validation Error',
+        text: 'Please fix the highlighted errors before updating.',
+        icon: 'error',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      await updateRecord(editRecord.id, editRecord);
+      await Swal.fire({
+        title: 'Success!',
+        text: 'Internship record updated successfully!',
+        icon: 'success',
+        confirmButtonColor: '#10B981',
+        confirmButtonText: 'Great!'
+      });
+      handleCancelEdit();
+    } catch (error) {
+      Swal.fire({
+        title: 'Error!',
+        text: error.message || "Failed to update internship record. Please try again.",
+        icon: 'error',
+        confirmButtonColor: '#EF4444',
+        confirmButtonText: 'OK'
+      });
+      console.error("Error updating internship record:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditRecord(null);
+    setErrors({});
   };
 
   const internshipTypes = ["summer", "winter", "part-time", "full-time", "remote", "research"];
@@ -650,6 +712,256 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
         </div>
       )}
 
+      {/* Edit Internship Form */}
+      {editingId && editRecord && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-amber-800">
+              Edit Internship Record - {editRecord.company_name}
+            </h3>
+            <button
+              onClick={handleCancelEdit}
+              className="text-amber-600 hover:text-amber-800 cursor-pointer"
+            >
+              <FaTimes size={20} />
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Company Name *</label>
+              <input
+                type="text"
+                value={editRecord.company_name}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, company_name: e.target.value }))}
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                  errors.record?.company_name ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                }`}
+                placeholder="Enter company name"
+                required
+              />
+              {errors.record?.company_name && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <FaExclamationCircle className="text-xs" />
+                  {errors.record.company_name}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Position/Role *</label>
+              <input
+                type="text"
+                value={editRecord.position}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, position: e.target.value }))}
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                  errors.record?.position ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                }`}
+                placeholder="Enter position/role"
+                required
+              />
+              {errors.record?.position && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <FaExclamationCircle className="text-xs" />
+                  {errors.record.position}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Internship Type</label>
+              <select
+                value={editRecord.internship_type}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, internship_type: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                {internshipTypes.map(type => (
+                  <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <input
+                type="date"
+                value={editRecord.start_date}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, start_date: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+              <input
+                type="date"
+                value={editRecord.end_date}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, end_date: e.target.value }))}
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                  errors.record?.end_date ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                }`}
+              />
+              {errors.record?.end_date && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <FaExclamationCircle className="text-xs" />
+                  {errors.record.end_date}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Duration (Months)</label>
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value={editRecord.duration_months}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, duration_months: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="Duration in months"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Stipend</label>
+              <input
+                type="number"
+                min="0"
+                value={editRecord.stipend}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, stipend: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="Monthly stipend amount"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+              <select
+                value={editRecord.currency}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, currency: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                {currencies.map(currency => (
+                  <option key={currency} value={currency}>{currency}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+              <input
+                type="text"
+                value={editRecord.location}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, location: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="City, State/Country"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Work Mode</label>
+              <select
+                value={editRecord.work_mode}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, work_mode: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                {workModes.map(mode => (
+                  <option key={mode} value={mode}>{mode.charAt(0).toUpperCase() + mode.slice(1)}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select
+                value={editRecord.status}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, status: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                {statuses.map(status => (
+                  <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Performance Rating (1-5)</label>
+              <select
+                value={editRecord.performance_rating}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, performance_rating: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Rating</option>
+                {ratings.map(rating => (
+                  <option key={rating} value={rating}>
+                    {rating} Star{rating !== "1" ? "s" : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea
+                value={editRecord.description}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, description: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                rows="4"
+                placeholder="Brief description of the internship role and company..."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Key Responsibilities</label>
+              <textarea
+                value={editRecord.key_responsibilities}
+                onChange={(e) => setEditRecord(prev => ({ ...prev, key_responsibilities: e.target.value }))}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                rows="4"
+                placeholder="List your main responsibilities and tasks..."
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={handleUpdateRecord}
+              disabled={isSubmitting || !editRecord.company_name || !editRecord.position}
+              className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                isSubmitting 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-green-600 hover:bg-green-700 cursor-pointer'
+              } text-white`}
+            >
+              {isSubmitting ? (
+                <>
+                  <FaSpinner className="animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                <>
+                  <FaSave />
+                  Update Record
+                </>
+              )}
+            </button>
+            <button
+              onClick={handleCancelEdit}
+              disabled={isSubmitting}
+              className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                isSubmitting 
+                  ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
+                  : 'bg-gray-600 hover:bg-gray-700 cursor-pointer text-white'
+              }`}
+            >
+              <FaTimes />
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Existing Internships */}
       <div className="space-y-4">
         {internships.length === 0 ? (
@@ -660,7 +972,11 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
           </div>
         ) : (
           internships.map((internship) => (
-            <div key={internship.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div key={internship.id} className={`bg-white border rounded-lg p-6 shadow-sm ${
+              editingId === (internship.internship_id || internship.id)
+                ? 'border-amber-300 bg-amber-50'
+                : 'border-gray-200'
+            }`}>
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800">{internship.position}</h3>
@@ -684,10 +1000,15 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                     {internship.status}
                   </span>
                   <button
-                    onClick={() => setEditingId(internship.id)}
-                    className="text-blue-600 hover:text-blue-800 p-2 cursor-pointer"
+                    onClick={() => editingId === (internship.internship_id || internship.id) ? handleCancelEdit() : handleEditRecord(internship)}
+                    className={`p-2 cursor-pointer rounded transition-colors ${
+                      editingId === (internship.internship_id || internship.id) 
+                        ? 'text-amber-600 hover:text-amber-800 hover:bg-amber-100' 
+                        : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
+                    }`}
+                    title={editingId === (internship.internship_id || internship.id) ? "Cancel Edit" : "Edit Record"}
                   >
-                    <FaEdit />
+                    {editingId === (internship.internship_id || internship.id) ? <FaTimes /> : <FaEdit />}
                   </button>
                   <button
                     onClick={() => handleDeleteRecord(internship.internship_id)}

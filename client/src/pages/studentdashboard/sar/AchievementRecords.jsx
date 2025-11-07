@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 export default function AchievementRecords({ achievements, addRecord, updateRecord, deleteRecord }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [editRecord, setEditRecord] = useState(null);
   
   // Error and loading states
   const [errors, setErrors] = useState({});
@@ -361,6 +362,133 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleEditRecord = (achievement) => {
+    // Format the achievement data for editing, ensuring arrays are properly handled
+    const formattedAchievement = {
+      ...achievement,
+      team_members: Array.isArray(achievement.team_members) ? achievement.team_members : 
+        (achievement.team_members ? achievement.team_members.split(',').map(m => m.trim()) : []),
+      skills_demonstrated: Array.isArray(achievement.skills_demonstrated) ? achievement.skills_demonstrated : 
+        (achievement.skills_demonstrated ? achievement.skills_demonstrated.split(',').map(s => s.trim()) : []),
+      technologies_used: Array.isArray(achievement.technologies_used) ? achievement.technologies_used : 
+        (achievement.technologies_used ? achievement.technologies_used.split(',').map(t => t.trim()) : []),
+      tags: Array.isArray(achievement.tags) ? achievement.tags : 
+        (achievement.tags ? achievement.tags.split(',').map(tag => tag.trim()) : []),
+      media_urls: Array.isArray(achievement.media_urls) ? achievement.media_urls : 
+        (achievement.media_urls ? achievement.media_urls.split(',').map(url => url.trim()) : []),
+      // Ensure numeric fields are properly handled
+      team_size: achievement.team_size || 1,
+      points_awarded: achievement.points_awarded || 0,
+      total_participants: achievement.total_participants || '',
+      prize_amount: achievement.prize_amount || '',
+      // Ensure boolean fields are properly handled
+      trophy_medal_received: !!achievement.trophy_medal_received,
+      media_coverage: !!achievement.media_coverage,
+      // Ensure string fields have defaults
+      prize_currency: achievement.prize_currency || 'INR',
+      verification_status: achievement.verification_status || 'pending',
+      category: achievement.category || 'academic',
+      level: achievement.level || 'college'
+    };
+    
+    setEditRecord(formattedAchievement);
+    setEditingId(achievement.achievement_id || achievement.id);
+    setErrors({});
+  };
+
+  const handleUpdateRecord = async () => {
+    try {
+      // Clear previous errors
+      setErrors({});
+      
+      // Validate achievement data
+      const validationErrors = validateAchievement(editRecord);
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        
+        // Show validation errors with SweetAlert2
+        const errorList = Object.values(validationErrors).join('\n');
+        Swal.fire({
+          icon: 'error',
+          title: 'Validation Error',
+          text: `Please correct the following errors:\n${errorList}`,
+          confirmButtonColor: '#dc3545'
+        });
+        return;
+      }
+
+      setIsSubmitting(true);
+      
+      // Prepare the record for update
+      const recordToUpdate = {
+        ...editRecord,
+        achievement_id: editingId
+      };
+      
+      // Call the parent component's updateRecord function
+      await updateRecord(editingId, recordToUpdate);
+      
+      // Show success message with SweetAlert2
+      await Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Achievement record updated successfully!',
+        confirmButtonColor: '#28a745'
+      });
+      
+      // Reset edit states
+      setEditRecord(null);
+      setEditingId(null);
+      
+    } catch (error) {
+      console.error('Error updating achievement record:', error);
+      
+      let errorMessage = "Failed to update achievement record. Please try again.";
+      
+      // Handle specific error types
+      if (error.response?.data?.errorCode) {
+        switch (error.response.data.errorCode) {
+          case 'DUPLICATE_ACHIEVEMENT':
+            errorMessage = "This achievement already exists. Please check your records.";
+            break;
+          case 'INVALID_DATE_RANGE':
+            errorMessage = "Invalid date range. Please check your dates.";
+            setErrors({ event_end_date: "End date must be after start date" });
+            break;
+          case 'MISSING_REQUIRED_FIELDS':
+            errorMessage = "Please fill in all required fields.";
+            break;
+          default:
+            errorMessage = error.response.data.message || "Failed to update achievement record. Please try again.";
+        }
+      } else if (error.response?.status === 400) {
+        errorMessage = "Invalid data provided. Please check your entries and try again.";
+      } else if (error.response?.status === 401) {
+        errorMessage = "You are not authorized to perform this action. Please log in again.";
+      } else if (error.response?.status >= 500) {
+        errorMessage = "Server error occurred. Please try again later.";
+      } else {
+        errorMessage = "Failed to update achievement record. Please check your connection and try again.";
+      }
+      
+      // Show error message with SweetAlert2
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorMessage,
+        confirmButtonColor: '#dc3545'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditRecord(null);
+    setEditingId(null);
+    setErrors({});
   };
 
   const categories = ["academic", "technical", "sports", "cultural", "social", "leadership", "research", "entrepreneurship"];
@@ -964,7 +1092,11 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
           </div>
         ) : (
           achievements.map((achievement) => (
-            <div key={achievement.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div key={achievement.id} className={`bg-white border rounded-lg p-6 shadow-sm ${
+              editingId === (achievement.achievement_id || achievement.id)
+                ? 'border-amber-300 bg-amber-50'
+                : 'border-gray-200'
+            }`}>
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-start gap-3">
                   {getCategoryIcon(achievement.category)}
@@ -987,20 +1119,346 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => setEditingId(achievement.id)}
-                    className="text-blue-600 hover:text-blue-800 p-2 cursor-pointer"
+                    onClick={() => editingId === (achievement.achievement_id || achievement.id) ? handleCancelEdit() : handleEditRecord(achievement)}
+                    className={`p-2 cursor-pointer rounded transition-colors ${
+                      editingId === (achievement.achievement_id || achievement.id) 
+                        ? 'text-amber-600 hover:text-amber-800 hover:bg-amber-100' 
+                        : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
+                    }`}
+                    title={editingId === (achievement.achievement_id || achievement.id) ? "Cancel Edit" : "Edit Record"}
                   >
-                    <FaEdit />
+                    {editingId === (achievement.achievement_id || achievement.id) ? <FaTimes /> : <FaEdit />}
                   </button>
                   <button
                     onClick={() => handleDeleteAchievement(achievement.id)}
-                    className="text-red-600 hover:text-red-800 p-2 cursor-pointer"
+                    className="text-red-600 hover:text-red-800 p-2 cursor-pointer hover:bg-red-50 rounded transition-colors"
                     disabled={isSubmitting}
+                    title="Delete Record"
                   >
                     {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaTrash />}
                   </button>
                 </div>
               </div>
+
+              {/* Edit Form */}
+              {editingId === (achievement.achievement_id || achievement.id) && editRecord && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
+                  <h4 className="text-lg font-semibold text-amber-800 mb-4">Edit Achievement</h4>
+                  
+                  {/* Basic Information */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                      <input
+                        type="text"
+                        value={editRecord.title}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, title: e.target.value }))}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 ${
+                          errors.title
+                            ? 'border-red-400 focus:ring-red-500'
+                            : 'border-gray-300 focus:ring-amber-500'
+                        }`}
+                        placeholder="Enter achievement title"
+                      />
+                      {errors.title && (
+                        <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                          <FaExclamationCircle /> {errors.title}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                      <select
+                        value={editRecord.category}
+                        onChange={(e) => setEditRecord(prev => ({ 
+                          ...prev, 
+                          category: e.target.value,
+                          subcategory: "" 
+                        }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                      >
+                        {categories.map(category => (
+                          <option key={category} value={category}>
+                            {category.charAt(0).toUpperCase() + category.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
+                      <select
+                        value={editRecord.subcategory}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, subcategory: e.target.value }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                      >
+                        <option value="">Select Subcategory</option>
+                        {subcategoriesByCategory[editRecord.category]?.map(sub => (
+                          <option key={sub} value={sub}>
+                            {sub.replace('_', ' ').split(' ').map(word => 
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                            ).join(' ')}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Level *</label>
+                      <select
+                        value={editRecord.level}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, level: e.target.value }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                      >
+                        {levels.map(level => (
+                          <option key={level} value={level}>
+                            {level.charAt(0).toUpperCase() + level.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Achievement Date *</label>
+                      <input
+                        type="date"
+                        value={editRecord.achievement_date}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, achievement_date: e.target.value }))}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 ${
+                          errors.achievement_date
+                            ? 'border-red-400 focus:ring-red-500'
+                            : 'border-gray-300 focus:ring-amber-500'
+                        }`}
+                      />
+                      {errors.achievement_date && (
+                        <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                          <FaExclamationCircle /> {errors.achievement_date}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Organization *</label>
+                      <input
+                        type="text"
+                        value={editRecord.organization}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, organization: e.target.value }))}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 ${
+                          errors.organization
+                            ? 'border-red-400 focus:ring-red-500'
+                            : 'border-gray-300 focus:ring-amber-500'
+                        }`}
+                        placeholder="Organizing body/institution"
+                      />
+                      {errors.organization && (
+                        <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                          <FaExclamationCircle /> {errors.organization}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Event Name</label>
+                      <input
+                        type="text"
+                        value={editRecord.event_name}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, event_name: e.target.value }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                        placeholder="Competition/event name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Position/Rank</label>
+                      <input
+                        type="text"
+                        value={editRecord.position_rank}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, position_rank: e.target.value }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                        placeholder="e.g., 1st, Winner, Gold Medal"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Total Participants</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={editRecord.total_participants}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, total_participants: e.target.value }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Team Size</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={editRecord.team_size}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, team_size: parseInt(e.target.value) }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                        placeholder="1"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Prize Amount</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={editRecord.prize_amount}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, prize_amount: e.target.value }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                      <select
+                        value={editRecord.prize_currency}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, prize_currency: e.target.value }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                      >
+                        {currencies.map(curr => (
+                          <option key={curr} value={curr}>{curr}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea
+                      value={editRecord.description}
+                      onChange={(e) => setEditRecord(prev => ({ ...prev, description: e.target.value }))}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                      rows="3"
+                      placeholder="Describe your achievement in detail..."
+                    />
+                  </div>
+
+                  {/* Certificate URL */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Certificate URL</label>
+                    <input
+                      type="url"
+                      value={editRecord.certificate_url}
+                      onChange={(e) => setEditRecord(prev => ({ ...prev, certificate_url: e.target.value }))}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                      placeholder="https://example.com/certificate"
+                    />
+                  </div>
+
+                  {/* Array fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Team Members (comma-separated)</label>
+                      <input
+                        type="text"
+                        value={Array.isArray(editRecord.team_members) ? editRecord.team_members.join(', ') : editRecord.team_members || ''}
+                        onChange={(e) => setEditRecord(prev => ({ 
+                          ...prev, 
+                          team_members: e.target.value.split(',').map(m => m.trim()).filter(m => m) 
+                        }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                        placeholder="Enter team member names separated by commas"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Skills Demonstrated (comma-separated)</label>
+                      <input
+                        type="text"
+                        value={Array.isArray(editRecord.skills_demonstrated) ? editRecord.skills_demonstrated.join(', ') : editRecord.skills_demonstrated || ''}
+                        onChange={(e) => setEditRecord(prev => ({ 
+                          ...prev, 
+                          skills_demonstrated: e.target.value.split(',').map(s => s.trim()).filter(s => s) 
+                        }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                        placeholder="Enter skills separated by commas"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Technologies Used (comma-separated)</label>
+                      <input
+                        type="text"
+                        value={Array.isArray(editRecord.technologies_used) ? editRecord.technologies_used.join(', ') : editRecord.technologies_used || ''}
+                        onChange={(e) => setEditRecord(prev => ({ 
+                          ...prev, 
+                          technologies_used: e.target.value.split(',').map(t => t.trim()).filter(t => t) 
+                        }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                        placeholder="Enter technologies separated by commas"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma-separated)</label>
+                      <input
+                        type="text"
+                        value={Array.isArray(editRecord.tags) ? editRecord.tags.join(', ') : editRecord.tags || ''}
+                        onChange={(e) => setEditRecord(prev => ({ 
+                          ...prev, 
+                          tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag) 
+                        }))}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                        placeholder="Enter tags separated by commas"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Checkboxes */}
+                  <div className="flex gap-4 mb-6">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={editRecord.trophy_medal_received}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, trophy_medal_received: e.target.checked }))}
+                        className="rounded"
+                      />
+                      <span className="text-sm text-gray-700">Trophy/Medal Received</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={editRecord.media_coverage}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, media_coverage: e.target.checked }))}
+                        className="rounded"
+                      />
+                      <span className="text-sm text-gray-700">Media Coverage</span>
+                    </label>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleUpdateRecord}
+                      className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                        isSubmitting || !editRecord.title
+                          ? 'bg-gray-400 cursor-not-allowed'
+                          : 'bg-amber-600 hover:bg-amber-700 cursor-pointer'
+                      } text-white`}
+                      disabled={isSubmitting || !editRecord.title}
+                    >
+                      {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaSave />}
+                      {isSubmitting ? 'Updating...' : 'Update Achievement'}
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
+                    >
+                      <FaTimes className="inline mr-2" />
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 text-sm">
                 {achievement.organization && (
