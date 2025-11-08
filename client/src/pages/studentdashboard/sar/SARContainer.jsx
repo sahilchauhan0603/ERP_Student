@@ -478,29 +478,34 @@ function SARContainerContent() {
   }
 
   return (
-    <div className="pt-4 md:pt-8 pb-12 bg-gradient-to-br from-indigo-50 via-white to-blue-50 min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 mb-6 md:mb-8 border border-gray-100">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">SAR Booklet</h1>
-          <p className="text-base md:text-lg text-gray-800 mb-2 md:mb-3 font-bold font-serif">
-            Student Academic Record - Showcasing your academic and professional growth.
-          </p>
-          <p className="text-sm md:text-base text-gray-500 mb-0">
-            Manage your semester-wise academic records, internships, and achievements.
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6">
+        {/* Header Section */}
+        <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-4 sm:p-6 mb-6 mt-4 sm:mt-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-indigo-600 rounded-lg shadow-md">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">SAR Booklet</h1>
+              <p className="text-gray-600 text-xs sm:text-sm">Student Academic Record - Showcasing your academic and professional growth</p>
+            </div>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 sticky top-2 z-10">
+        <div className="mb-6 bg-white rounded-lg shadow-lg border border-gray-100 sticky top-2 z-10">
           {/* Desktop Tabs */}
-          <div className="hidden md:flex justify-center">
+          <div className="hidden md:flex">
             {sectionTabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveSection(tab.key)}
-                className={`flex-1 max-w-xs px-4 py-3 font-medium whitespace-nowrap cursor-pointer transition-colors ${
+                className={`flex-1 px-4 py-3 font-medium text-sm whitespace-nowrap cursor-pointer transition-colors ${
                   activeSection === tab.key
-                    ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                    ? "text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50 font-semibold"
                     : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                 }`}
               >
@@ -511,14 +516,14 @@ function SARContainerContent() {
 
           {/* Mobile Tabs - Scrollable */}
           <div className="md:hidden">
-            <div className="flex overflow-x-auto scrollbar-hide px-2 py-1 space-x-1">
+            <div className="flex overflow-x-auto scrollbar-hide px-2 py-2 space-x-2">
               {sectionTabs.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveSection(tab.key)}
-                  className={`flex-shrink-0 px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap cursor-pointer transition-colors ${
+                  className={`flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap cursor-pointer transition-colors ${
                     activeSection === tab.key
-                      ? "text-blue-600 bg-blue-100 border border-blue-300"
+                      ? "text-indigo-600 bg-indigo-100 border border-indigo-300 font-semibold"
                       : "text-gray-500 bg-gray-100 hover:text-gray-700 hover:bg-gray-200"
                   }`}
                 >
@@ -529,8 +534,8 @@ function SARContainerContent() {
           </div>
         </div>
 
-        {/* Section Content */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        {/* Section Content - No wrapper, each page handles its own background */}
+        <div>
           {activeSection === "overview" && (
             <SAROverview 
               student={student} 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaTrophy, FaMedal, FaCertificate, FaAward, FaExclamationCircle, FaCheckCircle, FaSpinner } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaTrophy, FaMedal, FaCertificate, FaAward, FaExclamationCircle, FaCheckCircle, FaSpinner, FaCalendarAlt } from "react-icons/fa";
 import Swal from 'sweetalert2';
 
 export default function AchievementRecords({ achievements, addRecord, updateRecord, deleteRecord }) {
@@ -554,8 +554,8 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-yellow-600 rounded-xl shadow-lg">
-              <FaTrophy className="text-white text-xl" />
+            <div className="p-2 bg-yellow-600 rounded-lg shadow-md">
+              <FaTrophy className="text-white text-lg" />
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Achievement Records</h1>
@@ -564,8 +564,7 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
           </div>
           <button
             onClick={() => setShowAddForm(true)}
-            // className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-xl hover:from-yellow-700 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium text-sm sm:text-base w-full sm:w-auto justify-center"
-            className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-lg hover:from-yellow-700 hover:to-yellow-700 transition-all duration-200 shadow-md hover:shadow-xl font-medium text-sm w-full sm:w-auto justify-center"
+            className="flex items-center cursor-pointer gap-2 px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-medium text-sm w-full sm:w-auto justify-center"
           >
             <FaPlus className="text-xs" /> Add Achievement
           </button>
@@ -1128,68 +1127,95 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
       )}
 
       {/* Existing Achievements */}
-      <div className="space-y-4">
+      <div className="space-y-10">
         {achievements.length === 0 ? (
-          <div className="text-center py-16 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-            {/* <FaTrophy className="mx-auto text-4xl text-gray-400 mb-4" /> */}
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <FaTrophy className="text-4xl text-gray-400" />
+          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+            <div className="max-w-md mx-auto">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FaTrophy className="text-3xl text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">No Achievements Added</h3>
+              <p className="text-gray-500 mb-4">Start documenting your accomplishments and achievements to build your portfolio.</p>
             </div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-3">No Achievements Added</h3>
-            <p className="text-gray-500 mb-6 leading-relaxed">Start documenting your accomplishments and achievements to build your portfolio.</p>
           </div>
         ) : (
-          achievements.map((achievement) => (
-            <div key={achievement.id} className={`bg-white border rounded-lg p-6 shadow-sm ${
-              editingId === (achievement.achievement_id || achievement.id)
-                ? 'border-amber-300 bg-amber-50'
+          achievements.map((achievement) => {
+            const achievementId = achievement.achievement_id || achievement.id;
+            return (
+            <div key={achievementId} className={`bg-white border rounded-lg p-4 ${
+              editingId === achievementId
+                ? 'border-yellow-300 bg-yellow-50'
                 : 'border-gray-200'
             }`}>
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-start gap-3">
-                  {getCategoryIcon(achievement.category)}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800">{achievement.title}</h3>
-                    <div className="flex gap-2 mt-2">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(achievement.category)}`}>
-                        {achievement.category}
+              <div className="flex flex-col lg:flex-row justify-between items-start gap-3 mb-4">
+                <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-2 mb-2">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{achievement.title}</h3>
+                      <p className="text-base font-medium text-yellow-600 mb-2">{achievement.organization || achievement.event_name || 'Achievement'}</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(achievement.category)}`}>
+                        {achievement.category.charAt(0).toUpperCase() + achievement.category.slice(1)}
                       </span>
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${getLevelColor(achievement.level)}`}>
-                        {achievement.level}
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getLevelColor(achievement.level)}`}>
+                        {achievement.level.charAt(0).toUpperCase() + achievement.level.slice(1)}
                       </span>
                       {achievement.position_rank && (
-                        <span className="px-2 py-1 bg-gold-100 text-yellow-800 rounded text-xs font-medium">
+                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
                           {achievement.position_rank}
                         </span>
                       )}
                     </div>
                   </div>
+                  
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-2">
+                    {achievement.achievement_date && (
+                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                        <FaCalendarAlt className="text-gray-400" />
+                        {formatDate(achievement.achievement_date)}
+                      </span>
+                    )}
+                    {achievement.semester_achieved && (
+                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                        <FaCertificate className="text-gray-400" />
+                        Semester {achievement.semester_achieved}
+                      </span>
+                    )}
+                    {achievement.points_awarded > 0 && (
+                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                        <FaTrophy className="text-gray-400" />
+                        {achievement.points_awarded} Points
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex gap-2">
+                
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={() => editingId === (achievement.achievement_id || achievement.id) ? handleCancelEdit() : handleEditRecord(achievement)}
+                    onClick={() => editingId === achievementId ? handleCancelEdit() : handleEditRecord(achievement)}
                     className={`p-2 cursor-pointer rounded transition-colors ${
-                      editingId === (achievement.achievement_id || achievement.id) 
-                        ? 'text-amber-600 hover:text-amber-800 hover:bg-amber-100' 
-                        : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
+                      editingId === achievementId 
+                        ? 'text-yellow-600 hover:text-yellow-800 bg-yellow-100 hover:bg-yellow-200' 
+                        : 'text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200'
                     }`}
-                    title={editingId === (achievement.achievement_id || achievement.id) ? "Cancel Edit" : "Edit Record"}
+                    title={editingId === achievementId ? "Cancel Edit" : "Edit Record"}
                   >
-                    {editingId === (achievement.achievement_id || achievement.id) ? <FaTimes /> : <FaEdit />}
+                    {editingId === achievementId ? <FaTimes size={16} /> : <FaEdit size={16} />}
                   </button>
                   <button
-                    onClick={() => handleDeleteAchievement(achievement.id)}
-                    className="text-red-600 hover:text-red-800 p-2 cursor-pointer hover:bg-red-50 rounded transition-colors"
+                    onClick={() => handleDeleteAchievement(achievementId)}
+                    className="p-2 cursor-pointer text-red-600 hover:text-red-800 bg-red-100 hover:bg-red-200 rounded transition-colors"
                     disabled={isSubmitting}
                     title="Delete Record"
                   >
-                    {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaTrash />}
+                    {isSubmitting ? <FaSpinner className="animate-spin" size={16} /> : <FaTrash size={16} />}
                   </button>
                 </div>
               </div>
 
               {/* Edit Form */}
-              {editingId === (achievement.achievement_id || achievement.id) && editRecord && (
+              {editingId === achievementId && editRecord && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
                   <h4 className="text-lg font-semibold text-amber-800 mb-4">Edit Achievement</h4>
                   
@@ -1508,62 +1534,58 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
                 {achievement.organization && (
-                  <div>
-                    <span className="text-gray-500">Organization:</span> {achievement.organization}
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-1">Organization</p>
+                    <p className="font-semibold text-gray-900">{achievement.organization}</p>
                   </div>
                 )}
                 {achievement.event_name && (
-                  <div>
-                    <span className="text-gray-500">Event:</span> {achievement.event_name}
-                  </div>
-                )}
-                {achievement.achievement_date && (
-                  <div>
-                    <span className="text-gray-500">Date:</span> {formatDate(achievement.achievement_date)}
-                  </div>
-                )}
-                {achievement.semester_achieved && (
-                  <div>
-                    <span className="text-gray-500">Semester:</span> {achievement.semester_achieved}
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-1">Event</p>
+                    <p className="font-semibold text-gray-900">{achievement.event_name}</p>
                   </div>
                 )}
                 {achievement.total_participants && (
-                  <div>
-                    <span className="text-gray-500">Participants:</span> {achievement.total_participants}
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-1">Participants</p>
+                    <p className="font-semibold text-gray-900">{achievement.total_participants}</p>
                   </div>
                 )}
                 {achievement.team_size > 1 && (
-                  <div>
-                    <span className="text-gray-500">Team Size:</span> {achievement.team_size}
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-1">Team Size</p>
+                    <p className="font-semibold text-gray-900">{achievement.team_size}</p>
                   </div>
                 )}
                 {achievement.prize_amount && (
-                  <div>
-                    <span className="text-gray-500">Prize:</span> {achievement.prize_amount} {achievement.prize_currency}
-                  </div>
-                )}
-                {achievement.points_awarded > 0 && (
-                  <div>
-                    <span className="text-gray-500">Points:</span> {achievement.points_awarded}
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-1">Prize</p>
+                    <p className="font-semibold text-gray-900">{achievement.prize_amount} {achievement.prize_currency}</p>
                   </div>
                 )}
               </div>
 
               {achievement.description && (
                 <div className="mb-4">
-                  <p className="text-sm text-gray-600">{achievement.description}</p>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <div className="w-1 h-4 bg-yellow-500 rounded"></div>
+                    Description
+                  </h4>
+                  <p className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-xl">{achievement.description}</p>
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
                 {achievement.team_members && achievement.team_members.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Team Members</h4>
-                    <div className="flex flex-wrap gap-1">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      Team Members
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
                       {achievement.team_members.map((member, index) => (
-                        <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                        <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
                           {member}
                         </span>
                       ))}
@@ -1572,11 +1594,13 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                 )}
 
                 {achievement.skills_demonstrated && achievement.skills_demonstrated.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Skills</h4>
-                    <div className="flex flex-wrap gap-1">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      Skills Demonstrated
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
                       {achievement.skills_demonstrated.map((skill, index) => (
-                        <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                        <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
                           {skill}
                         </span>
                       ))}
@@ -1585,12 +1609,29 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                 )}
 
                 {achievement.technologies_used && achievement.technologies_used.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Technologies</h4>
-                    <div className="flex flex-wrap gap-1">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      Technologies Used
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
                       {achievement.technologies_used.map((tech, index) => (
-                        <span key={index} className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">
+                        <span key={index} className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm">
                           {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {achievement.tags && achievement.tags.length > 0 && (
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      Tags
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {achievement.tags.map((tag, index) => (
+                        <span key={index} className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">
+                          #{tag}
                         </span>
                       ))}
                     </div>
@@ -1598,58 +1639,58 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                 )}
               </div>
 
-              {achievement.tags && achievement.tags.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Tags</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {achievement.tags.map((tag, index) => (
-                      <span key={index} className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {(achievement.certificate_url || (achievement.media_urls && achievement.media_urls.length > 0)) && (
-                <div className="border-t pt-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Links</h4>
-                  <div className="space-y-1 text-sm">
+                <div className="border-t border-gray-200 pt-4 mb-4">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <div className="w-1 h-4 bg-indigo-500 rounded"></div>
+                    Links & Media
+                  </h4>
+                  <div className="space-y-2">
                     {achievement.certificate_url && (
-                      <div>
-                        <a 
-                          href={achievement.certificate_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          📜 Certificate
-                        </a>
-                      </div>
+                      <a 
+                        href={achievement.certificate_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors border border-blue-200"
+                      >
+                        📜 View Certificate
+                      </a>
                     )}
                     {achievement.media_urls && achievement.media_urls.map((url, index) => (
-                      <div key={index}>
-                        <a 
-                          href={url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          🔗 Media Link {index + 1}
-                        </a>
-                      </div>
+                      <a 
+                        key={index}
+                        href={url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors border border-blue-200 mr-2"
+                      >
+                        🔗 Media Link {index + 1}
+                      </a>
                     ))}
                   </div>
                 </div>
               )}
 
-              <div className="flex gap-4 mt-4 text-xs text-gray-500">
-                {achievement.trophy_medal_received && <span>🏆 Trophy/Medal Received</span>}
-                {achievement.media_coverage && <span>📰 Media Coverage</span>}
-                {achievement.verification_status === 'verified' && <span>✅ Verified</span>}
+              <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+                {achievement.trophy_medal_received && (
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-yellow-700 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-200">
+                    🏆 Trophy/Medal Received
+                  </span>
+                )}
+                {achievement.media_coverage && (
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                    📰 Media Coverage
+                  </span>
+                )}
+                {achievement.verification_status === 'verified' && (
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-200">
+                    ✅ Verified
+                  </span>
+                )}
               </div>
             </div>
-          ))
+            );
+          })
         )}
         </div>
       </div>

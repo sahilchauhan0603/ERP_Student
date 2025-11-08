@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaEdit, FaSave, FaTimes, FaUser, FaEnvelope, FaGraduationCap, FaChartLine, FaExclamationCircle, FaCheckCircle, FaSpinner } from "react-icons/fa";
+import { FaEdit, FaSave, FaTimes, FaUser, FaEnvelope, FaGraduationCap, FaChartLine, FaExclamationCircle, FaCheckCircle, FaSpinner, FaInfoCircle } from "react-icons/fa";
 import Swal from 'sweetalert2';
 
 export default function SAROverview({ student, sarData, updateSAROverview }) {
@@ -162,248 +162,292 @@ export default function SAROverview({ student, sarData, updateSAROverview }) {
   const completionPercentage = calculateCompletionPercentage();
 
   return (
-    <div className="p-4 md:p-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 md:mb-6 gap-4">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-800">SAR Overview</h2>
-        {!isEditing ? (
-          <button
-            onClick={handleEdit}
-            className="flex items-center cursor-pointer justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base"
-          >
-            <FaEdit /> Edit Info
-          </button>
-        ) : (
-          <div className="flex gap-2">
-            <button
-              onClick={handleSave}
-              className={`flex items-center cursor-pointer justify-center gap-2 px-3 md:px-4 py-2 rounded-lg transition-colors text-sm md:text-base ${
-                isSubmitting
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-green-600 hover:bg-green-700'
-              } text-white`}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaSave />}
-              {isSubmitting ? 'Saving...' : 'Save'}
-            </button>
-            <button
-              onClick={handleCancel}
-              className="flex items-center cursor-pointer justify-center gap-2 px-3 md:px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm md:text-base"
-            >
-              <FaTimes /> Cancel
-            </button>
-          </div>
-        )}
-      </div>
-
-
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        {/* Basic Information */}
-        <div className="bg-gray-50 rounded-lg p-4 md:p-6">
-          <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4 flex items-center gap-2">
-            <FaUser className="text-blue-600 text-sm md:text-base" />
-            Basic Information
-          </h3>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Student Name
-              </label>
-              <div className="p-3 bg-white rounded-lg border">
-                {student?.firstName} {student?.middleName} {student?.lastName}
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-100 p-3 sm:p-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-indigo-600 rounded-lg shadow-md">
+              <FaInfoCircle className="text-white text-lg" />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Enrollment Number
-              </label>
-              {isEditing ? (
-                <div>
-                  <input
-                    type="text"
-                    value={editForm.enrollment_no}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, enrollment_no: e.target.value }))}
-                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent ${
-                      errors.enrollment_no
-                        ? 'border-red-400 focus:ring-red-500'
-                        : 'border-gray-300 focus:ring-blue-500'
-                    }`}
-                    placeholder="Enter enrollment number"
-                  />
-                  {errors.enrollment_no && (
-                    <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                      <FaExclamationCircle /> {errors.enrollment_no}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="p-3 bg-white rounded-lg border">
-                  {sarData.sarInfo.enrollment_no || "Not set - Click Edit to add"}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Personal Email
-              </label>
-              <div className="p-3 bg-white rounded-lg border flex items-center gap-2">
-                <FaEnvelope className="text-blue-600" />
-                {student?.email || "Not available"}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Microsoft Email
-              </label>
-              {isEditing ? (
-                <div>
-                  <input
-                    type="email"
-                    value={editForm.microsoft_email}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, microsoft_email: e.target.value }))}
-                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent ${
-                      errors.microsoft_email
-                        ? 'border-red-400 focus:ring-red-500'
-                        : 'border-gray-300 focus:ring-blue-500'
-                    }`}
-                    placeholder="Enter Microsoft email (e.g., student@bpitindia.edu.in)"
-                  />
-                  {errors.microsoft_email && (
-                    <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                      <FaExclamationCircle /> {errors.microsoft_email}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="p-3 bg-white rounded-lg border flex items-center gap-2">
-                  <FaEnvelope className="text-green-600" />
-                  {sarData.sarInfo.microsoft_email || "Not set - Click Edit to add"}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Current Semester
-              </label>
-              {isEditing ? (
-                <div>
-                  <select
-                    value={editForm.current_semester}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, current_semester: parseInt(e.target.value) }))}
-                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent ${
-                      errors.current_semester
-                        ? 'border-red-400 focus:ring-red-500'
-                        : 'border-gray-300 focus:ring-blue-500'
-                    }`}
-                  >
-                    <option value="">Select Semester</option>
-                    {[1,2,3,4,5,6,7,8].map(sem => (
-                      <option key={sem} value={sem}>Semester {sem}</option>
-                    ))}
-                  </select>
-                  {errors.current_semester && (
-                    <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                      <FaExclamationCircle /> {errors.current_semester}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="p-3 bg-white rounded-lg border flex items-center gap-2">
-                  <FaGraduationCap className="text-blue-600" />
-                  Semester {sarData.sarInfo.current_semester}
-                </div>
-              )}
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">SAR Overview</h1>
+              <p className="text-gray-600 text-xs sm:text-sm">Manage your academic profile and track progress</p>
             </div>
           </div>
-        </div>
-
-        {/* Statistics */}
-        <div className="bg-gray-50 rounded-lg p-4 md:p-6">
-          <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4 flex items-center gap-2">
-            <FaChartLine className="text-green-600 text-sm md:text-base" />
-            SAR Statistics
-          </h3>
-
-          <div className="space-y-4">
-            {/* Profile Completion */}
-            <div className="bg-white rounded-lg p-4 border">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">Profile Completion</span>
-                <span className="text-lg font-bold text-blue-600">{completionPercentage}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div 
-                  className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-                  style={{ width: `${completionPercentage}%` }}
-                ></div>
-              </div>
-            </div>
-
-            {/* Record Counts */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white rounded-lg p-4 border text-center">
-                <div className="text-2xl font-bold text-blue-600">{sarData.academicRecords.length}</div>
-                <div className="text-xs text-gray-600">Academic Records</div>
-              </div>
-              <div className="bg-white rounded-lg p-4 border text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {sarData.internships.length}
-                </div>
-                <div className="text-xs text-gray-600">Completed Internships</div>
-              </div>
-              <div className="bg-white rounded-lg p-4 border text-center">
-                <div className="text-2xl font-bold text-purple-600">{sarData.achievements.length}</div>
-                <div className="text-xs text-gray-600">Achievements</div>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-lg p-4 border">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Recent Activity</h4>
-              <div className="space-y-2 text-sm text-gray-600">
-                {sarData.academicRecords.length === 0 && sarData.internships.length === 0 && sarData.achievements.length === 0 ? (
-                  <p className="text-gray-500 italic">No records added yet</p>
+          {!isEditing ? (
+            <button
+              onClick={handleEdit}
+              className="flex items-center gap-2 cursor-pointer px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm w-full sm:w-auto justify-center"
+            >
+              <FaEdit className="text-xs" /> Edit Info
+            </button>
+          ) : (
+            <div className="flex gap-2 w-full sm:w-auto">
+              <button
+                onClick={handleSave}
+                disabled={isSubmitting}
+                className={`flex items-center cursor-pointer gap-2 px-3 py-2 rounded-lg font-medium transition-colors text-sm flex-1 sm:flex-none justify-center ${
+                  isSubmitting
+                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                    : 'bg-green-600 hover:bg-green-700 text-white'
+                }`}
+              >
+                {isSubmitting ? (
+                  <>
+                    <FaSpinner className="animate-spin text-xs" />
+                    Saving...
+                  </>
                 ) : (
                   <>
-                    {sarData.academicRecords.length > 0 && (
-                      <p>✓ {sarData.academicRecords.length} academic record(s) added</p>
-                    )}
-                    {sarData.internships.length > 0 && (
-                      <p>✓ {sarData.internships.length} completed internship(s) recorded</p>
-                    )}
-                    {sarData.achievements.length > 0 && (
-                      <p>✓ {sarData.achievements.length} achievement(s) documented</p>
-                    )}
+                    <FaSave className="text-xs" />
+                    Save
                   </>
+                )}
+              </button>
+              <button
+                onClick={handleCancel}
+                disabled={isSubmitting}
+                className="flex items-center gap-2 cursor-pointer px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm"
+              >
+                <FaTimes className="text-xs" />
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
+
+
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          {/* Basic Information */}
+          <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-4 sm:p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <div className="w-1 h-4 bg-blue-500 rounded"></div>
+              Basic Information
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Student Name
+                </label>
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-900">
+                  {student?.firstName} {student?.middleName} {student?.lastName}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Enrollment Number
+                </label>
+                {isEditing ? (
+                  <div>
+                    <input
+                      type="text"
+                      value={editForm.enrollment_no}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, enrollment_no: e.target.value }))}
+                      className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                        errors.enrollment_no
+                          ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                      placeholder="Enter enrollment number"
+                    />
+                    {errors.enrollment_no && (
+                      <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded mt-1">
+                        <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" />
+                        {errors.enrollment_no}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-center gap-2">
+                    <FaGraduationCap className="text-indigo-600" />
+                    <span className="text-gray-900">{sarData.sarInfo.enrollment_no || "Not set - Click Edit to add"}</span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Personal Email
+                </label>
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-center gap-2">
+                  <FaEnvelope className="text-blue-600" />
+                  <span className="text-gray-900">{student?.email || "Not available"}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Microsoft Email
+                </label>
+                {isEditing ? (
+                  <div>
+                    <input
+                      type="email"
+                      value={editForm.microsoft_email}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, microsoft_email: e.target.value }))}
+                      className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                        errors.microsoft_email
+                          ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                      placeholder="Enter Microsoft email (e.g., student@bpitindia.edu.in)"
+                    />
+                    {errors.microsoft_email && (
+                      <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded mt-1">
+                        <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" />
+                        {errors.microsoft_email}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-center gap-2">
+                    <FaEnvelope className="text-green-600" />
+                    <span className="text-gray-900">{sarData.sarInfo.microsoft_email || "Not set - Click Edit to add"}</span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Current Semester
+                </label>
+                {isEditing ? (
+                  <div>
+                    <select
+                      value={editForm.current_semester}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, current_semester: parseInt(e.target.value) }))}
+                      className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                        errors.current_semester
+                          ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <option value="">Select Semester</option>
+                      {[1,2,3,4,5,6,7,8].map(sem => (
+                        <option key={sem} value={sem}>Semester {sem}</option>
+                      ))}
+                    </select>
+                    {errors.current_semester && (
+                      <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded mt-1">
+                        <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" />
+                        {errors.current_semester}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-center gap-2">
+                    <FaGraduationCap className="text-blue-600" />
+                    <span className="text-gray-900">Semester {sarData.sarInfo.current_semester}</span>
+                  </div>
                 )}
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Quick Actions */}
-      <div className="mt-6 bg-blue-50 rounded-lg p-4 border border-blue-200">
-        <h4 className="text-sm font-medium text-blue-800 mb-3">Quick Actions</h4>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="text-sm text-blue-700">
-            <strong>Next Steps:</strong>
-            {sarData.academicRecords.length === 0 && " Add your academic records"}
-            {sarData.academicRecords.length > 0 && sarData.internships.length === 0 && " Record your completed internships"}
-            {sarData.internships.length > 0 && sarData.achievements.length === 0 && " Document your achievements"}
-            {sarData.achievements.length > 0 && " Keep updating your records"}
+          {/* Statistics */}
+          <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-4 sm:p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <div className="w-1 h-4 bg-green-500 rounded"></div>
+              SAR Statistics
+            </h3>
+
+            <div className="space-y-4">
+              {/* Profile Completion */}
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-semibold text-gray-700">Profile Completion</span>
+                  <span className="text-xl font-bold text-indigo-600">{completionPercentage}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div 
+                    className="bg-gradient-to-r from-indigo-600 to-blue-600 h-3 rounded-full transition-all duration-300"
+                    style={{ width: `${completionPercentage}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Record Counts */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center">
+                  <div className="text-2xl font-bold text-purple-600">{sarData.academicRecords.length}</div>
+                  <div className="text-xs text-gray-600 mt-1">Academic Records</div>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {sarData.internships.length}
+                  </div>
+                  <div className="text-xs text-gray-600 mt-1">Internships</div>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center">
+                  <div className="text-2xl font-bold text-yellow-600">{sarData.achievements.length}</div>
+                  <div className="text-xs text-gray-600 mt-1">Achievements</div>
+                </div>
+              </div>
+
+              {/* Recent Activity */}
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  Recent Activity
+                </h4>
+                <div className="space-y-2 text-sm">
+                  {sarData.academicRecords.length === 0 && sarData.internships.length === 0 && sarData.achievements.length === 0 ? (
+                    <p className="text-gray-500 italic">No records added yet</p>
+                  ) : (
+                    <>
+                      {sarData.academicRecords.length > 0 && (
+                        <p className="text-gray-700 flex items-center gap-2">
+                          <FaCheckCircle className="text-green-600" />
+                          {sarData.academicRecords.length} academic record(s) added
+                        </p>
+                      )}
+                      {sarData.internships.length > 0 && (
+                        <p className="text-gray-700 flex items-center gap-2">
+                          <FaCheckCircle className="text-blue-600" />
+                          {sarData.internships.length} internship(s) recorded
+                        </p>
+                      )}
+                      {sarData.achievements.length > 0 && (
+                        <p className="text-gray-700 flex items-center gap-2">
+                          <FaCheckCircle className="text-yellow-600" />
+                          {sarData.achievements.length} achievement(s) documented
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="text-sm text-blue-700">
-            <strong>Completion Goal:</strong> Reach 100% profile completion
-          </div>
-          <div className="text-sm text-blue-700">
-            <strong>Records Target:</strong> All {sarData.sarInfo.current_semester} semesters documented
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-6 bg-white rounded-lg shadow-lg border border-gray-100 p-4 sm:p-6">
+          <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <div className="w-1 h-4 bg-indigo-500 rounded"></div>
+            Quick Actions & Goals
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
+              <p className="text-sm font-semibold text-indigo-800 mb-1">Next Steps</p>
+              <p className="text-sm text-indigo-700">
+                {sarData.academicRecords.length === 0 && "Add your academic records"}
+                {sarData.academicRecords.length > 0 && sarData.internships.length === 0 && "Record your completed internships"}
+                {sarData.internships.length > 0 && sarData.achievements.length === 0 && "Document your achievements"}
+                {sarData.achievements.length > 0 && "Keep updating your records"}
+              </p>
+            </div>
+            <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+              <p className="text-sm font-semibold text-green-800 mb-1">Completion Goal</p>
+              <p className="text-sm text-green-700">Reach 100% profile completion</p>
+            </div>
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <p className="text-sm font-semibold text-blue-800 mb-1">Records Target</p>
+              <p className="text-sm text-blue-700">All {sarData.sarInfo.current_semester} semesters documented</p>
+            </div>
           </div>
         </div>
       </div>

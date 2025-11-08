@@ -622,7 +622,7 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
           </div>
           <button
             onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm w-full sm:w-auto justify-center"
+            className="flex items-center cursor-pointer gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm w-full sm:w-auto justify-center"
           >
             <FaPlus className="text-xs" /> Add Internship
           </button>

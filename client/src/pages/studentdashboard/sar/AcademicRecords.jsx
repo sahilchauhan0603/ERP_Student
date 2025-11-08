@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaBook, FaChartBar, FaExclamationCircle, FaCheckCircle, FaSpinner } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaBook, FaChartBar, FaExclamationCircle, FaCheckCircle, FaSpinner, FaCalendarAlt } from "react-icons/fa";
 import Swal from 'sweetalert2';
 
 export default function AcademicRecords({ academicRecords, currentSemester, addRecord, updateRecord, deleteRecord }) {
@@ -534,7 +534,7 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-indigo-600 rounded-xl shadow-lg">
+            <div className="p-2 bg-purple-600 rounded-lg shadow-md">
               <FaBook className="text-white text-lg" />
             </div>
             <div>
@@ -544,10 +544,9 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
           </div>
           <button
             onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-md hover:shadow-xl font-medium text-sm w-full sm:w-auto justify-center"
-            // className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium text-sm sm:text-base w-full sm:w-auto justify-center"
+            className="flex items-center gap-2 px-3 py-2 cursor-pointer bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm w-full sm:w-auto justify-center"
           >
-            <FaPlus className="text-sm" /> Add Semester Record
+            <FaPlus className="text-xs" /> Add Semester Record
           </button>
         </div>
 
@@ -1557,92 +1556,121 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
       )}
 
       {/* Existing Records */}
-      <div className="space-y-4">
+      <div className="space-y-10">
         {academicRecords.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-            <FaChartBar className="mx-auto text-4xl text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 mb-2">No Academic Records Added</h3>
-            <p className="text-gray-500 mb-4">Start by adding your semester-wise academic performance records.</p>
+          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+            <div className="max-w-md mx-auto">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FaChartBar className="text-3xl text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">No Academic Records Added</h3>
+              <p className="text-gray-500 mb-4">Start by adding your semester-wise academic performance records.</p>
+            </div>
           </div>
         ) : (
           academicRecords.map((record) => {
             const recordId = record.academic_id || record.id;
             return (
-            <div key={recordId} className={`rounded-lg p-6 shadow-sm ${
+            <div key={recordId} className={`bg-white border rounded-lg p-4 ${
               editingId === recordId 
-                ? 'bg-amber-50 border-2 border-amber-300' 
-                : 'bg-white border border-gray-200'
+                ? 'border-yellow-300 bg-yellow-50' 
+                : 'border-gray-200'
             }`}>
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      Semester {record.semester} • {record.academic_year}
-                    </h3>
-                    {editingId === recordId && (
-                      <span className="px-2 py-1 bg-amber-200 text-amber-800 text-xs rounded-full font-medium">
-                        Currently Editing
+              <div className="flex flex-col lg:flex-row justify-between items-start gap-3 mb-4">
+                <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-2 mb-2">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                        Semester {record.semester}
+                      </h3>
+                      <p className="text-base font-medium text-purple-600 mb-2">{record.academic_year}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        record.semester_result === 'pass' ? 'bg-green-100 text-green-800' :
+                        record.semester_result === 'fail' ? 'bg-red-100 text-red-800' :
+                        record.semester_result === 'detained' ? 'bg-red-100 text-red-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {record.semester_result === 'pass' ? 'Passed' : 
+                         record.semester_result === 'fail' ? 'Failed' :
+                         record.semester_result === 'detained' ? 'Detained' :
+                         record.semester_result.charAt(0).toUpperCase() + record.semester_result.slice(1)}
+                      </span>
+                      {record.sgpa && (
+                        <div className="flex items-center gap-1 bg-indigo-50 px-3 py-1 rounded-full">
+                          <FaChartBar className="text-indigo-500 text-sm" />
+                          <span className="text-sm font-medium text-indigo-700">SGPA: {record.sgpa}</span>
+                        </div>
+                      )}
+                      {record.cgpa && (
+                        <div className="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full">
+                          <FaChartBar className="text-blue-500 text-sm" />
+                          <span className="text-sm font-medium text-blue-700">CGPA: {record.cgpa}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-2">
+                    {record.attendance_percentage && (
+                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                        <FaCheckCircle className="text-gray-400" />
+                        Attendance: {record.attendance_percentage}%
+                      </span>
+                    )}
+                    {record.exam_month && record.exam_year && (
+                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                        <FaCalendarAlt className="text-gray-400" />
+                        {record.exam_month} {record.exam_year}
                       </span>
                     )}
                   </div>
-                  <div className="flex gap-4 mt-2 text-sm text-gray-600">
-                    {record.sgpa && <span>SGPA: <strong>{record.sgpa}</strong></span>}
-                    {record.cgpa && <span>CGPA: <strong>{record.cgpa}</strong></span>}
-                    {record.attendance_percentage && <span>Attendance: <strong>{record.attendance_percentage}%</strong></span>}
-                  </div>
                 </div>
-                <div className="flex gap-2">
+                
+                <div className="flex items-center gap-2">
                   <button
                     onClick={() => editingId === recordId ? handleCancelEdit() : handleEditRecord(record)}
                     className={`p-2 cursor-pointer rounded transition-colors ${
                       editingId === recordId 
-                        ? 'text-amber-600 hover:text-amber-800 hover:bg-amber-100' 
-                        : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
+                        ? 'text-yellow-600 hover:text-yellow-800 bg-yellow-100 hover:bg-yellow-200' 
+                        : 'text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200'
                     }`}
                     title={editingId === recordId ? "Cancel Edit" : "Edit Record"}
                   >
-                    {editingId === recordId ? <FaTimes /> : <FaEdit />}
+                    {editingId === recordId ? <FaTimes size={16} /> : <FaEdit size={16} />}
                   </button>
                   <button
                     onClick={() => setManagingSubjectsFor(record)}
-                    className="text-green-600 hover:text-green-800 p-2 cursor-pointer hover:bg-green-50 rounded transition-colors flex items-center gap-1"
+                    className="p-2 cursor-pointer text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 rounded transition-colors"
                     title="Add/Manage Subjects for this semester"
                   >
-                    <FaPlus />
+                    <FaPlus size={16} />
                   </button>
                   <button
                     onClick={() => handleDeleteRecord(record.academic_id)}
-                    className="text-red-600 hover:text-red-800 p-2 cursor-pointer hover:bg-red-50 rounded transition-colors"
+                    className="p-2 cursor-pointer text-red-600 hover:text-red-800 bg-red-100 hover:bg-red-200 rounded transition-colors"
                     title="Delete Record"
                   >
-                    <FaTrash />
+                    <FaTrash size={16} />
                   </button>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="text-sm">
-                  <span className="text-gray-500">Credits:</span> {record.earned_credits}/{record.total_credits}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-1">Credits</p>
+                  <p className="font-semibold text-gray-900">
+                    {record.earned_credits || 0}/{record.total_credits || 0}
+                  </p>
                 </div>
-                <div className="text-sm">
-                  <span className="text-gray-500">Backlogs:</span> {record.backlog_count}
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-1">Backlogs</p>
+                  <p className="font-semibold text-gray-900">{record.backlog_count || 0}</p>
                 </div>
-                <div className="text-sm">
-                  <span className="text-gray-500">Result:</span> 
-                  <span className={`ml-1 px-2 py-1 rounded text-xs ${
-                    record.semester_result === 'pass' ? 'bg-green-100 text-green-800' :
-                    record.semester_result === 'fail' ? 'bg-red-100 text-red-800' :
-                    record.semester_result === 'detained' ? 'bg-red-100 text-red-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {record.semester_result === 'pass' ? 'Passed' : 
-                     record.semester_result === 'fail' ? 'Failed' :
-                     record.semester_result === 'detained' ? 'Detained' :
-                     record.semester_result.charAt(0).toUpperCase() + record.semester_result.slice(1)}
-                  </span>
-                </div>
-                <div className="text-sm">
-                  <span className="text-gray-500">Subjects:</span> {(() => {
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-1">Subjects</p>
+                  <p className="font-semibold text-gray-900">{(() => {
                     let subjects = record.subjects || record.Subjects || record.academic_subjects || [];
                     
                     // If subjects is a string (JSON), parse it
@@ -1655,8 +1683,14 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
                     }
                     
                     return Array.isArray(subjects) ? subjects.length : 0;
-                  })()}
+                  })()}</p>
                 </div>
+                {record.sgpa && (
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-1">SGPA</p>
+                    <p className="font-semibold text-gray-900">{record.sgpa}</p>
+                  </div>
+                )}
               </div>
 
               {/* Subjects Section */}
@@ -1681,69 +1715,106 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
                 const subjectCount = subjects.length;
                 
                 return subjectCount > 0 ? (
-                  <div className="border-t pt-4">
+                  <div className="border-t border-gray-200 pt-4 mb-4">
                     <div className="flex justify-between items-center mb-3">
-                      <h4 className="text-sm font-medium text-gray-700">Subjects ({subjectCount})</h4>
+                      <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                        <div className="w-1 h-4 bg-purple-500 rounded"></div>
+                        Subjects ({subjectCount})
+                      </h4>
                       <button
                         onClick={() => setManagingSubjectsFor(record)}
-                        className="text-xs text-green-600 hover:text-green-800 cursor-pointer flex items-center gap-1"
+                        className="text-sm text-green-600 hover:text-green-800 cursor-pointer flex items-center gap-1 font-medium"
                       >
                         <FaPlus className="text-xs" /> Add More
                       </button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {subjects.map((subject, index) => (
-                        <div key={subject.id || index} className="bg-gray-50 rounded p-3 text-sm border border-gray-200">
-                          <div className="font-medium text-gray-800">
-                            {subject.subject_code || subject.code || 'N/A'} - {subject.subject_name || subject.name || 'Unnamed Subject'}
-                          </div>
-                          <div className="text-gray-600 text-xs mt-1 flex flex-wrap gap-2">
-                            <span>{subject.credits || subject.credit || 0} credits</span>
-                            <span>•</span>
-                            {/* Show theory and practical grades separately */}
-                            {subject.theory_grade && (
-                              <span>Theory: {subject.theory_grade}</span>
-                            )}
-                            {subject.theory_grade && subject.practical_grade && <span>•</span>}
-                            {subject.practical_grade && (
-                              <span>Practical: {subject.practical_grade}</span>
-                            )}
-                            {/* Fallback for old grade format */}
-                            {!subject.theory_grade && !subject.practical_grade && (
-                              <span>Grade: {subject.grade || subject.final_grade || 'N/A'}</span>
-                            )}
+                        <div key={subject.id || index} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex-1">
+                              <div className="font-semibold text-gray-900 mb-1">
+                                {subject.subject_code || subject.code || 'N/A'} - {subject.subject_name || subject.name || 'Unnamed Subject'}
+                              </div>
+                              <div className="flex flex-wrap gap-2 mb-2">
+                                <span className="text-xs text-gray-600 bg-white px-2 py-1 rounded">
+                                  {subject.credits || subject.credit || 0} credits
+                                </span>
+                                {subject.subject_type && (
+                                  <span className="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded capitalize">
+                                    {subject.subject_type}
+                                  </span>
+                                )}
+                                {/* Show theory and practical grades separately */}
+                                {subject.theory_grade && (
+                                  <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                                    Theory: {subject.theory_grade}
+                                  </span>
+                                )}
+                                {subject.practical_grade && (
+                                  <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                                    Practical: {subject.practical_grade}
+                                  </span>
+                                )}
+                                {/* Fallback for old grade format */}
+                                {!subject.theory_grade && !subject.practical_grade && (
+                                  <span className="text-xs text-gray-600 bg-white px-2 py-1 rounded">
+                                    Grade: {subject.grade || subject.final_grade || 'N/A'}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           </div>
                           
                           {/* Detailed marks breakdown */}
                           {(subject.internal_theory || subject.external_theory || subject.internal_practical || subject.external_practical) && (
-                            <div className="text-gray-600 text-xs mt-2 space-y-1">
+                            <div className="text-gray-700 text-xs mt-3 space-y-2 pt-3 border-t border-gray-200">
                               {/* Theory breakdown */}
                               {(subject.internal_theory || subject.external_theory) && (
-                                <div>
-                                  <span className="font-medium text-blue-600">Theory:</span> 
-                                  {subject.internal_theory && <span> Int: {subject.internal_theory}</span>}
-                                  {subject.external_theory && <span> | Ext: {subject.external_theory}</span>}
-                                  {subject.total_theory && <span> | Total: {subject.total_theory}</span>}
-                                  {subject.theory_grade && <span> | Grade: {subject.theory_grade}</span>}
-                                  {subject.theory_grade_points && <span> ({subject.theory_grade_points} pts)</span>}
+                                <div className="bg-blue-50 rounded p-2">
+                                  <span className="font-semibold text-blue-700">Theory:</span>
+                                  <div className="flex flex-wrap gap-2 mt-1">
+                                    {subject.internal_theory && (
+                                      <span className="text-blue-600">Int: {subject.internal_theory}</span>
+                                    )}
+                                    {subject.external_theory && (
+                                      <span className="text-blue-600">Ext: {subject.external_theory}</span>
+                                    )}
+                                    {subject.total_theory && (
+                                      <span className="font-medium text-blue-700">Total: {subject.total_theory}</span>
+                                    )}
+                                    {subject.theory_grade && (
+                                      <span className="font-medium text-blue-700">Grade: {subject.theory_grade}</span>
+                                    )}
+                                    {subject.theory_grade_points && (
+                                      <span className="text-blue-600">({subject.theory_grade_points} pts)</span>
+                                    )}
+                                  </div>
                                 </div>
                               )}
                               {/* Practical breakdown */}
                               {(subject.internal_practical || subject.external_practical) && (
-                                <div>
-                                  <span className="font-medium text-green-600">Practical:</span>
-                                  {subject.internal_practical && <span> Int: {subject.internal_practical}</span>}
-                                  {subject.external_practical && <span> | Ext: {subject.external_practical}</span>}
-                                  {subject.total_practical && <span> | Total: {subject.total_practical}</span>}
-                                  {subject.practical_grade && <span> | Grade: {subject.practical_grade}</span>}
-                                  {subject.practical_grade_points && <span> ({subject.practical_grade_points} pts)</span>}
+                                <div className="bg-green-50 rounded p-2">
+                                  <span className="font-semibold text-green-700">Practical:</span>
+                                  <div className="flex flex-wrap gap-2 mt-1">
+                                    {subject.internal_practical && (
+                                      <span className="text-green-600">Int: {subject.internal_practical}</span>
+                                    )}
+                                    {subject.external_practical && (
+                                      <span className="text-green-600">Ext: {subject.external_practical}</span>
+                                    )}
+                                    {subject.total_practical && (
+                                      <span className="font-medium text-green-700">Total: {subject.total_practical}</span>
+                                    )}
+                                    {subject.practical_grade && (
+                                      <span className="font-medium text-green-700">Grade: {subject.practical_grade}</span>
+                                    )}
+                                    {subject.practical_grade_points && (
+                                      <span className="text-green-600">({subject.practical_grade_points} pts)</span>
+                                    )}
+                                  </div>
                                 </div>
                               )}
-                            </div>
-                          )}
-                          {subject.subject_type && (
-                            <div className="text-xs text-blue-600 mt-1 capitalize">
-                              {subject.subject_type}
                             </div>
                           )}
                         </div>
@@ -1751,13 +1822,13 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
                     </div>
                   </div>
                 ) : (
-                  <div className="border-t pt-4">
-                    <div className="text-center py-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <FaBook className="mx-auto text-xl text-blue-400 mb-2" />
-                      <p className="text-blue-700 text-sm font-medium mb-2">No subjects added yet</p>
+                  <div className="border-t border-gray-200 pt-4 mb-4">
+                    <div className="text-center py-6 bg-gray-50 rounded-lg border border-gray-200">
+                      <FaBook className="mx-auto text-2xl text-gray-400 mb-2" />
+                      <p className="text-gray-700 text-sm font-medium mb-2">No subjects added yet</p>
                       <button
                         onClick={() => setManagingSubjectsFor(record)}
-                        className="text-xs px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                        className="text-sm px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors cursor-pointer font-medium"
                       >
                         <FaPlus className="inline text-xs mr-1" /> Add Subjects
                       </button>
@@ -1767,8 +1838,12 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
               })()}
 
               {record.remarks && record.remarks.trim() && record.remarks !== 'topper' && (
-                <div className="border-t pt-4 mt-4">
-                  <p className="text-sm text-gray-600">{record.remarks}</p>
+                <div className="border-t border-gray-200 pt-4 mt-4">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <div className="w-1 h-4 bg-indigo-500 rounded"></div>
+                    Remarks
+                  </h4>
+                  <p className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-xl">{record.remarks}</p>
                 </div>
               )}
             </div>
