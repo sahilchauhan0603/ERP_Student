@@ -52,6 +52,11 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
   const [showSubjectForm, setShowSubjectForm] = useState(false);
   const [subjectErrors, setSubjectErrors] = useState({});
 
+  // Subject editing states
+  const [editingSubjectId, setEditingSubjectId] = useState(null);
+  const [editSubject, setEditSubject] = useState(null);
+  const [subjectParentRecordId, setSubjectParentRecordId] = useState(null); // Track which academic record this subject belongs to
+
   // Validation functions
   const validateRecord = (record) => {
     const newErrors = {};
@@ -522,6 +527,124 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
     setEditingId(null);
     setEditRecord(null);
     setErrors({});
+  };
+
+  const handleEditSubject = (subject, parentRecordId) => {
+    setEditSubject({
+      ...subject,
+      internal_theory: subject.internal_theory || '',
+      external_theory: subject.external_theory || '',
+      total_theory: subject.total_theory || '',
+      internal_practical: subject.internal_practical || '',
+      external_practical: subject.external_practical || '',
+      total_practical: subject.total_practical || '',
+      theory_grade: subject.theory_grade || '',
+      theory_grade_points: subject.theory_grade_points || '',
+      practical_grade: subject.practical_grade || '',
+      practical_grade_points: subject.practical_grade_points || '',
+      attendance: subject.attendance || '',
+      credits: subject.credits || '',
+      subject_type: subject.subject_type || 'core',
+      passed: subject.passed !== undefined ? subject.passed : true
+    });
+    setEditingSubjectId(subject.id || subject.subject_id);
+    setSubjectParentRecordId(parentRecordId); // Track the parent academic record
+    setSubjectErrors({});
+  };
+
+  const handleSubjectEditFieldChange = (field, value) => {
+    setEditSubject(prev => {
+      const updated = { ...prev, [field]: value };
+      
+      // Auto-calculate totals
+      if (field === 'internal_theory' || field === 'external_theory') {
+        updated.total_theory = calculateTotalTheory(
+          field === 'internal_theory' ? value : updated.internal_theory,
+          field === 'external_theory' ? value : updated.external_theory
+        );
+      }
+      
+      if (field === 'internal_practical' || field === 'external_practical') {
+        updated.total_practical = calculateTotalPractical(
+          field === 'internal_practical' ? value : updated.internal_practical,
+          field === 'external_practical' ? value : updated.external_practical
+        );
+      }
+      
+      return updated;
+    });
+  };
+
+  const handleUpdateSubject = async () => {
+    try {
+      setIsSubmitting(true);
+      const validationErrors = validateSubject(editSubject);
+      
+      if (Object.keys(validationErrors).length > 0) {
+        setSubjectErrors(validationErrors);
+        return;
+      }
+
+      // Find the parent academic record
+      const parentRecord = academicRecords.find(r => r.id === subjectParentRecordId || r.academic_id === subjectParentRecordId);
+      
+      if (!parentRecord) {
+        throw new Error('Parent academic record not found');
+      }
+
+      // Update the subject in the parent record's subjects array
+      const updatedSubjects = (parentRecord.subjects || []).map(s => {
+        const subjectId = s.id || s.subject_id;
+        return subjectId === editingSubjectId ? editSubject : s;
+      });
+
+      // Update the entire academic record with modified subjects
+      const updatedRecord = {
+        ...parentRecord,
+        subjects: updatedSubjects
+      };
+
+      await updateRecord(subjectParentRecordId, updatedRecord);
+      
+      // Show success message
+      Swal.fire({
+        title: 'Success!',
+        text: 'Subject updated successfully!',
+        icon: 'success',
+        confirmButtonColor: '#10B981',
+        confirmButtonText: 'OK'
+      });
+      
+      setEditSubject(null);
+      setEditingSubjectId(null);
+      setSubjectParentRecordId(null);
+      setSubjectErrors({});
+    } catch (error) {
+      console.error('Error updating subject:', error);
+      
+      // Show error message with SweetAlert
+      const errorMessage = error.message || 'Failed to update subject';
+      Swal.fire({
+        title: 'Error!',
+        text: errorMessage === 'No token provided' 
+          ? 'Your session has expired. Please login again.' 
+          : errorMessage,
+        icon: 'error',
+        confirmButtonColor: '#EF4444',
+        confirmButtonText: 'OK'
+      });
+      
+      setSubjectErrors({ submit: errorMessage });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelSubjectEdit = () => {
+    setEditSubject(null);
+    setEditingSubjectId(null);
+    setSubjectParentRecordId(null);
+    setSubjectErrors({});
   };
 
   const subjectTypes = ["core", "elective", "lab", "project", "seminar", "internship"];
@@ -1741,8 +1864,19 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
                       )}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {subjects.map((subject, index) => (
-                        <div key={subject.id || index} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      {subjects.map((subject, index) => {
+                        const subjectId = subject.id || subject.subject_id;
+                        const isEditingSubject = editingSubjectId === subjectId && editSubject;
+                        
+                        return (
+                        <div key={subjectId || index} className={`rounded-lg p-4 border transition-all ${
+                          isEditingSubject 
+                            ? 'bg-indigo-50 border-indigo-300 shadow-md' 
+                            : 'bg-gray-50 border-gray-200'
+                        }`}>
+                          {!isEditingSubject ? (
+                            // Read-only view
+                            <>
                           <div className="flex justify-between items-start mb-2">
                             <div className="flex-1">
                               <div className="font-semibold text-gray-900 mb-1">
@@ -1776,6 +1910,15 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
                                 )}
                               </div>
                             </div>
+                            {!isEditing && (
+                              <button
+                                onClick={() => handleEditSubject(subject, record.id || record.academic_id)}
+                                className="ml-2 p-1 text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 rounded transition-colors cursor-pointer"
+                                title="Edit Subject"
+                              >
+                                <FaEdit className="text-sm" />
+                              </button>
+                            )}
                           </div>
                           
                           {/* Detailed marks breakdown */}
@@ -1829,8 +1972,227 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
                               )}
                             </div>
                           )}
+                            </>
+                          ) : (
+                            // Edit mode
+                            <>
+                              <div className="mb-3 flex justify-between items-center">
+                                <span className="px-2 py-1 bg-indigo-600 text-white rounded-full text-xs font-semibold">
+                                  Editing Subject
+                                </span>
+                                <div className="flex gap-1">
+                                  <button
+                                    onClick={handleUpdateSubject}
+                                    disabled={isSubmitting}
+                                    className={`px-2 py-1 rounded text-xs flex items-center gap-1 ${
+                                      isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 cursor-pointer'
+                                    } text-white`}
+                                  >
+                                    {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaSave />}
+                                    Save
+                                  </button>
+                                  <button
+                                    onClick={handleCancelSubjectEdit}
+                                    disabled={isSubmitting}
+                                    className="px-2 py-1 bg-gray-600 text-white rounded text-xs hover:bg-gray-700 cursor-pointer"
+                                  >
+                                    <FaTimes />
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div className="space-y-2">
+                                {/* Basic Info */}
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <label className="block text-xs font-semibold text-gray-700 mb-1">Subject Code</label>
+                                    <input
+                                      type="text"
+                                      value={editSubject.subject_code}
+                                      onChange={(e) => setEditSubject(prev => ({ ...prev, subject_code: e.target.value }))}
+                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-indigo-500"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs font-semibold text-gray-700 mb-1">Credits</label>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      step="0.5"
+                                      value={editSubject.credits}
+                                      onChange={(e) => setEditSubject(prev => ({ ...prev, credits: e.target.value }))}
+                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-indigo-500"
+                                    />
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <label className="block text-xs font-semibold text-gray-700 mb-1">Subject Name</label>
+                                  <input
+                                    type="text"
+                                    value={editSubject.subject_name}
+                                    onChange={(e) => setEditSubject(prev => ({ ...prev, subject_name: e.target.value }))}
+                                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-indigo-500"
+                                  />
+                                </div>
+
+                                <div>
+                                  <label className="block text-xs font-semibold text-gray-700 mb-1">Type</label>
+                                  <select
+                                    value={editSubject.subject_type}
+                                    onChange={(e) => setEditSubject(prev => ({ ...prev, subject_type: e.target.value }))}
+                                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-indigo-500"
+                                  >
+                                    {subjectTypes.map(type => (
+                                      <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
+                                    ))}
+                                  </select>
+                                </div>
+
+                                {/* Theory Marks */}
+                                <div className="border-t pt-2">
+                                  <h5 className="text-xs font-bold text-blue-700 mb-1">Theory Marks</h5>
+                                  <div className="grid grid-cols-3 gap-2">
+                                    <div>
+                                      <label className="block text-xs text-gray-600 mb-1">Internal</label>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        value={editSubject.internal_theory}
+                                        onChange={(e) => handleSubjectEditFieldChange('internal_theory', e.target.value)}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs text-gray-600 mb-1">External</label>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        value={editSubject.external_theory}
+                                        onChange={(e) => handleSubjectEditFieldChange('external_theory', e.target.value)}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs text-gray-600 mb-1">Total</label>
+                                      <input
+                                        type="number"
+                                        value={editSubject.total_theory}
+                                        readOnly
+                                        className="w-full px-2 py-1 border border-gray-200 rounded text-sm bg-gray-50"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2 mt-2">
+                                    <div>
+                                      <label className="block text-xs text-gray-600 mb-1">Grade</label>
+                                      <select
+                                        value={editSubject.theory_grade}
+                                        onChange={(e) => setEditSubject(prev => ({ ...prev, theory_grade: e.target.value }))}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                      >
+                                        <option value="">Select</option>
+                                        {grades.map(grade => (
+                                          <option key={grade} value={grade}>{grade}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs text-gray-600 mb-1">Points</label>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max="10"
+                                        step="0.1"
+                                        value={editSubject.theory_grade_points}
+                                        onChange={(e) => setEditSubject(prev => ({ ...prev, theory_grade_points: e.target.value }))}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Practical Marks */}
+                                <div className="border-t pt-2">
+                                  <h5 className="text-xs font-bold text-green-700 mb-1">Practical Marks</h5>
+                                  <div className="grid grid-cols-3 gap-2">
+                                    <div>
+                                      <label className="block text-xs text-gray-600 mb-1">Internal</label>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        value={editSubject.internal_practical}
+                                        onChange={(e) => handleSubjectEditFieldChange('internal_practical', e.target.value)}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-green-500"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs text-gray-600 mb-1">External</label>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        value={editSubject.external_practical}
+                                        onChange={(e) => handleSubjectEditFieldChange('external_practical', e.target.value)}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-green-500"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs text-gray-600 mb-1">Total</label>
+                                      <input
+                                        type="number"
+                                        value={editSubject.total_practical}
+                                        readOnly
+                                        className="w-full px-2 py-1 border border-gray-200 rounded text-sm bg-gray-50"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2 mt-2">
+                                    <div>
+                                      <label className="block text-xs text-gray-600 mb-1">Grade</label>
+                                      <select
+                                        value={editSubject.practical_grade}
+                                        onChange={(e) => setEditSubject(prev => ({ ...prev, practical_grade: e.target.value }))}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-green-500"
+                                      >
+                                        <option value="">Select</option>
+                                        {grades.map(grade => (
+                                          <option key={grade} value={grade}>{grade}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs text-gray-600 mb-1">Points</label>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max="10"
+                                        step="0.1"
+                                        value={editSubject.practical_grade_points}
+                                        onChange={(e) => setEditSubject(prev => ({ ...prev, practical_grade_points: e.target.value }))}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-green-500"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Attendance */}
+                                <div>
+                                  <label className="block text-xs font-semibold text-gray-700 mb-1">Attendance %</label>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    value={editSubject.attendance}
+                                    onChange={(e) => setEditSubject(prev => ({ ...prev, attendance: e.target.value }))}
+                                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-indigo-500"
+                                  />
+                                </div>
+                              </div>
+                            </>
+                          )}
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 ) : (
