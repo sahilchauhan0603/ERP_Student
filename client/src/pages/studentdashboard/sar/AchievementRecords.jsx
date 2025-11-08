@@ -1141,399 +1141,131 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
         ) : (
           achievements.map((achievement) => {
             const achievementId = achievement.achievement_id || achievement.id;
+            const isEditing = editingId === achievementId && editRecord;
+            
             return (
-            <div key={achievementId} className={`bg-white border rounded-lg p-4 ${
-              editingId === achievementId
-                ? 'border-yellow-300 bg-yellow-50'
-                : 'border-gray-200'
+            <div key={achievementId} className={`border rounded-lg p-4 transition-all ${
+              isEditing
+                ? 'border-yellow-400 bg-yellow-50 shadow-lg'
+                : 'bg-white border-gray-200'
             }`}>
+              {/* Header with Edit/Delete buttons */}
               <div className="flex flex-col lg:flex-row justify-between items-start gap-3 mb-4">
-                <div className="flex-1">
-                  <div className="flex flex-col sm:flex-row sm:items-start gap-2 mb-2">
+                {!isEditing ? (
+                  <>
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{achievement.title}</h3>
-                      <p className="text-base font-medium text-yellow-600 mb-2">{achievement.organization || achievement.event_name || 'Achievement'}</p>
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-2 mb-2">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-1">{achievement.title}</h3>
+                          <p className="text-base font-medium text-yellow-600 mb-2">{achievement.organization || achievement.event_name || 'Achievement'}</p>
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(achievement.category)}`}>
+                            {achievement.category.charAt(0).toUpperCase() + achievement.category.slice(1)}
+                          </span>
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getLevelColor(achievement.level)}`}>
+                            {achievement.level.charAt(0).toUpperCase() + achievement.level.slice(1)}
+                          </span>
+                          {achievement.position_rank && (
+                            <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
+                              {achievement.position_rank}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-2">
+                        {achievement.achievement_date && (
+                          <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                            <FaCalendarAlt className="text-gray-400" />
+                            {formatDate(achievement.achievement_date)}
+                          </span>
+                        )}
+                        {achievement.semester_achieved && (
+                          <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                            <FaCertificate className="text-gray-400" />
+                            Semester {achievement.semester_achieved}
+                          </span>
+                        )}
+                        {achievement.points_awarded > 0 && (
+                          <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                            <FaTrophy className="text-gray-400" />
+                            {achievement.points_awarded} Points
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getCategoryColor(achievement.category)}`}>
-                        {achievement.category.charAt(0).toUpperCase() + achievement.category.slice(1)}
-                      </span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getLevelColor(achievement.level)}`}>
-                        {achievement.level.charAt(0).toUpperCase() + achievement.level.slice(1)}
-                      </span>
-                      {achievement.position_rank && (
-                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
-                          {achievement.position_rank}
+                    
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEditRecord(achievement)}
+                        className="p-2 cursor-pointer text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 rounded transition-colors"
+                        title="Edit Record"
+                      >
+                        <FaEdit size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteAchievement(achievementId)}
+                        className="p-2 cursor-pointer text-red-600 hover:text-red-800 bg-red-100 hover:bg-red-200 rounded transition-colors"
+                        disabled={isSubmitting}
+                        title="Delete Record"
+                      >
+                        {isSubmitting ? <FaSpinner className="animate-spin" size={16} /> : <FaTrash size={16} />}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="px-3 py-1 bg-yellow-600 text-white rounded-full text-xs font-semibold">
+                          Editing Mode
                         </span>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-2">
-                    {achievement.achievement_date && (
-                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
-                        <FaCalendarAlt className="text-gray-400" />
-                        {formatDate(achievement.achievement_date)}
-                      </span>
-                    )}
-                    {achievement.semester_achieved && (
-                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
-                        <FaCertificate className="text-gray-400" />
-                        Semester {achievement.semester_achieved}
-                      </span>
-                    )}
-                    {achievement.points_awarded > 0 && (
-                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
-                        <FaTrophy className="text-gray-400" />
-                        {achievement.points_awarded} Points
-                      </span>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => editingId === achievementId ? handleCancelEdit() : handleEditRecord(achievement)}
-                    className={`p-2 cursor-pointer rounded transition-colors ${
-                      editingId === achievementId 
-                        ? 'text-yellow-600 hover:text-yellow-800 bg-yellow-100 hover:bg-yellow-200' 
-                        : 'text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200'
-                    }`}
-                    title={editingId === achievementId ? "Cancel Edit" : "Edit Record"}
-                  >
-                    {editingId === achievementId ? <FaTimes size={16} /> : <FaEdit size={16} />}
-                  </button>
-                  <button
-                    onClick={() => handleDeleteAchievement(achievementId)}
-                    className="p-2 cursor-pointer text-red-600 hover:text-red-800 bg-red-100 hover:bg-red-200 rounded transition-colors"
-                    disabled={isSubmitting}
-                    title="Delete Record"
-                  >
-                    {isSubmitting ? <FaSpinner className="animate-spin" size={16} /> : <FaTrash size={16} />}
-                  </button>
-                </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleUpdateRecord}
+                        disabled={
+                          isSubmitting ||
+                          !editRecord.title ||
+                          !editRecord.organization
+                        }
+                        className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm ${
+                          isSubmitting ||
+                          !editRecord.title ||
+                          !editRecord.organization
+                            ? "bg-gray-400 cursor-not-allowed text-white"
+                            : "bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                        }`}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <FaSpinner className="animate-spin text-xs" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <FaSave className="text-xs" />
+                            Save
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        disabled={isSubmitting}
+                        className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer text-sm"
+                      >
+                        <FaTimes className="text-xs" />
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
 
-              {/* Edit Form */}
-              {editingId === achievementId && editRecord && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
-                  <h4 className="text-lg font-semibold text-amber-800 mb-4">Edit Achievement</h4>
-                  
-                  {/* Basic Information */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-                      <input
-                        type="text"
-                        value={editRecord.title}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, title: e.target.value }))}
-                        className={`w-full p-3 border rounded-lg focus:ring-2 ${
-                          errors.title
-                            ? 'border-red-400 focus:ring-red-500'
-                            : 'border-gray-300 focus:ring-amber-500'
-                        }`}
-                        placeholder="Enter achievement title"
-                      />
-                      {errors.title && (
-                        <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                          <FaExclamationCircle /> {errors.title}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                      <select
-                        value={editRecord.category}
-                        onChange={(e) => setEditRecord(prev => ({ 
-                          ...prev, 
-                          category: e.target.value,
-                          subcategory: "" 
-                        }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                      >
-                        {categories.map(category => (
-                          <option key={category} value={category}>
-                            {category.charAt(0).toUpperCase() + category.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
-                      <select
-                        value={editRecord.subcategory}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, subcategory: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                      >
-                        <option value="">Select Subcategory</option>
-                        {subcategoriesByCategory[editRecord.category]?.map(sub => (
-                          <option key={sub} value={sub}>
-                            {sub.replace('_', ' ').split(' ').map(word => 
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                            ).join(' ')}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Level *</label>
-                      <select
-                        value={editRecord.level}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, level: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                      >
-                        {levels.map(level => (
-                          <option key={level} value={level}>
-                            {level.charAt(0).toUpperCase() + level.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Achievement Date *</label>
-                      <input
-                        type="date"
-                        value={editRecord.achievement_date}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, achievement_date: e.target.value }))}
-                        className={`w-full p-3 border rounded-lg focus:ring-2 ${
-                          errors.achievement_date
-                            ? 'border-red-400 focus:ring-red-500'
-                            : 'border-gray-300 focus:ring-amber-500'
-                        }`}
-                      />
-                      {errors.achievement_date && (
-                        <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                          <FaExclamationCircle /> {errors.achievement_date}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Organization *</label>
-                      <input
-                        type="text"
-                        value={editRecord.organization}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, organization: e.target.value }))}
-                        className={`w-full p-3 border rounded-lg focus:ring-2 ${
-                          errors.organization
-                            ? 'border-red-400 focus:ring-red-500'
-                            : 'border-gray-300 focus:ring-amber-500'
-                        }`}
-                        placeholder="Organizing body/institution"
-                      />
-                      {errors.organization && (
-                        <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                          <FaExclamationCircle /> {errors.organization}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Event Name</label>
-                      <input
-                        type="text"
-                        value={editRecord.event_name}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, event_name: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                        placeholder="Competition/event name"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Position/Rank</label>
-                      <input
-                        type="text"
-                        value={editRecord.position_rank}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, position_rank: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                        placeholder="e.g., 1st, Winner, Gold Medal"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Total Participants</label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={editRecord.total_participants}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, total_participants: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                        placeholder="0"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Team Size</label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={editRecord.team_size}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, team_size: parseInt(e.target.value) }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                        placeholder="1"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Prize Amount</label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={editRecord.prize_amount}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, prize_amount: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                        placeholder="0"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
-                      <select
-                        value={editRecord.prize_currency}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, prize_currency: e.target.value }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                      >
-                        {currencies.map(curr => (
-                          <option key={curr} value={curr}>{curr}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea
-                      value={editRecord.description}
-                      onChange={(e) => setEditRecord(prev => ({ ...prev, description: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                      rows="3"
-                      placeholder="Describe your achievement in detail..."
-                    />
-                  </div>
-
-                  {/* Certificate URL */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Certificate URL</label>
-                    <input
-                      type="url"
-                      value={editRecord.certificate_url}
-                      onChange={(e) => setEditRecord(prev => ({ ...prev, certificate_url: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                      placeholder="https://example.com/certificate"
-                    />
-                  </div>
-
-                  {/* Array fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Team Members (comma-separated)</label>
-                      <input
-                        type="text"
-                        value={Array.isArray(editRecord.team_members) ? editRecord.team_members.join(', ') : editRecord.team_members || ''}
-                        onChange={(e) => setEditRecord(prev => ({ 
-                          ...prev, 
-                          team_members: e.target.value.split(',').map(m => m.trim()).filter(m => m) 
-                        }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                        placeholder="Enter team member names separated by commas"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Skills Demonstrated (comma-separated)</label>
-                      <input
-                        type="text"
-                        value={Array.isArray(editRecord.skills_demonstrated) ? editRecord.skills_demonstrated.join(', ') : editRecord.skills_demonstrated || ''}
-                        onChange={(e) => setEditRecord(prev => ({ 
-                          ...prev, 
-                          skills_demonstrated: e.target.value.split(',').map(s => s.trim()).filter(s => s) 
-                        }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                        placeholder="Enter skills separated by commas"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Technologies Used (comma-separated)</label>
-                      <input
-                        type="text"
-                        value={Array.isArray(editRecord.technologies_used) ? editRecord.technologies_used.join(', ') : editRecord.technologies_used || ''}
-                        onChange={(e) => setEditRecord(prev => ({ 
-                          ...prev, 
-                          technologies_used: e.target.value.split(',').map(t => t.trim()).filter(t => t) 
-                        }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                        placeholder="Enter technologies separated by commas"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma-separated)</label>
-                      <input
-                        type="text"
-                        value={Array.isArray(editRecord.tags) ? editRecord.tags.join(', ') : editRecord.tags || ''}
-                        onChange={(e) => setEditRecord(prev => ({ 
-                          ...prev, 
-                          tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag) 
-                        }))}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                        placeholder="Enter tags separated by commas"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Checkboxes */}
-                  <div className="flex gap-4 mb-6">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={editRecord.trophy_medal_received}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, trophy_medal_received: e.target.checked }))}
-                        className="rounded"
-                      />
-                      <span className="text-sm text-gray-700">Trophy/Medal Received</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={editRecord.media_coverage}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, media_coverage: e.target.checked }))}
-                        className="rounded"
-                      />
-                      <span className="text-sm text-gray-700">Media Coverage</span>
-                    </label>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-3">
-                    <button
-                      onClick={handleUpdateRecord}
-                      className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                        isSubmitting || !editRecord.title
-                          ? 'bg-gray-400 cursor-not-allowed'
-                          : 'bg-amber-600 hover:bg-amber-700 cursor-pointer'
-                      } text-white`}
-                      disabled={isSubmitting || !editRecord.title}
-                    >
-                      {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaSave />}
-                      {isSubmitting ? 'Updating...' : 'Update Achievement'}
-                    </button>
-                    <button
-                      onClick={handleCancelEdit}
-                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
-                    >
-                      <FaTimes className="inline mr-2" />
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-
+              {!isEditing ? (
+                /* Read-only Display */
+                <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
                 {achievement.organization && (
                   <div className="bg-gray-50 p-3 rounded-lg">
@@ -1688,6 +1420,280 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                   </span>
                 )}
               </div>
+                </>
+              ) : (
+                /* Inline Edit Form */
+                <>
+                  <div className="mb-4">
+                    <h4 className="text-md font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                      Basic Information
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <div className="md:col-span-2 space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Title *</label>
+                        <input
+                          type="text"
+                          value={editRecord.title}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, title: e.target.value }))}
+                          className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 ${
+                            errors.title ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                          placeholder="Enter achievement title"
+                        />
+                        {errors.title && (
+                          <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded">
+                            <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" /> {errors.title}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Category *</label>
+                        <select
+                          value={editRecord.category}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, category: e.target.value, subcategory: "" }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                        >
+                          {categories.map(category => (
+                            <option key={category} value={category}>
+                              {category.charAt(0).toUpperCase() + category.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Subcategory</label>
+                        <select
+                          value={editRecord.subcategory || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, subcategory: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                        >
+                          <option value="">Select Subcategory</option>
+                          {subcategoriesByCategory[editRecord.category]?.map(sub => (
+                            <option key={sub} value={sub}>
+                              {sub.replace('_', ' ').split(' ').map(word => 
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                              ).join(' ')}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Level *</label>
+                        <select
+                          value={editRecord.level}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, level: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                        >
+                          {levels.map(level => (
+                            <option key={level} value={level}>
+                              {level.charAt(0).toUpperCase() + level.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Achievement Date *</label>
+                        <input
+                          type="date"
+                          value={editRecord.achievement_date || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, achievement_date: e.target.value }))}
+                          className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 ${
+                            errors.achievement_date ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                        />
+                        {errors.achievement_date && (
+                          <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded">
+                            <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" /> {errors.achievement_date}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Organization *</label>
+                        <input
+                          type="text"
+                          value={editRecord.organization || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, organization: e.target.value }))}
+                          className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 ${
+                            errors.organization ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                          placeholder="Organizing body/institution"
+                        />
+                        {errors.organization && (
+                          <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded">
+                            <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" /> {errors.organization}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Event Name</label>
+                        <input
+                          type="text"
+                          value={editRecord.event_name || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, event_name: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                          placeholder="Competition/event name"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Position/Rank</label>
+                        <input
+                          type="text"
+                          value={editRecord.position_rank || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, position_rank: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                          placeholder="e.g., 1st, Winner, Gold Medal"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Total Participants</label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={editRecord.total_participants || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, total_participants: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                          placeholder="0"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Team Size</label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={editRecord.team_size || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, team_size: parseInt(e.target.value) || 1 }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                          placeholder="1"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Prize Amount</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editRecord.prize_amount || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, prize_amount: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                          placeholder="0"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Currency</label>
+                        <select
+                          value={editRecord.prize_currency || "INR"}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, prize_currency: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                        >
+                          {currencies.map(curr => (
+                            <option key={curr} value={curr}>{curr}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+                    <textarea
+                      value={editRecord.description || ""}
+                      onChange={(e) => setEditRecord(prev => ({ ...prev, description: e.target.value }))}
+                      className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                      rows="3"
+                      placeholder="Describe your achievement in detail..."
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Certificate URL</label>
+                    <input
+                      type="url"
+                      value={editRecord.certificate_url || ""}
+                      onChange={(e) => setEditRecord(prev => ({ ...prev, certificate_url: e.target.value }))}
+                      className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                      placeholder="https://example.com/certificate"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                    <div className="space-y-1">
+                      <label className="block text-sm font-semibold text-gray-700">Team Members (comma-separated)</label>
+                      <input
+                        type="text"
+                        value={Array.isArray(editRecord.team_members) ? editRecord.team_members.join(', ') : editRecord.team_members || ''}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, team_members: e.target.value.split(',').map(m => m.trim()).filter(m => m) }))}
+                        className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                        placeholder="Enter team member names separated by commas"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-sm font-semibold text-gray-700">Skills Demonstrated (comma-separated)</label>
+                      <input
+                        type="text"
+                        value={Array.isArray(editRecord.skills_demonstrated) ? editRecord.skills_demonstrated.join(', ') : editRecord.skills_demonstrated || ''}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, skills_demonstrated: e.target.value.split(',').map(s => s.trim()).filter(s => s) }))}
+                        className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                        placeholder="Enter skills separated by commas"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-sm font-semibold text-gray-700">Technologies Used (comma-separated)</label>
+                      <input
+                        type="text"
+                        value={Array.isArray(editRecord.technologies_used) ? editRecord.technologies_used.join(', ') : editRecord.technologies_used || ''}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, technologies_used: e.target.value.split(',').map(t => t.trim()).filter(t => t) }))}
+                        className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                        placeholder="Enter technologies separated by commas"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-sm font-semibold text-gray-700">Tags (comma-separated)</label>
+                      <input
+                        type="text"
+                        value={Array.isArray(editRecord.tags) ? editRecord.tags.join(', ') : editRecord.tags || ''}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag) }))}
+                        className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                        placeholder="Enter tags separated by commas"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 mb-4">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={editRecord.trophy_medal_received || false}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, trophy_medal_received: e.target.checked }))}
+                        className="rounded"
+                      />
+                      <span className="text-sm text-gray-700">Trophy/Medal Received</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={editRecord.media_coverage || false}
+                        onChange={(e) => setEditRecord(prev => ({ ...prev, media_coverage: e.target.checked }))}
+                        className="rounded"
+                      />
+                      <span className="text-sm text-gray-700">Media Coverage</span>
+                    </label>
+                  </div>
+                </>
+              )}
             </div>
             );
           })

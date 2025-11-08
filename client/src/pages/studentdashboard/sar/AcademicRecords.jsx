@@ -1321,240 +1321,6 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
         </div>
       )}
 
-      {/* Edit Record Form */}
-      {editingId && editRecord && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-amber-800">
-              Edit Academic Record - Semester {editRecord.semester}
-            </h3>
-            <button
-              onClick={handleCancelEdit}
-              className="text-amber-600 hover:text-amber-800 cursor-pointer"
-            >
-              <FaTimes size={20} />
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Semester *</label>
-              <select
-                value={editRecord.semester}
-                onChange={(e) => setEditRecord(prev => ({ ...prev, semester: parseInt(e.target.value) }))}
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  errors.record?.semester ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                required
-              >
-                {[1,2,3,4,5,6,7,8].map(sem => (
-                  <option key={sem} value={sem}>Semester {sem}</option>
-                ))}
-              </select>
-              {errors.record?.semester && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                  <FaExclamationCircle className="text-xs" />
-                  {errors.record.semester}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year *</label>
-              <input
-                type="text"
-                value={editRecord.academic_year}
-                onChange={(e) => setEditRecord(prev => ({ ...prev, academic_year: e.target.value }))}
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  errors.record?.academic_year ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="e.g., 2023-24"
-                required
-              />
-              {errors.record?.academic_year && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                  <FaExclamationCircle className="text-xs" />
-                  {errors.record.academic_year}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">SGPA</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                max="10"
-                value={editRecord.sgpa}
-                onChange={(e) => setEditRecord(prev => ({ ...prev, sgpa: e.target.value }))}
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  errors.record?.sgpa ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="0.00"
-              />
-              {errors.record?.sgpa && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                  <FaExclamationCircle className="text-xs" />
-                  {errors.record.sgpa}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">CGPA</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                max="10"
-                value={editRecord.cgpa}
-                onChange={(e) => setEditRecord(prev => ({ ...prev, cgpa: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="0.00"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Total Credits</label>
-              <input
-                type="number"
-                min="0"
-                value={editRecord.total_credits}
-                onChange={(e) => setEditRecord(prev => ({ ...prev, total_credits: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="0"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Earned Credits</label>
-              <input
-                type="number"
-                min="0"
-                value={editRecord.earned_credits}
-                onChange={(e) => setEditRecord(prev => ({ ...prev, earned_credits: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="0"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Attendance %</label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                step="0.1"
-                value={editRecord.attendance_percentage}
-                onChange={(e) => setEditRecord(prev => ({ ...prev, attendance_percentage: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="0.0"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Backlog Count</label>
-              <input
-                type="number"
-                min="0"
-                value={editRecord.backlog_count}
-                onChange={(e) => setEditRecord(prev => ({ ...prev, backlog_count: parseInt(e.target.value) || 0 }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="0"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Semester Result</label>
-              <select
-                value={editRecord.semester_result}
-                onChange={(e) => setEditRecord(prev => ({ ...prev, semester_result: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                {["ongoing", "pass", "fail", "detained"].map(result => (
-                  <option key={result} value={result}>
-                    {result === 'pass' ? 'Passed' : 
-                     result === 'fail' ? 'Failed' :
-                     result === 'detained' ? 'Detained' :
-                     result.charAt(0).toUpperCase() + result.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Exam Month</label>
-              <input
-                type="text"
-                value={editRecord.exam_month}
-                onChange={(e) => setEditRecord(prev => ({ ...prev, exam_month: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., May"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Exam Year</label>
-              <input
-                type="text"
-                value={editRecord.exam_year}
-                onChange={(e) => setEditRecord(prev => ({ ...prev, exam_year: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., 2024"
-              />
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Remarks</label>
-            <textarea
-              value={editRecord.remarks}
-              onChange={(e) => setEditRecord(prev => ({ ...prev, remarks: e.target.value }))}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              rows="3"
-              placeholder="Any additional remarks about this semester..."
-            />
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              onClick={handleUpdateRecord}
-              disabled={isSubmitting || !editRecord.semester || !editRecord.academic_year}
-              className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                isSubmitting 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-green-600 hover:bg-green-700 cursor-pointer'
-              } text-white`}
-            >
-              {isSubmitting ? (
-                <>
-                  <FaSpinner className="animate-spin" />
-                  Updating...
-                </>
-              ) : (
-                <>
-                  <FaSave />
-                  Update Record
-                </>
-              )}
-            </button>
-            <button
-              onClick={handleCancelEdit}
-              disabled={isSubmitting}
-              className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                isSubmitting 
-                  ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
-                  : 'bg-gray-600 hover:bg-gray-700 cursor-pointer text-white'
-              }`}
-            >
-              <FaTimes />
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Existing Records */}
       <div className="space-y-10">
         {academicRecords.length === 0 ? (
@@ -1570,94 +1336,146 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
         ) : (
           academicRecords.map((record) => {
             const recordId = record.academic_id || record.id;
+            const isEditing = editingId === recordId && editRecord;
+            
             return (
-            <div key={recordId} className={`bg-white border rounded-lg p-4 ${
-              editingId === recordId 
-                ? 'border-yellow-300 bg-yellow-50' 
-                : 'border-gray-200'
+            <div key={recordId} className={`border rounded-lg p-4 transition-all ${
+              isEditing
+                ? 'border-purple-400 bg-purple-50 shadow-lg'
+                : 'bg-white border-gray-200'
             }`}>
+              {/* Header with Edit/Delete buttons */}
               <div className="flex flex-col lg:flex-row justify-between items-start gap-3 mb-4">
-                <div className="flex-1">
-                  <div className="flex flex-col sm:flex-row sm:items-start gap-2 mb-2">
+                {!isEditing ? (
+                  <>
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                        Semester {record.semester}
-                      </h3>
-                      <p className="text-base font-medium text-purple-600 mb-2">{record.academic_year}</p>
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-2 mb-2">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                            Semester {record.semester}
+                          </h3>
+                          <p className="text-base font-medium text-purple-600 mb-2">{record.academic_year}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            record.semester_result === 'pass' ? 'bg-green-100 text-green-800' :
+                            record.semester_result === 'fail' ? 'bg-red-100 text-red-800' :
+                            record.semester_result === 'detained' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {record.semester_result === 'pass' ? 'Passed' : 
+                             record.semester_result === 'fail' ? 'Failed' :
+                             record.semester_result === 'detained' ? 'Detained' :
+                             record.semester_result.charAt(0).toUpperCase() + record.semester_result.slice(1)}
+                          </span>
+                          {record.sgpa && (
+                            <div className="flex items-center gap-1 bg-indigo-50 px-3 py-1 rounded-full">
+                              <FaChartBar className="text-indigo-500 text-sm" />
+                              <span className="text-sm font-medium text-indigo-700">SGPA: {record.sgpa}</span>
+                            </div>
+                          )}
+                          {record.cgpa && (
+                            <div className="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full">
+                              <FaChartBar className="text-blue-500 text-sm" />
+                              <span className="text-sm font-medium text-blue-700">CGPA: {record.cgpa}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-2">
+                        {record.attendance_percentage && (
+                          <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                            <FaCheckCircle className="text-gray-400" />
+                            Attendance: {record.attendance_percentage}%
+                          </span>
+                        )}
+                        {record.exam_month && record.exam_year && (
+                          <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                            <FaCalendarAlt className="text-gray-400" />
+                            {record.exam_month} {record.exam_year}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEditRecord(record)}
+                        className="p-2 cursor-pointer text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 rounded transition-colors"
+                        title="Edit Record"
+                      >
+                        <FaEdit size={16} />
+                      </button>
+                      <button
+                        onClick={() => setManagingSubjectsFor(record)}
+                        className="p-2 cursor-pointer text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 rounded transition-colors"
+                        title="Add/Manage Subjects for this semester"
+                      >
+                        <FaPlus size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteRecord(record.academic_id)}
+                        className="p-2 cursor-pointer text-red-600 hover:text-red-800 bg-red-100 hover:bg-red-200 rounded transition-colors"
+                        title="Delete Record"
+                      >
+                        <FaTrash size={16} />
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="px-3 py-1 bg-purple-600 text-white rounded-full text-xs font-semibold">
+                          Editing Mode
+                        </span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        record.semester_result === 'pass' ? 'bg-green-100 text-green-800' :
-                        record.semester_result === 'fail' ? 'bg-red-100 text-red-800' :
-                        record.semester_result === 'detained' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {record.semester_result === 'pass' ? 'Passed' : 
-                         record.semester_result === 'fail' ? 'Failed' :
-                         record.semester_result === 'detained' ? 'Detained' :
-                         record.semester_result.charAt(0).toUpperCase() + record.semester_result.slice(1)}
-                      </span>
-                      {record.sgpa && (
-                        <div className="flex items-center gap-1 bg-indigo-50 px-3 py-1 rounded-full">
-                          <FaChartBar className="text-indigo-500 text-sm" />
-                          <span className="text-sm font-medium text-indigo-700">SGPA: {record.sgpa}</span>
-                        </div>
-                      )}
-                      {record.cgpa && (
-                        <div className="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full">
-                          <FaChartBar className="text-blue-500 text-sm" />
-                          <span className="text-sm font-medium text-blue-700">CGPA: {record.cgpa}</span>
-                        </div>
-                      )}
+                      <button
+                        onClick={handleUpdateRecord}
+                        disabled={
+                          isSubmitting ||
+                          !editRecord.semester ||
+                          !editRecord.academic_year
+                        }
+                        className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm ${
+                          isSubmitting ||
+                          !editRecord.semester ||
+                          !editRecord.academic_year
+                            ? "bg-gray-400 cursor-not-allowed text-white"
+                            : "bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                        }`}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <FaSpinner className="animate-spin text-xs" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <FaSave className="text-xs" />
+                            Save
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        disabled={isSubmitting}
+                        className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer text-sm"
+                      >
+                        <FaTimes className="text-xs" />
+                      </button>
                     </div>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-2">
-                    {record.attendance_percentage && (
-                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
-                        <FaCheckCircle className="text-gray-400" />
-                        Attendance: {record.attendance_percentage}%
-                      </span>
-                    )}
-                    {record.exam_month && record.exam_year && (
-                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
-                        <FaCalendarAlt className="text-gray-400" />
-                        {record.exam_month} {record.exam_year}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => editingId === recordId ? handleCancelEdit() : handleEditRecord(record)}
-                    className={`p-2 cursor-pointer rounded transition-colors ${
-                      editingId === recordId 
-                        ? 'text-yellow-600 hover:text-yellow-800 bg-yellow-100 hover:bg-yellow-200' 
-                        : 'text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200'
-                    }`}
-                    title={editingId === recordId ? "Cancel Edit" : "Edit Record"}
-                  >
-                    {editingId === recordId ? <FaTimes size={16} /> : <FaEdit size={16} />}
-                  </button>
-                  <button
-                    onClick={() => setManagingSubjectsFor(record)}
-                    className="p-2 cursor-pointer text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 rounded transition-colors"
-                    title="Add/Manage Subjects for this semester"
-                  >
-                    <FaPlus size={16} />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteRecord(record.academic_id)}
-                    className="p-2 cursor-pointer text-red-600 hover:text-red-800 bg-red-100 hover:bg-red-200 rounded transition-colors"
-                    title="Delete Record"
-                  >
-                    <FaTrash size={16} />
-                  </button>
-                </div>
+                  </>
+                )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+              {!isEditing ? (
+                /* Read-only Display */
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <p className="text-sm text-gray-600 mb-1">Credits</p>
                   <p className="font-semibold text-gray-900">
@@ -1692,8 +1510,200 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
                   </div>
                 )}
               </div>
+                </>
+              ) : (
+                /* Inline Edit Form */
+                <>
+                  <div className="mb-4">
+                    <h4 className="text-md font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                      Basic Information
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Semester *</label>
+                        <select
+                          value={editRecord.semester}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, semester: parseInt(e.target.value) }))}
+                          className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 ${
+                            errors.record?.semester ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                          required
+                        >
+                          {[1,2,3,4,5,6,7,8].map(sem => (
+                            <option key={sem} value={sem}>Semester {sem}</option>
+                          ))}
+                        </select>
+                        {errors.record?.semester && (
+                          <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded">
+                            <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" />
+                            {errors.record.semester}
+                          </p>
+                        )}
+                      </div>
 
-              {/* Subjects Section */}
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Academic Year *</label>
+                        <input
+                          type="text"
+                          value={editRecord.academic_year}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, academic_year: e.target.value }))}
+                          className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 ${
+                            errors.record?.academic_year ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                          placeholder="e.g., 2023-24"
+                          required
+                        />
+                        {errors.record?.academic_year && (
+                          <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded">
+                            <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" />
+                            {errors.record.academic_year}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">SGPA</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          max="10"
+                          value={editRecord.sgpa || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, sgpa: e.target.value }))}
+                          className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 ${
+                            errors.record?.sgpa ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                          placeholder="0.00"
+                        />
+                        {errors.record?.sgpa && (
+                          <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded">
+                            <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" />
+                            {errors.record.sgpa}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">CGPA</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          max="10"
+                          value={editRecord.cgpa || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, cgpa: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 hover:border-gray-300"
+                          placeholder="0.00"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Total Credits</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editRecord.total_credits || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, total_credits: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 hover:border-gray-300"
+                          placeholder="0"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Earned Credits</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editRecord.earned_credits || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, earned_credits: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 hover:border-gray-300"
+                          placeholder="0"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Attendance %</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          value={editRecord.attendance_percentage || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, attendance_percentage: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 hover:border-gray-300"
+                          placeholder="0.0"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Backlog Count</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editRecord.backlog_count || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, backlog_count: parseInt(e.target.value) || 0 }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 hover:border-gray-300"
+                          placeholder="0"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Semester Result</label>
+                        <select
+                          value={editRecord.semester_result}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, semester_result: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 hover:border-gray-300"
+                        >
+                          {semesterResults.map(result => (
+                            <option key={result} value={result}>
+                              {result === 'pass' ? 'Passed' : 
+                               result === 'fail' ? 'Failed' :
+                               result === 'detained' ? 'Detained' :
+                               result.charAt(0).toUpperCase() + result.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Exam Month</label>
+                        <input
+                          type="text"
+                          value={editRecord.exam_month || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, exam_month: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 hover:border-gray-300"
+                          placeholder="e.g., May"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Exam Year</label>
+                        <input
+                          type="text"
+                          value={editRecord.exam_year || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, exam_year: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 hover:border-gray-300"
+                          placeholder="e.g., 2024"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Remarks</label>
+                    <textarea
+                      value={editRecord.remarks || ""}
+                      onChange={(e) => setEditRecord(prev => ({ ...prev, remarks: e.target.value }))}
+                      className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-purple-100 focus:border-purple-500 hover:border-gray-300"
+                      rows="3"
+                      placeholder="Any additional remarks about this semester..."
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Subjects Section (shown in both modes) */}
               {(() => {
                 // Handle different possible subject data structures and parse JSON strings
                 let subjects = record.subjects || record.Subjects || record.academic_subjects || [];
@@ -1721,12 +1731,14 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
                         <div className="w-1 h-4 bg-purple-500 rounded"></div>
                         Subjects ({subjectCount})
                       </h4>
-                      <button
-                        onClick={() => setManagingSubjectsFor(record)}
-                        className="text-sm text-green-600 hover:text-green-800 cursor-pointer flex items-center gap-1 font-medium"
-                      >
-                        <FaPlus className="text-xs" /> Add More
-                      </button>
+                      {!isEditing && (
+                        <button
+                          onClick={() => setManagingSubjectsFor(record)}
+                          className="text-sm text-green-600 hover:text-green-800 cursor-pointer flex items-center gap-1 font-medium"
+                        >
+                          <FaPlus className="text-xs" /> Add More
+                        </button>
+                      )}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {subjects.map((subject, index) => (
@@ -1826,12 +1838,14 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
                     <div className="text-center py-6 bg-gray-50 rounded-lg border border-gray-200">
                       <FaBook className="mx-auto text-2xl text-gray-400 mb-2" />
                       <p className="text-gray-700 text-sm font-medium mb-2">No subjects added yet</p>
-                      <button
-                        onClick={() => setManagingSubjectsFor(record)}
-                        className="text-sm px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors cursor-pointer font-medium"
-                      >
-                        <FaPlus className="inline text-xs mr-1" /> Add Subjects
-                      </button>
+                      {!isEditing && (
+                        <button
+                          onClick={() => setManagingSubjectsFor(record)}
+                          className="text-sm px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors cursor-pointer font-medium"
+                        >
+                          <FaPlus className="inline text-xs mr-1" /> Add Subjects
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
