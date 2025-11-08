@@ -214,7 +214,7 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
     }
   };
 
-  const handleOfferLetterUpload = async (event) => {
+  const handleOfferLetterUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -227,6 +227,7 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
         text: 'Please upload only image files (JPEG, PNG, GIF).',
         confirmButtonColor: '#dc3545'
       });
+      event.target.value = ''; // Clear the input
       return;
     }
 
@@ -238,35 +239,19 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
         text: 'Please upload an image smaller than 2MB.',
         confirmButtonColor: '#dc3545'
       });
+      event.target.value = ''; // Clear the input
       return;
     }
 
-    setUploadingOfferLetter(true);
+    // Store file locally for preview, don't upload to Cloudinary yet
     setOfferLetterFile(file);
-
-    try {
-      const uploadedUrl = await uploadToCloudinary(file);
-      console.log('Upload successful, URL received:', uploadedUrl); // Debug log
-      setNewInternship(prev => ({ ...prev, offer_letter: uploadedUrl }));
-      
-      Swal.fire({
-        icon: 'success',
-        title: 'Upload Successful',
-        text: 'Offer letter uploaded successfully!',
-        confirmButtonColor: '#28a745'
-      });
-    } catch (error) {
-      console.error('Upload error:', error); // Debug log
-      Swal.fire({
-        icon: 'error',
-        title: 'Upload Failed',
-        text: error.message,
-        confirmButtonColor: '#dc3545'
-      });
-      setOfferLetterFile(null);
-    } finally {
-      setUploadingOfferLetter(false);
-    }
+    
+    Swal.fire({
+      icon: 'success',
+      title: 'File Selected',
+      text: 'Offer letter ready for upload. Complete the form and click "Save Internship" to upload.',
+      confirmButtonColor: '#28a745'
+    });
   };
 
   const resetForm = () => {
@@ -357,15 +342,64 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
     setIsSubmitting(true);
     
     try {
-      console.log('Submitting internship data:', newInternship); // Debug log
-      console.log('Offer letter URL:', newInternship.offer_letter); // Debug log
-      await addRecord(newInternship);
+      // Create a copy of the internship data
+      let internshipDataToSubmit = { ...newInternship };
+      
+      // Sanitize data: convert empty strings to null for numeric/optional fields
+      if (!internshipDataToSubmit.performance_rating || internshipDataToSubmit.performance_rating === "") {
+        internshipDataToSubmit.performance_rating = null;
+      }
+      // Note: Keep performance_rating as raw numeric value for server-side ENUM conversion
+      
+      // Sanitize other numeric fields
+      if (!internshipDataToSubmit.duration_months || internshipDataToSubmit.duration_months === "") {
+        internshipDataToSubmit.duration_months = null;
+      } else {
+        internshipDataToSubmit.duration_months = parseFloat(internshipDataToSubmit.duration_months);
+      }
+      
+      if (!internshipDataToSubmit.duration_weeks || internshipDataToSubmit.duration_weeks === "") {
+        internshipDataToSubmit.duration_weeks = null;
+      } else {
+        internshipDataToSubmit.duration_weeks = parseInt(internshipDataToSubmit.duration_weeks);
+      }
+      
+      if (!internshipDataToSubmit.stipend || internshipDataToSubmit.stipend === "") {
+        internshipDataToSubmit.stipend = null;
+      } else {
+        internshipDataToSubmit.stipend = parseFloat(internshipDataToSubmit.stipend);
+      }
+      
+      // If there's an offer letter file, upload it to Cloudinary first
+      if (offerLetterFile) {
+        try {
+          console.log('Uploading offer letter to Cloudinary...');
+          const uploadedUrl = await uploadToCloudinary(offerLetterFile);
+          console.log('Upload successful, URL received:', uploadedUrl);
+          internshipDataToSubmit.offer_letter = uploadedUrl;
+        } catch (uploadError) {
+          console.error('Upload error:', uploadError);
+          Swal.fire({
+            icon: 'error',
+            title: 'Upload Failed',
+            text: `Failed to upload offer letter: ${uploadError.message}`,
+            confirmButtonColor: '#dc3545'
+          });
+          setIsSubmitting(false);
+          return;
+        }
+      }
+      
+      console.log('Submitting internship data:', internshipDataToSubmit);
+      await addRecord(internshipDataToSubmit);
       
       // Show success message with SweetAlert2
       await Swal.fire({
         icon: 'success',
         title: 'Success!',
-        text: 'Internship record created successfully!',
+        text: offerLetterFile 
+          ? 'Internship record created successfully with offer letter uploaded!' 
+          : 'Internship record created successfully!',
         confirmButtonColor: '#28a745'
       });
       
@@ -461,10 +495,60 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
     setIsSubmitting(true);
     
     try {
-      await updateRecord(editRecord.id, editRecord);
+      // Create a copy of the edit record data
+      let recordDataToUpdate = { ...editRecord };
+      
+      // Sanitize data: convert empty strings to null for numeric/optional fields
+      if (!recordDataToUpdate.performance_rating || recordDataToUpdate.performance_rating === "") {
+        recordDataToUpdate.performance_rating = null;
+      }
+      // Note: Keep performance_rating as raw numeric value for server-side ENUM conversion
+      
+      // Sanitize other numeric fields
+      if (!recordDataToUpdate.duration_months || recordDataToUpdate.duration_months === "") {
+        recordDataToUpdate.duration_months = null;
+      } else {
+        recordDataToUpdate.duration_months = parseFloat(recordDataToUpdate.duration_months);
+      }
+      
+      if (!recordDataToUpdate.duration_weeks || recordDataToUpdate.duration_weeks === "") {
+        recordDataToUpdate.duration_weeks = null;
+      } else {
+        recordDataToUpdate.duration_weeks = parseInt(recordDataToUpdate.duration_weeks);
+      }
+      
+      if (!recordDataToUpdate.stipend || recordDataToUpdate.stipend === "") {
+        recordDataToUpdate.stipend = null;
+      } else {
+        recordDataToUpdate.stipend = parseFloat(recordDataToUpdate.stipend);
+      }
+      
+      // If there's a new offer letter file, upload it to Cloudinary first
+      if (offerLetterFile) {
+        try {
+          console.log('Uploading new offer letter to Cloudinary...');
+          const uploadedUrl = await uploadToCloudinary(offerLetterFile);
+          console.log('Upload successful, URL received:', uploadedUrl);
+          recordDataToUpdate.offer_letter = uploadedUrl;
+        } catch (uploadError) {
+          console.error('Upload error:', uploadError);
+          Swal.fire({
+            icon: 'error',
+            title: 'Upload Failed',
+            text: `Failed to upload offer letter: ${uploadError.message}`,
+            confirmButtonColor: '#dc3545'
+          });
+          setIsSubmitting(false);
+          return;
+        }
+      }
+      
+      await updateRecord(recordDataToUpdate.id, recordDataToUpdate);
       await Swal.fire({
         title: 'Success!',
-        text: 'Internship record updated successfully!',
+        text: offerLetterFile 
+          ? 'Internship record updated successfully with new offer letter uploaded!' 
+          : 'Internship record updated successfully!',
         icon: 'success',
         confirmButtonColor: '#10B981',
         confirmButtonText: 'Great!'
@@ -487,6 +571,7 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditRecord(null);
+    setOfferLetterFile(null); // Clear any selected file
     setErrors({});
   };
 
@@ -877,14 +962,14 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                         />
                       </svg>
                       <span className="text-sm text-gray-600 font-medium">
-                        {newInternship.offer_letter ? (
-                          <span className="text-green-600">Offer letter uploaded!</span>
+                        {offerLetterFile ? (
+                          <span className="text-green-600">File selected: {offerLetterFile.name}</span>
                         ) : (
-                          "Click to upload offer letter"
+                          "Click to select offer letter"
                         )}
                       </span>
                       <span className="text-xs text-gray-500 mt-1">
-                        JPEG, PNG, or GIF (max 2MB)
+                        JPEG, PNG, or GIF (max 2MB). Upload on save.
                       </span>
                     </div>
                   </label>
@@ -895,20 +980,28 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                     <span className="text-sm">Uploading...</span>
                   </div>
                 )}
-                {newInternship.offer_letter && (
+                {offerLetterFile && (
                   <div className="mt-3 flex flex-col items-center space-y-2">
                     <button
-                      onClick={() => openImageModal(newInternship.offer_letter, "Offer Letter")}
+                      onClick={() => {
+                        const fileUrl = URL.createObjectURL(offerLetterFile);
+                        openImageModal(fileUrl, `Selected File: ${offerLetterFile.name}`);
+                      }}
                       className="inline-flex items-center cursor-pointer px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
                     >
-                      📄 View Document
+                      📄 View Selected File
                     </button>
                     <button
                       type="button"
-                      onClick={() => setNewInternship(prev => ({ ...prev, offer_letter: "" }))}
+                      onClick={() => {
+                        setOfferLetterFile(null);
+                        // Clear the file input
+                        const fileInput = document.getElementById('offer-letter-upload');
+                        if (fileInput) fileInput.value = '';
+                      }}
                       className="text-xs cursor-pointer text-red-600 hover:text-red-800"
                     >
-                      Remove
+                      Remove Selected File
                     </button>
                   </div>
                 )}
@@ -1200,7 +1293,7 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={async (event) => {
+                    onChange={(event) => {
                       const file = event.target.files[0];
                       if (!file) return;
 
@@ -1213,6 +1306,7 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                           text: 'Please upload only image files (JPEG, PNG, GIF).',
                           confirmButtonColor: '#dc3545'
                         });
+                        event.target.value = ''; // Clear the input
                         return;
                       }
 
@@ -1224,31 +1318,19 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                           text: 'Please upload an image smaller than 2MB.',
                           confirmButtonColor: '#dc3545'
                         });
+                        event.target.value = ''; // Clear the input
                         return;
                       }
 
-                      setUploadingOfferLetter(true);
-
-                      try {
-                        const uploadedUrl = await uploadToCloudinary(file);
-                        setEditRecord(prev => ({ ...prev, offer_letter: uploadedUrl }));
-                        
-                        Swal.fire({
-                          icon: 'success',
-                          title: 'Upload Successful',
-                          text: 'Offer letter uploaded successfully!',
-                          confirmButtonColor: '#28a745'
-                        });
-                      } catch (error) {
-                        Swal.fire({
-                          icon: 'error',
-                          title: 'Upload Failed',
-                          text: error.message,
-                          confirmButtonColor: '#dc3545'
-                        });
-                      } finally {
-                        setUploadingOfferLetter(false);
-                      }
+                      // Store file locally for preview, don't upload to Cloudinary yet
+                      setOfferLetterFile(file);
+                      
+                      Swal.fire({
+                        icon: 'success',
+                        title: 'File Selected',
+                        text: 'New offer letter ready for upload. Click "Update Record" to upload.',
+                        confirmButtonColor: '#28a745'
+                      });
                     }}
                     disabled={uploadingOfferLetter}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -1273,14 +1355,16 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                         />
                       </svg>
                       <span className="text-sm text-gray-600 font-medium">
-                        {editRecord.offer_letter ? (
-                          <span className="text-green-600">Offer letter uploaded!</span>
+                        {offerLetterFile ? (
+                          <span className="text-green-600">New file selected: {offerLetterFile.name}</span>
+                        ) : editRecord.offer_letter ? (
+                          <span className="text-blue-600">Current file uploaded</span>
                         ) : (
-                          "Click to upload offer letter"
+                          "Click to select new offer letter"
                         )}
                       </span>
                       <span className="text-xs text-gray-500 mt-1">
-                        JPEG, PNG, or GIF (max 2MB)
+                        JPEG, PNG, or GIF (max 2MB). Upload on update.
                       </span>
                     </div>
                   </label>
@@ -1291,23 +1375,54 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                     <span className="text-sm">Uploading...</span>
                   </div>
                 )}
-                {editRecord.offer_letter && (
-                  <div className="mt-3 flex flex-col items-center space-y-2">
-                    <button
-                      onClick={() => openImageModal(editRecord.offer_letter, "Offer Letter")}
-                      className="inline-flex items-center cursor-pointer px-3 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors"
-                    >
-                      📄 View Document
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditRecord(prev => ({ ...prev, offer_letter: "" }))}
-                      className="text-xs cursor-pointer text-red-600 hover:text-red-800"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                )}
+                
+                <div className="mt-3 flex flex-col items-center space-y-2">
+                  {/* Show new file selection if available */}
+                  {offerLetterFile && (
+                    <>
+                      <button
+                        onClick={() => {
+                          const fileUrl = URL.createObjectURL(offerLetterFile);
+                          openImageModal(fileUrl, `Selected File: ${offerLetterFile.name}`);
+                        }}
+                        className="inline-flex items-center cursor-pointer px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        📄 View New Selected File
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOfferLetterFile(null);
+                          // Clear the file input
+                          const fileInput = document.getElementById('edit-offer-letter-upload');
+                          if (fileInput) fileInput.value = '';
+                        }}
+                        className="text-xs cursor-pointer text-red-600 hover:text-red-800"
+                      >
+                        Remove Selected File
+                      </button>
+                    </>
+                  )}
+                  
+                  {/* Show current uploaded file if available and no new file selected */}
+                  {editRecord.offer_letter && !offerLetterFile && (
+                    <>
+                      <button
+                        onClick={() => openImageModal(editRecord.offer_letter, "Current Offer Letter")}
+                        className="inline-flex items-center cursor-pointer px-3 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors"
+                      >
+                        📄 View Current Document
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditRecord(prev => ({ ...prev, offer_letter: "" }))}
+                        className="text-xs cursor-pointer text-red-600 hover:text-red-800"
+                      >
+                        Remove Current Document
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>

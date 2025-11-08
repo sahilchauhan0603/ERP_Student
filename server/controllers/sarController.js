@@ -1,6 +1,34 @@
 const db = require('../config/db').promise;
 const cloudinary = require('../config/cloudinary');
 
+// Helper function to convert numeric rating to database ENUM value
+const convertRatingToEnum = (numericRating) => {
+  if (!numericRating) return null;
+  
+  const ratingMap = {
+    1: 'needs_improvement',
+    2: 'average', 
+    3: 'average',
+    4: 'good',
+    5: 'excellent'
+  };
+  
+  return ratingMap[parseInt(numericRating)] || null;
+};
+// Helper function to convert database ENUM value back to numeric rating
+const convertEnumToRating = (enumValue) => {
+  if (!enumValue) return null;
+  
+  const enumMap = {
+    'needs_improvement': 1,
+    'average': 2,
+    'good': 4, 
+    'excellent': 5
+  };
+  
+  return enumMap[enumValue] || null;
+};
+
 // Helper function to safely parse JSON fields
 const safeJsonParse = (jsonString, defaultValue = []) => {
   if (!jsonString) return defaultValue;
@@ -125,7 +153,11 @@ const transformSubjectToEnhancedFormat = (subject) => {
   return transformed;
 };
 
+
+
 const sarController = {
+
+  /* SAR OVERVIEW */
   // Get SAR Overview
   getSAROverview: async (req, res) => {
     try {
@@ -244,6 +276,7 @@ const sarController = {
 
 
 
+  /* ACADEMIC RECORDS */
   // Get Academic Records
   getAcademicRecords: async (req, res) => {
     try {
@@ -628,6 +661,7 @@ const sarController = {
 
 
 
+  /* INTERNSHIP RECORDS */
   // Get Internship Records
   getInternshipRecords: async (req, res) => {
     try {
@@ -654,12 +688,13 @@ const sarController = {
         [sarId]
       );
 
-      // Parse JSON fields for each record
+      // Parse JSON fields for each record and convert rating back to numeric
       const internshipRecords = rows.map(record => ({
         ...record,
         skills_learned: safeJsonParse(record.skills_learned),
         technologies_used: safeJsonParse(record.technologies_used),
-        media_urls: safeJsonParse(record.media_urls)
+        media_urls: safeJsonParse(record.media_urls),
+        performance_rating: convertEnumToRating(record.performance_rating) // Convert ENUM back to numeric
       }));
 
       res.json({
@@ -728,13 +763,16 @@ const sarController = {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
         [
           sarId, company_name, position, internship_type || 'summer',
-          start_date || null, end_date || null, duration_months || null,
-          duration_weeks || null, stipend || null, currency || 'INR',
+          start_date || null, end_date || null, 
+          duration_months ? parseFloat(duration_months) : null,
+          duration_weeks ? parseInt(duration_weeks) : null, 
+          stipend ? parseFloat(stipend) : null, currency || 'INR',
           location || null, work_mode || 'onsite', description || null,
           key_responsibilities || null, JSON.stringify(skills_learned || []),
           JSON.stringify(technologies_used || []), supervisor_name || null,
           supervisor_designation || null, supervisor_email || null,
-          supervisor_phone || null, performance_rating || null,
+          supervisor_phone || null, 
+          convertRatingToEnum(performance_rating), // Convert numeric rating to ENUM
           final_presentation || false, offer_letter_received || false,
           offer_letter || null, status || 'applied'
         ]
@@ -811,13 +849,17 @@ const sarController = {
          WHERE internship_id = ? AND SAR_id = ?`,
         [
           company_name, position, internship_type || 'summer', start_date || null,
-          end_date || null, duration_months || null, duration_weeks || null,
-          stipend || null, currency || 'INR', location || null, work_mode || 'onsite',
+          end_date || null, 
+          duration_months ? parseFloat(duration_months) : null, 
+          duration_weeks ? parseInt(duration_weeks) : null,
+          stipend ? parseFloat(stipend) : null, currency || 'INR', 
+          location || null, work_mode || 'onsite',
           description || null, key_responsibilities || null,
           JSON.stringify(skills_learned || []), JSON.stringify(technologies_used || []),
           supervisor_name || null, supervisor_designation || null,
           supervisor_email || null, supervisor_phone || null,
-          performance_rating || null, final_presentation || false,
+          convertRatingToEnum(performance_rating), // Convert numeric rating to ENUM
+          final_presentation || false,
           offer_letter_received || false, offer_letter || null, status || 'applied',
           recordId, sarId
         ]
@@ -884,6 +926,9 @@ const sarController = {
     }
   },
 
+
+   
+  /* ACHIEVEMENT RECORDS */
   // Get Achievement Records
   getAchievementRecords: async (req, res) => {
     try {
@@ -1202,7 +1247,8 @@ const sarController = {
         ...record,
         skills_learned: safeJsonParse(record.skills_learned),
         technologies_used: safeJsonParse(record.technologies_used),
-        media_urls: safeJsonParse(record.media_urls)
+        media_urls: safeJsonParse(record.media_urls),
+        performance_rating: convertEnumToRating(record.performance_rating) // Convert ENUM back to numeric
       }));
 
       const achievementRecords = achievementRows.map(record => ({

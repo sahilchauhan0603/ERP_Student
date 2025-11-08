@@ -6,8 +6,6 @@ const { authenticate } = require("../middleware/auth");
 // Apply authentication middleware to all SAR routes
 router.use(authenticate);
 
-// Cloudinary signed upload route
-router.post('/upload-signature', sarController.generateUploadSignature);
 
 // SAR Overview Routes
 router.get('/overview', sarController.getSAROverview);
@@ -22,6 +20,7 @@ router.delete('/academic/:id', sarController.deleteAcademicRecord);
 // Internship Records Routes
 router.get('/internships', sarController.getInternshipRecords);
 router.post('/internships', sarController.createInternshipRecord);
+router.post('/upload-signature', sarController.generateUploadSignature);   // Cloudinary signed upload route for offer letter
 router.put('/internships/:id', sarController.updateInternshipRecord);
 router.delete('/internships/:id', sarController.deleteInternshipRecord);
 
