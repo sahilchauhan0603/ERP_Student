@@ -622,7 +622,7 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
           </div>
           <button
             onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-xl font-medium text-sm w-full sm:w-auto justify-center"
+            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm w-full sm:w-auto justify-center"
           >
             <FaPlus className="text-xs" /> Add Internship
           </button>
@@ -1114,10 +1114,10 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                   handleSubmitInternship();
                 }}
                 disabled={isSubmitting || !newInternship.company_name || !newInternship.position}
-                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
                   isSubmitting 
                     ? 'bg-gray-400 cursor-not-allowed text-white' 
-                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md hover:shadow-lg'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
                 }`}
               >
                 {isSubmitting ? (
@@ -1135,10 +1135,10 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
               <button
                 onClick={resetForm}
                 disabled={isSubmitting}
-                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
                   isSubmitting 
                     ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border-2 border-gray-200 hover:border-gray-300'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300'
                 }`}
               >
                 <FaTimes className="text-sm" />
@@ -1547,36 +1547,30 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
         )}
 
         {/* Existing Internships */}
-        <div className="space-y-6">
+        <div className="space-y-10">
           {internships.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200 shadow-sm">
+            <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
               <div className="max-w-md mx-auto">
-                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <FaBriefcase className="text-4xl text-gray-400" />
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaBriefcase className="text-3xl text-gray-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-3">No Internships Added</h3>
-                <p className="text-gray-500 mb-6 leading-relaxed">Start documenting your professional experience and internships to build your portfolio.</p>
-                {/* <button
-                  onClick={() => setShowAddForm(true)}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium"
-                >
-                  <FaPlus /> Add Your First Internship
-                </button> */}
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">No Internships Added</h3>
+                <p className="text-gray-500 mb-4">Start documenting your professional experience and internships.</p>
               </div>
             </div>
           ) : (
             internships.map((internship) => (
-              <div key={internship.id} className={`bg-white border-2 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 ${
+              <div key={internship.id} className={`bg-white border rounded-lg p-4 ${
                 editingId === (internship.internship_id || internship.id)
-                  ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 shadow-amber-200'
-                  : 'border-gray-100 hover:border-blue-200'
+                  ? 'border-yellow-300 bg-yellow-50'
+                  : 'border-gray-200'
               }`}>
-                <div className="flex flex-col lg:flex-row justify-between items-start gap-4 mb-6">
+                <div className="flex flex-col lg:flex-row justify-between items-start gap-3 mb-4">
                   <div className="flex-1">
-                    <div className="flex flex-col sm:flex-row sm:items-start gap-3 mb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-2 mb-2">
                       <div className="flex-1">
-                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{internship.position}</h3>
-                        <p className="text-lg font-semibold text-blue-600 mb-3">{internship.company_name}</p>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{internship.position}</h3>
+                        <p className="text-base font-medium text-blue-600 mb-2">{internship.company_name}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(internship.status)}`}>
@@ -1607,46 +1601,46 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2 lg:flex-col lg:items-end">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => editingId === (internship.internship_id || internship.id) ? handleCancelEdit() : handleEditRecord(internship)}
-                      className={`p-3 cursor-pointer rounded-xl transition-all duration-200 ${
+                      className={`p-2 cursor-pointer rounded transition-colors ${
                         editingId === (internship.internship_id || internship.id) 
-                          ? 'text-amber-600 hover:text-amber-800 bg-amber-100 hover:bg-amber-200' 
-                          : 'text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100'
+                          ? 'text-yellow-600 hover:text-yellow-800 bg-yellow-100 hover:bg-yellow-200' 
+                          : 'text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200'
                       }`}
                       title={editingId === (internship.internship_id || internship.id) ? "Cancel Edit" : "Edit Record"}
                     >
-                      {editingId === (internship.internship_id || internship.id) ? <FaTimes size={18} /> : <FaEdit size={18} />}
+                      {editingId === (internship.internship_id || internship.id) ? <FaTimes size={16} /> : <FaEdit size={16} />}
                     </button>
                     <button
                       onClick={() => handleDeleteRecord(internship.internship_id)}
-                      className="p-3 cursor-pointer text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 rounded-xl transition-all duration-200"
+                      className="p-2 cursor-pointer text-red-600 hover:text-red-800 bg-red-100 hover:bg-red-200 rounded transition-colors"
                       title="Delete Record"
                     >
-                      <FaTrash size={18} />
+                      <FaTrash size={16} />
                     </button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+                  <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm text-gray-600 mb-1">Type</p>
                     <p className="font-semibold text-gray-900">{internship.internship_type}</p>
                   </div>
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl">
+                  <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm text-gray-600 mb-1">Duration</p>
                     <p className="font-semibold text-gray-900">
                       {internship.duration_months && `${internship.duration_months} months `}
                       ({internship.duration_weeks && `${internship.duration_weeks} weeks`})
                     </p>
                   </div>
-                  <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-4 rounded-xl">
+                  <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm text-gray-600 mb-1">Work Mode</p>
                     <p className="font-semibold text-gray-900">{internship.work_mode}</p>
                   </div>
                   {internship.stipend && (
-                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl">
+                    <div className="bg-gray-50 p-3 rounded-lg">
                       <p className="text-sm text-gray-600 mb-1">Stipend</p>
                       <p className="font-semibold text-gray-900">{internship.stipend} {internship.currency}</p>
                     </div>
@@ -1675,14 +1669,13 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
                   {internship.skills_learned && internship.skills_learned.length > 0 && (
-                    <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-xl">
-                      <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
                         Skills Learned
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {internship.skills_learned.map((skill, index) => (
-                          <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium border border-blue-200">
+                          <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
                             {skill}
                           </span>
                         ))}
@@ -1691,14 +1684,13 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                   )}
 
                   {internship.technologies_used && internship.technologies_used.length > 0 && (
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl">
-                      <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
                         Technologies Used
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {internship.technologies_used.map((tech, index) => (
-                          <span key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium border border-green-200">
+                          <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
                             {tech}
                           </span>
                         ))}
@@ -1709,18 +1701,17 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
 
                 {internship.supervisor_name && (
                   <div className="border-t border-gray-200 pt-4 mb-4">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      <div className="w-1 h-4 bg-purple-500 rounded"></div>
+                    <h4 className="text-base font-semibold text-gray-800 mb-3">
                       Supervisor Information
                     </h4>
-                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl">
+                    <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="text-gray-700">
                         <span className="font-semibold">{internship.supervisor_name}</span>
                         {internship.supervisor_designation && (
                           <span className="text-gray-600"> - {internship.supervisor_designation}</span>
                         )}
                         {internship.supervisor_email && (
-                          <span className="block text-sm text-gray-600 mt-1">✉️ {internship.supervisor_email}</span>
+                          <span className="block text-sm text-gray-600 mt-1">{internship.supervisor_email}</span>
                         )}
                       </p>
                     </div>
@@ -1736,12 +1727,12 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                     {internship.offer_letter ? (
                       <button
                         onClick={() => openImageModal(internship.offer_letter, `Offer Letter - ${internship.company_name}`)}
-                        className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-3 rounded-xl transition-all duration-200 border border-blue-200 hover:border-blue-300"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors border border-blue-200"
                       >
                         📄 View Offer Letter
                       </button>
                     ) : (
-                      <div className="text-sm text-gray-500 italic bg-gray-50 px-4 py-3 rounded-xl border border-gray-200">
+                      <div className="text-sm text-gray-500 italic bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
                         Offer letter received but not uploaded to system
                       </div>
                     )}
