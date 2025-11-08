@@ -150,8 +150,9 @@ export default function SAROverview({ student, sarData, updateSAROverview }) {
     totalFields += sarData.sarInfo.current_semester;
     filledFields += sarData.academicRecords.length;
 
-    // Bonus points for internships and achievements
-    if (sarData.internships.length > 0) filledFields += 2;
+    // Bonus points for completed internships and achievements
+    const completedInternships = sarData.internships.length;
+    if (completedInternships > 0) filledFields += 2;
     if (sarData.achievements.length > 0) filledFields += 2;
     totalFields += 4; // Maximum bonus
 
@@ -351,8 +352,10 @@ export default function SAROverview({ student, sarData, updateSAROverview }) {
                 <div className="text-xs text-gray-600">Academic Records</div>
               </div>
               <div className="bg-white rounded-lg p-4 border text-center">
-                <div className="text-2xl font-bold text-green-600">{sarData.internships.length}</div>
-                <div className="text-xs text-gray-600">Internships</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {sarData.internships.length}
+                </div>
+                <div className="text-xs text-gray-600">Completed Internships</div>
               </div>
               <div className="bg-white rounded-lg p-4 border text-center">
                 <div className="text-2xl font-bold text-purple-600">{sarData.achievements.length}</div>
@@ -372,7 +375,7 @@ export default function SAROverview({ student, sarData, updateSAROverview }) {
                       <p>✓ {sarData.academicRecords.length} academic record(s) added</p>
                     )}
                     {sarData.internships.length > 0 && (
-                      <p>✓ {sarData.internships.length} internship(s) recorded</p>
+                      <p>✓ {sarData.internships.length} completed internship(s) recorded</p>
                     )}
                     {sarData.achievements.length > 0 && (
                       <p>✓ {sarData.achievements.length} achievement(s) documented</p>
@@ -392,7 +395,7 @@ export default function SAROverview({ student, sarData, updateSAROverview }) {
           <div className="text-sm text-blue-700">
             <strong>Next Steps:</strong>
             {sarData.academicRecords.length === 0 && " Add your academic records"}
-            {sarData.academicRecords.length > 0 && sarData.internships.length === 0 && " Record your internships"}
+            {sarData.academicRecords.length > 0 && sarData.internships.length === 0 && " Record your completed internships"}
             {sarData.internships.length > 0 && sarData.achievements.length === 0 && " Document your achievements"}
             {sarData.achievements.length > 0 && " Keep updating your records"}
           </div>

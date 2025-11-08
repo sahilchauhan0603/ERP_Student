@@ -549,52 +549,73 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 flex cursor-pointer items-center gap-2">
-          <FaTrophy className="text-yellow-600" />
-          Achievement Records
-        </h2>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-2 px-4 py-2 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <FaPlus /> Add Achievement
-        </button>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-orange-100 p-3 sm:p-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-yellow-600 rounded-xl shadow-lg">
+              <FaTrophy className="text-white text-xl" />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Achievement Records</h1>
+              <p className="text-gray-600 text-xs sm:text-sm">Document your accomplishments and recognition</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowAddForm(true)}
+            // className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-xl hover:from-yellow-700 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium text-sm sm:text-base w-full sm:w-auto justify-center"
+            className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-lg hover:from-yellow-700 hover:to-yellow-700 transition-all duration-200 shadow-md hover:shadow-xl font-medium text-sm w-full sm:w-auto justify-center"
+          >
+            <FaPlus className="text-xs" /> Add Achievement
+          </button>
+        </div>
 
 
 
       {/* Add Achievement Form */}
       {showAddForm && (
-        <div className="bg-gray-50 rounded-lg p-6 mb-6 border">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Add New Achievement</h3>
+        <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-4 sm:p-5 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="p-1 bg-yellow-100 rounded-md">
+                <FaPlus className="text-yellow-600 text-sm" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Add New Achievement</h3>
+            </div>
+            <button
+              onClick={() => setShowAddForm(false)}
+              className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <FaTimes className="text-lg" />
+            </button>
+          </div>
           
           {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+            <div className="md:col-span-2 space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Title *</label>
               <input
                 type="text"
                 value={newAchievement.title}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, title: e.target.value }))}
-                className={`w-full p-3 border rounded-lg focus:ring-2 ${
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
                   errors.title
-                    ? 'border-red-400 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
+                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100'
+                    : 'border-gray-200 bg-white hover:border-gray-300'
                 }`}
                 placeholder="Enter achievement title"
                 required
               />
               {errors.title && (
-                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                  <FaExclamationCircle /> {errors.title}
+                <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded">
+                  <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" /> {errors.title}
                 </p>
               )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Category *</label>
               <select
                 value={newAchievement.category}
                 onChange={(e) => setNewAchievement(prev => ({ 
@@ -602,7 +623,9 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                   category: e.target.value,
                   subcategory: "" // Reset subcategory when category changes
                 }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.category ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
                 required
               >
                 {categories.map(category => (
@@ -613,12 +636,14 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Subcategory</label>
               <select
                 value={newAchievement.subcategory}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, subcategory: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.subcategory ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
               >
                 <option value="">Select Subcategory</option>
                 {subcategoriesByCategory[newAchievement.category]?.map(sub => (
@@ -631,12 +656,14 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Level *</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Level *</label>
               <select
                 value={newAchievement.level}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, level: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.level ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
                 required
               >
                 {levels.map(level => (
@@ -647,32 +674,34 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Achievement Date *</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Achievement Date *</label>
               <input
                 type="date"
                 value={newAchievement.achievement_date}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, achievement_date: e.target.value }))}
-                className={`w-full p-3 border rounded-lg focus:ring-2 ${
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
                   errors.achievement_date
-                    ? 'border-red-400 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
+                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100'
+                    : 'border-gray-200 bg-white hover:border-gray-300'
                 }`}
                 required
               />
               {errors.achievement_date && (
-                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                  <FaExclamationCircle /> {errors.achievement_date}
+                <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded">
+                  <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" /> {errors.achievement_date}
                 </p>
               )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Semester Achieved</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Semester Achieved</label>
               <select
                 value={newAchievement.semester_achieved}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, semester_achieved: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.semester_achieved ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
               >
                 <option value="">Select Semester</option>
                 {semesters.map(sem => (
@@ -681,16 +710,16 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Organization *</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Organization *</label>
               <input
                 type="text"
                 value={newAchievement.organization}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, organization: e.target.value }))}
-                className={`w-full p-3 border rounded-lg focus:ring-2 ${
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
                   errors.organization
-                    ? 'border-red-400 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
+                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100'
+                    : 'border-gray-200 bg-white hover:border-gray-300'
                 }`}
                 placeholder="Organizing body/institution"
                 required
@@ -702,86 +731,98 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
               )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Event Name</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Event Name</label>
               <input
                 type="text"
                 value={newAchievement.event_name}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, event_name: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.event_name ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
                 placeholder="Competition/event name"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Position/Rank</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Position/Rank</label>
               <input
                 type="text"
                 value={newAchievement.position_rank}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, position_rank: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.position_rank ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
                 placeholder="e.g., 1st, Winner, Gold Medal"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Total Participants</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Total Participants</label>
               <input
                 type="number"
                 min="1"
                 value={newAchievement.total_participants}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, total_participants: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.total_participants ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
                 placeholder="0"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Team Size</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Team Size</label>
               <input
                 type="number"
                 min="1"
                 value={newAchievement.team_size}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, team_size: parseInt(e.target.value) }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.team_size ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
                 placeholder="1"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Points Awarded</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Points Awarded</label>
               <input
                 type="number"
                 min="0"
                 value={newAchievement.points_awarded}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, points_awarded: parseInt(e.target.value) }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.points_awarded ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
                 placeholder="0"
               />
             </div>
           </div>
 
           {/* Event Dates */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Event Start Date</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Event Start Date</label>
               <input
                 type="date"
                 value={newAchievement.event_start_date}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, event_start_date: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.event_start_date ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Event End Date</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Event End Date</label>
               <input
                 type="date"
                 value={newAchievement.event_end_date}
                 onChange={(e) => setNewAchievement(prev => ({ ...prev, event_end_date: e.target.value }))}
-                className={`w-full p-3 border rounded-lg focus:ring-2 ${
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
                   errors.event_end_date
-                    ? 'border-red-400 focus:ring-red-500'
+                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100'
                     : 'border-gray-300 focus:ring-blue-500'
                 }`}
               />
@@ -833,47 +874,51 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
           </div>
 
           {/* Description */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
             <textarea
               value={newAchievement.description}
               onChange={(e) => setNewAchievement(prev => ({ ...prev, description: e.target.value }))}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              rows="3"
+              className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                errors.description ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+              }`}
+              rows="2"
               placeholder="Describe your achievement in detail..."
             />
           </div>
 
           {/* Certificate URL */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Certificate URL</label>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Certificate URL</label>
             <input
               type="url"
               value={newAchievement.certificate_url}
               onChange={(e) => setNewAchievement(prev => ({ ...prev, certificate_url: e.target.value }))}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                errors.certificate_url ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+              }`}
               placeholder="https://example.com/certificate"
             />
           </div>
 
           {/* Dynamic Arrays */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             {/* Team Members */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Team Members</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Team Members</label>
               <div className="flex gap-2 mb-2">
                 <input
                   type="text"
                   value={teamMemberInput}
                   onChange={(e) => setTeamMemberInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddTeamMember()}
-                  className="flex-1 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                   placeholder="Add team member name"
                 />
                 <button
                   type="button"
                   onClick={handleAddTeamMember}
-                  className="px-3 py-2 bg-blue-600 text-white cursor-pointer rounded hover:bg-blue-700 text-sm"
+                  className="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
                 >
                   Add
                 </button>
@@ -1037,7 +1082,7 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
           </div>
 
           {/* Checkboxes */}
-          <div className="flex gap-4 mb-6">
+          <div className="flex gap-3 mb-4">
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -1058,24 +1103,24 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
             </label>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-2 pt-3 border-t border-gray-200">
             <button
               onClick={handleSubmitAchievement}
-              className={`px-4 py-2 cursor-pointer rounded-lg transition-colors flex items-center gap-2 ${
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
                 isSubmitting || !newAchievement.title
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700'
-              } text-white`}
+                  ? 'bg-gray-400 cursor-not-allowed text-white'
+                  : 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white shadow-md hover:shadow-lg'
+              }`}
               disabled={isSubmitting || !newAchievement.title}
             >
-              {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaSave />}
+              {isSubmitting ? <FaSpinner className="animate-spin text-sm" /> : <FaSave className="text-sm" />}
               {isSubmitting ? 'Saving...' : 'Save Achievement'}
             </button>
             <button
               onClick={resetForm}
-              className="px-4 py-2 cursor-pointer bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              className="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 border-2 border-gray-200 hover:border-gray-300"
             >
-              <FaTimes className="inline mr-2" />
+              <FaTimes className="text-sm" />
               Cancel
             </button>
           </div>
@@ -1085,10 +1130,13 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
       {/* Existing Achievements */}
       <div className="space-y-4">
         {achievements.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-            <FaTrophy className="mx-auto text-4xl text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 mb-2">No Achievements Added</h3>
-            <p className="text-gray-500 mb-4">Start documenting your accomplishments and achievements.</p>
+          <div className="text-center py-16 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+            {/* <FaTrophy className="mx-auto text-4xl text-gray-400 mb-4" /> */}
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <FaTrophy className="text-4xl text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-3">No Achievements Added</h3>
+            <p className="text-gray-500 mb-6 leading-relaxed">Start documenting your accomplishments and achievements to build your portfolio.</p>
           </div>
         ) : (
           achievements.map((achievement) => (
@@ -1603,6 +1651,7 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
             </div>
           ))
         )}
+        </div>
       </div>
     </div>
   );

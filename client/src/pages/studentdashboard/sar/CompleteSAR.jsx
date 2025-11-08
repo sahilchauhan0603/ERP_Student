@@ -47,8 +47,33 @@ export default function CompleteSAR({ student, sarData }) {
   // Calculate statistics
   const totalAchievements = sarData.achievements.length;
   const totalInternships = sarData.internships.length;
-  const completedInternships = sarData.internships.filter(i => i.status === 'completed').length;
+  const completedInternships = sarData.internships.length;
   const totalSemesters = sarData.academicRecords.length;
+  
+  // Calculate completion percentage (same logic as SAROverview)
+  const calculateCompletionPercentage = () => {
+    let totalFields = 0;
+    let filledFields = 0;
+
+    // Check basic info
+    totalFields += 2;
+    if (sarData.sarInfo.enrollment_no) filledFields++;
+    if (sarData.sarInfo.microsoft_email) filledFields++;
+
+    // Check academic records (expect at least current semester)
+    totalFields += sarData.sarInfo.current_semester;
+    filledFields += sarData.academicRecords.length;
+
+    // Bonus points for completed internships and achievements
+    const completedInternships = sarData.internships.length;
+    if (completedInternships > 0) filledFields += 2;
+    if (sarData.achievements.length > 0) filledFields += 2;
+    totalFields += 4; // Maximum bonus
+
+    return Math.min(Math.round((filledFields / totalFields) * 100), 100);
+  };
+
+  const completionPercentage = calculateCompletionPercentage();
   
   // Calculate average CGPA
   const cgpaRecords = sarData.academicRecords.filter(r => r.cgpa && parseFloat(r.cgpa) > 0);
@@ -416,9 +441,7 @@ export default function CompleteSAR({ student, sarData }) {
 
         <div className="mt-4 text-center text-sm text-gray-600">
           <p>Last Updated: {new Date().toLocaleDateString('en-GB')} • 
-          Profile Completion: <strong>{Math.round(
-            ((totalSemesters + totalInternships + totalAchievements) / (8 + 2 + 3)) * 100
-          )}%</strong></p>
+          Profile Completion: <strong>{completionPercentage}%</strong></p>
         </div>
       </div>
     </div>

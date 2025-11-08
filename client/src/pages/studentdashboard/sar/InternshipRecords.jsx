@@ -607,230 +607,296 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <FaBriefcase className="text-blue-600" />
-          Internship Records
-        </h2>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-2 px-4 py-2 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <FaPlus /> Add Internship
-        </button>
-      </div>
-
-
-
-      {/* Add Internship Form */}
-      {showAddForm && (
-        <div className="bg-gray-50 rounded-lg p-6 mb-6 border">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Add New Internship</h3>
-          
-          {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Company Name *</label>
-              <input
-                type="text"
-                value={newInternship.company_name}
-                onChange={(e) => setNewInternship(prev => ({ ...prev, company_name: e.target.value }))}
-                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  errors.company_name ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="Enter company name"
-                required
-              />
-              {errors.company_name && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                  <FaExclamationCircle className="text-xs" />
-                  {errors.company_name}
-                </p>
-              )}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 p-3 sm:p-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-blue-600 rounded-lg shadow-md">
+              <FaBriefcase className="text-white text-lg" />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Position *</label>
-              <input
-                type="text"
-                value={newInternship.position}
-                onChange={(e) => setNewInternship(prev => ({ ...prev, position: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter position/role"
-                required
-              />
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Internship Records</h1>
+              <p className="text-gray-600 text-xs sm:text-sm">Manage your professional experience</p>
             </div>
+          </div>
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-xl font-medium text-sm w-full sm:w-auto justify-center"
+          >
+            <FaPlus className="text-xs" /> Add Internship
+          </button>
+        </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Internship Type</label>
-              <select
-                value={newInternship.internship_type}
-                onChange={(e) => setNewInternship(prev => ({ ...prev, internship_type: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        {/* Add Internship Form */ }
+        {showAddForm && (
+          <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-4 sm:p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-1 bg-green-100 rounded-md">
+                  <FaPlus className="text-green-600 text-sm" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Add New Internship</h3>
+              </div>
+              <button
+                onClick={resetForm}
+                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
               >
-                {internshipTypes.map(type => (
-                  <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
-                ))}
-              </select>
+                <FaTimes className="text-lg" />
+              </button>
             </div>
+            
+            {/* Basic Information */}
+            <div className="mb-4">
+              <h4 className="text-md font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                Basic Information
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+                <div className="space-y-1">
+                  <label className="block text-sm font-semibold text-gray-700">Company Name *</label>
+                  <input
+                    type="text"
+                    value={newInternship.company_name}
+                    onChange={(e) => setNewInternship(prev => ({ ...prev, company_name: e.target.value }))}
+                    className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                      errors.company_name ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                    placeholder="Enter company name"
+                    required
+                  />
+                  {errors.company_name && (
+                    <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded">
+                      <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" />
+                      {errors.company_name}
+                    </p>
+                  )}
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-              <input
-                type="date"
-                value={newInternship.start_date}
-                onChange={(e) => setNewInternship(prev => ({ ...prev, start_date: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+                <div className="space-y-1">
+                  <label className="block text-sm font-semibold text-gray-700">Position *</label>
+                  <input
+                    type="text"
+                    value={newInternship.position}
+                    onChange={(e) => setNewInternship(prev => ({ ...prev, position: e.target.value }))}
+                    className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                      errors.position ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                    placeholder="Enter position/role"
+                    required
+                  />
+                  {errors.position && (
+                    <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded">
+                      <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" />
+                      {errors.position}
+                    </p>
+                  )}
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-              <input
-                type="date"
-                value={newInternship.end_date}
-                onChange={(e) => setNewInternship(prev => ({ ...prev, end_date: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+                <div className="space-y-1">
+                  <label className="block text-sm font-semibold text-gray-700">Internship Type</label>
+                  <select
+                    value={newInternship.internship_type}
+                    onChange={(e) => setNewInternship(prev => ({ ...prev, internship_type: e.target.value }))}
+                    className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                      errors.internship_type ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    {internshipTypes.map(type => (
+                      <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
+                    ))}
+                  </select>
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Duration (Months)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.5"
-                value={newInternship.duration_months}
-                onChange={(e) => setNewInternship(prev => ({ ...prev, duration_months: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="0"
-              />
-            </div>
+                <div className="space-y-1">
+                  <label className="block text-sm font-semibold text-gray-700">Start Date</label>
+                  <input
+                    type="date"
+                    value={newInternship.start_date}
+                    onChange={(e) => setNewInternship(prev => ({ ...prev, start_date: e.target.value }))}
+                    className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                      errors.start_date ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Duration (Weeks)</label>
-              <input
-                type="number"
-                min="0"
-                value={newInternship.duration_weeks}
-                onChange={(e) => setNewInternship(prev => ({ ...prev, duration_weeks: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="0"
-              />
-            </div>
+                <div className="space-y-1">
+                  <label className="block text-sm font-semibold text-gray-700">End Date</label>
+                  <input
+                    type="date"
+                    value={newInternship.end_date}
+                    onChange={(e) => setNewInternship(prev => ({ ...prev, end_date: e.target.value }))}
+                    className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                      errors.end_date ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Stipend</label>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  min="0"
-                  value={newInternship.stipend}
-                  onChange={(e) => setNewInternship(prev => ({ ...prev, stipend: e.target.value }))}
-                  className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="0"
-                />
-                <select
-                  value={newInternship.currency}
-                  onChange={(e) => setNewInternship(prev => ({ ...prev, currency: e.target.value }))}
-                  className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                >
-                  {currencies.map(curr => (
-                    <option key={curr} value={curr}>{curr}</option>
-                  ))}
-                </select>
+                <div className="space-y-1">
+                  <label className="block text-sm font-semibold text-gray-700">Duration (Months)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={newInternship.duration_months}
+                    onChange={(e) => setNewInternship(prev => ({ ...prev, duration_months: e.target.value }))}
+                    className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                      errors.duration_months ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                    placeholder="0"
+                  />
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+            {/* Additional Information */}
+            <div className="mb-4">
+              <h4 className="text-md font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                Additional Details
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+                
+                <div className="space-y-1">
+                  <label className="block text-sm font-semibold text-gray-700">Duration (Weeks)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={newInternship.duration_weeks}
+                    onChange={(e) => setNewInternship(prev => ({ ...prev, duration_weeks: e.target.value }))}
+                    className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                      errors.duration_weeks ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-sm font-semibold text-gray-700">Stipend & Currency</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      value={newInternship.stipend}
+                      onChange={(e) => setNewInternship(prev => ({ ...prev, stipend: e.target.value }))}
+                      className={`flex-1 px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                        errors.stipend ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                      placeholder="Amount"
+                    />
+                    <select
+                      value={newInternship.currency}
+                      onChange={(e) => setNewInternship(prev => ({ ...prev, currency: e.target.value }))}
+                      className="px-2 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 hover:border-gray-300"
+                    >
+                      {currencies.map(curr => (
+                        <option key={curr} value={curr}>{curr}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Location</label>
               <input
                 type="text"
                 value={newInternship.location}
                 onChange={(e) => setNewInternship(prev => ({ ...prev, location: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.location ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
                 placeholder="City, Country"
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Work Mode</label>
+                </div>
+    
+                <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Work Mode</label>
               <select
                 value={newInternship.work_mode}
                 onChange={(e) => setNewInternship(prev => ({ ...prev, work_mode: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.work_mode ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
               >
                 {workModes.map(mode => (
                   <option key={mode} value={mode}>{mode.charAt(0).toUpperCase() + mode.slice(1)}</option>
                 ))}
               </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                </div>
+    
+                <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Status</label>
               <select
                 value={newInternship.status}
                 onChange={(e) => setNewInternship(prev => ({ ...prev, status: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.status ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
               >
                 {statuses.map(status => (
                   <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
                 ))}
               </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Performance Rating (1-5)</label>
+                </div>
+    
+                <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Performance Rating (1-5)</label>
               <select
                 value={newInternship.performance_rating}
                 onChange={(e) => setNewInternship(prev => ({ ...prev, performance_rating: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.performance_rating ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
               >
                 <option value="">Select Rating</option>
                 {ratings.map(rating => (
                   <option key={rating} value={rating}>{rating} Star{rating !== '1' ? 's' : ''}</option>
                 ))}
               </select>
-            </div>
-          </div>
+                </div>
+              </div>
 
-          {/* Description and Responsibilities */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              {/* Description and Responsibilities */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 mt-4">
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Description</label>
               <textarea
                 value={newInternship.description}
                 onChange={(e) => setNewInternship(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                rows="4"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.description ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
+                rows="3"
                 placeholder="Describe your internship experience..."
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Key Responsibilities</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Key Responsibilities</label>
               <textarea
                 value={newInternship.key_responsibilities}
                 onChange={(e) => setNewInternship(prev => ({ ...prev, key_responsibilities: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                rows="4"
+                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.key_responsibilities ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
+                rows="3"
                 placeholder="List your main responsibilities..."
               />
             </div>
-          </div>
-
-          {/* Skills and Technologies */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Skills Learned</label>
+              </div>
+    
+              {/* Skills and Technologies */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Skills Learned</label>
               <div className="flex gap-2 mb-2">
                 <input
                   type="text"
                   value={skillInput}
                   onChange={(e) => setSkillInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddSkill()}
-                  className="flex-1 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                   placeholder="Add a skill and press Enter"
                 />
                 <button
@@ -856,26 +922,26 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Technologies Used</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Technologies Used</label>
               <div className="flex gap-2 mb-2">
                 <input
                   type="text"
                   value={technologyInput}
                   onChange={(e) => setTechnologyInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddTechnology()}
-                  className="flex-1 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                   placeholder="Add a technology and press Enter"
                 />
                 <button
                   type="button"
                   onClick={handleAddTechnology}
-                  className="px-3 py-2 cursor-pointer bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                  className="px-2 py-1 cursor-pointer bg-green-600 text-white rounded hover:bg-green-700 text-sm"
                 >
                   Add
                 </button>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1">
                 {newInternship.technologies_used.map((tech, index) => (
                   <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs flex items-center gap-1">
                     {tech}
@@ -889,49 +955,57 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                 ))}
               </div>
             </div>
-          </div>
-
-          {/* Supervisor Information */}
-          <div className="bg-white rounded-lg p-4 mb-6 border">
-            <h4 className="text-md font-semibold text-gray-800 mb-3">Supervisor Information</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              </div>
+    
+              {/* Supervisor Information */}
+              <div className="bg-gray-50 rounded-lg p-3 mb-4 border">
+            <h4 className="text-md font-semibold text-gray-800 mb-2">Supervisor Information</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input
                 type="text"
                 placeholder="Supervisor Name"
                 value={newInternship.supervisor_name}
                 onChange={(e) => setNewInternship(prev => ({ ...prev, supervisor_name: e.target.value }))}
-                className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.supervisor_name ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
               />
               <input
                 type="text"
                 placeholder="Supervisor Designation"
                 value={newInternship.supervisor_designation}
                 onChange={(e) => setNewInternship(prev => ({ ...prev, supervisor_designation: e.target.value }))}
-                className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.supervisor_designation ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
               />
               <input
                 type="email"
                 placeholder="Supervisor Email"
                 value={newInternship.supervisor_email}
                 onChange={(e) => setNewInternship(prev => ({ ...prev, supervisor_email: e.target.value }))}
-                className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.supervisor_email ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
               />
               <input
                 type="tel"
                 placeholder="Supervisor Phone"
                 value={newInternship.supervisor_phone}
                 onChange={(e) => setNewInternship(prev => ({ ...prev, supervisor_phone: e.target.value }))}
-                className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
+                  errors.supervisor_phone ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
               />
             </div>
-          </div>
-
-          {/* Offer Letter Upload */}
-          <div className="bg-white rounded-lg p-4 mb-6 border">
-            <h4 className="text-md font-semibold text-gray-800 mb-3">Offer Letter</h4>
-            <div className="space-y-4">
+              </div>
+    
+              {/* Offer Letter Upload */}
+              <div className="bg-gray-50 rounded-lg p-3 mb-4 border">
+            <h4 className="text-md font-semibold text-gray-800 mb-2">Offer Letter</h4>
+            <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Upload Offer Letter Image
                 </label>
                 <div className="relative">
@@ -945,11 +1019,11 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                   />
                   <label
                     htmlFor="offer-letter-upload"
-                    className="block w-full px-4 py-3 border-2 border-dashed border-gray-400 rounded-xl transition-colors duration-300 cursor-pointer bg-white hover:border-blue-500"
+                    className="block w-full px-3 py-2 border-2 border-dashed border-gray-400 rounded-lg transition-colors duration-300 cursor-pointer bg-white hover:border-blue-500"
                   >
                     <div className="flex flex-col items-center justify-center text-center">
                       <svg
-                        className="w-8 h-8 text-gray-400 mb-2"
+                        className="w-6 h-6 text-gray-400 mb-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -1007,10 +1081,10 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
                 )}
               </div>
             </div>
-          </div>
-
-          {/* Additional Information */}
-          <div className="flex gap-4 mb-6">
+              </div>
+    
+              {/* Additional Information */}
+              <div className="flex gap-3 mb-4">
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -1029,49 +1103,56 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
               />
               <span className="text-sm text-gray-700">Offer Letter Received</span>
             </label>
+              </div>
+    
+              {/* Form Actions */}
+              <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={() => {
+                  console.log('Save button clicked!'); // Debug log
+                  handleSubmitInternship();
+                }}
+                disabled={isSubmitting || !newInternship.company_name || !newInternship.position}
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  isSubmitting 
+                    ? 'bg-gray-400 cursor-not-allowed text-white' 
+                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md hover:shadow-lg'
+                }`}
+              >
+                {isSubmitting ? (
+                  <>
+                    <FaSpinner className="animate-spin text-sm" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <FaSave className="text-sm" />
+                    Save Internship
+                  </>
+                )}
+              </button>
+              <button
+                onClick={resetForm}
+                disabled={isSubmitting}
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  isSubmitting 
+                    ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border-2 border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <FaTimes className="text-sm" />
+                Cancel
+              </button>
+              </div>
+            
+            </div>
           </div>
+        )}
 
-          <div className="flex gap-3">
-            <button
-              onClick={handleSubmitInternship}
-              disabled={isSubmitting || !newInternship.company_name || !newInternship.position}
-              className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                isSubmitting 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'
-              } text-white`}
-            >
-              {isSubmitting ? (
-                <>
-                  <FaSpinner className="animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <FaSave />
-                  Save Internship
-                </>
-              )}
-            </button>
-            <button
-              onClick={resetForm}
-              disabled={isSubmitting}
-              className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                isSubmitting 
-                  ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
-                  : 'bg-gray-600 hover:bg-gray-700 cursor-pointer text-white'
-              }`}
-            >
-              <FaTimes />
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Internship Form */}
-      {editingId && editRecord && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
+        {/* Edit Internship Form */}
+        {editingId && editRecord && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-amber-800">
               Edit Internship Record - {editRecord.company_name}
@@ -1462,168 +1543,234 @@ export default function InternshipRecords({ internships, addRecord, updateRecord
               Cancel
             </button>
           </div>
-        </div>
-      )}
-
-      {/* Existing Internships */}
-      <div className="space-y-4">
-        {internships.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-            <FaBriefcase className="mx-auto text-4xl text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 mb-2">No Internships Added</h3>
-            <p className="text-gray-500 mb-4">Start documenting your professional experience and internships.</p>
           </div>
-        ) : (
-          internships.map((internship) => (
-            <div key={internship.id} className={`bg-white border rounded-lg p-6 shadow-sm ${
-              editingId === (internship.internship_id || internship.id)
-                ? 'border-amber-300 bg-amber-50'
-                : 'border-gray-200'
-            }`}>
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800">{internship.position}</h3>
-                  <p className="text-blue-600 font-medium">{internship.company_name}</p>
-                  <div className="flex gap-4 mt-2 text-sm text-gray-600">
-                    <span className="flex items-center gap-1">
-                      <FaMapMarkerAlt /> {internship.location || 'Remote'}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FaCalendarAlt /> {formatDate(internship.start_date)} - {formatDate(internship.end_date)}
-                    </span>
-                    {internship.performance_rating && (
-                      <span className="flex items-center gap-1">
-                        <FaStar className="text-yellow-500" /> {internship.performance_rating}/5
+        )}
+
+        {/* Existing Internships */}
+        <div className="space-y-6">
+          {internships.length === 0 ? (
+            <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200 shadow-sm">
+              <div className="max-w-md mx-auto">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <FaBriefcase className="text-4xl text-gray-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-700 mb-3">No Internships Added</h3>
+                <p className="text-gray-500 mb-6 leading-relaxed">Start documenting your professional experience and internships to build your portfolio.</p>
+                {/* <button
+                  onClick={() => setShowAddForm(true)}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium"
+                >
+                  <FaPlus /> Add Your First Internship
+                </button> */}
+              </div>
+            </div>
+          ) : (
+            internships.map((internship) => (
+              <div key={internship.id} className={`bg-white border-2 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 ${
+                editingId === (internship.internship_id || internship.id)
+                  ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 shadow-amber-200'
+                  : 'border-gray-100 hover:border-blue-200'
+              }`}>
+                <div className="flex flex-col lg:flex-row justify-between items-start gap-4 mb-6">
+                  <div className="flex-1">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-3 mb-2">
+                      <div className="flex-1">
+                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{internship.position}</h3>
+                        <p className="text-lg font-semibold text-blue-600 mb-3">{internship.company_name}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(internship.status)}`}>
+                          {internship.status.charAt(0).toUpperCase() + internship.status.slice(1)}
+                        </span>
+                        {internship.performance_rating && (
+                          <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                            <FaStar className="text-yellow-500 text-sm" />
+                            <span className="text-sm font-medium text-yellow-700">{internship.performance_rating}/5</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-2">
+                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                        <FaMapMarkerAlt className="text-gray-400" />
+                        {internship.location || 'Remote'}
                       </span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(internship.status)}`}>
-                    {internship.status}
-                  </span>
-                  <button
-                    onClick={() => editingId === (internship.internship_id || internship.id) ? handleCancelEdit() : handleEditRecord(internship)}
-                    className={`p-2 cursor-pointer rounded transition-colors ${
-                      editingId === (internship.internship_id || internship.id) 
-                        ? 'text-amber-600 hover:text-amber-800 hover:bg-amber-100' 
-                        : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
-                    }`}
-                    title={editingId === (internship.internship_id || internship.id) ? "Cancel Edit" : "Edit Record"}
-                  >
-                    {editingId === (internship.internship_id || internship.id) ? <FaTimes /> : <FaEdit />}
-                  </button>
-                  <button
-                    onClick={() => handleDeleteRecord(internship.internship_id)}
-                    className="text-red-600 hover:text-red-800 p-2 cursor-pointer hover:bg-red-50 rounded transition-colors"
-                    title="Delete Record"
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div className="text-sm">
-                  <span className="text-gray-500">Type:</span> {internship.internship_type}
-                </div>
-                <div className="text-sm">
-                  <span className="text-gray-500">Duration:</span> 
-                  {internship.duration_months && ` ${internship.duration_months} months`}
-                  {internship.duration_weeks && ` ${internship.duration_weeks} weeks`}
-                </div>
-                <div className="text-sm">
-                  <span className="text-gray-500">Work Mode:</span> {internship.work_mode}
-                </div>
-                {internship.stipend && (
-                  <div className="text-sm">
-                    <span className="text-gray-500">Stipend:</span> {internship.stipend} {internship.currency}
-                  </div>
-                )}
-              </div>
-
-              {internship.description && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Description</h4>
-                  <p className="text-sm text-gray-600">{internship.description}</p>
-                </div>
-              )}
-
-              {internship.key_responsibilities && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Key Responsibilities</h4>
-                  <p className="text-sm text-gray-600">{internship.key_responsibilities}</p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {internship.skills_learned && internship.skills_learned.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Skills Learned</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {internship.skills_learned.map((skill, index) => (
-                        <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
-                          {skill}
-                        </span>
-                      ))}
+                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                        <FaCalendarAlt className="text-gray-400" />
+                        {formatDate(internship.start_date)} - {formatDate(internship.end_date)}
+                      </span>
+                      <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
+                        <FaBriefcase className="text-gray-400" />
+                        {internship.work_mode.charAt(0).toUpperCase() + internship.work_mode.slice(1)}
+                      </span>
                     </div>
                   </div>
-                )}
-
-                {internship.technologies_used && internship.technologies_used.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Technologies Used</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {internship.technologies_used.map((tech, index) => (
-                        <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {internship.supervisor_name && (
-                <div className="border-t pt-4 mt-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Supervisor</h4>
-                  <p className="text-sm text-gray-600">
-                    {internship.supervisor_name}
-                    {internship.supervisor_designation && ` - ${internship.supervisor_designation}`}
-                    {internship.supervisor_email && ` (${internship.supervisor_email})`}
-                  </p>
-                </div>
-              )}
-
-              {(internship.offer_letter || internship.offer_letter_received) && (
-                <div className="border-t pt-4 mt-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Offer Letter</h4>
-                  {internship.offer_letter ? (
+                  
+                  <div className="flex items-center gap-2 lg:flex-col lg:items-end">
                     <button
-                      onClick={() => openImageModal(internship.offer_letter, `Offer Letter - ${internship.company_name}`)}
-                      className="inline-flex items-center cursor-pointer gap-2 text-sm text-blue-600 hover:underline bg-blue-50 px-3 py-2 rounded-lg transition-colors hover:bg-blue-100"
+                      onClick={() => editingId === (internship.internship_id || internship.id) ? handleCancelEdit() : handleEditRecord(internship)}
+                      className={`p-3 cursor-pointer rounded-xl transition-all duration-200 ${
+                        editingId === (internship.internship_id || internship.id) 
+                          ? 'text-amber-600 hover:text-amber-800 bg-amber-100 hover:bg-amber-200' 
+                          : 'text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100'
+                      }`}
+                      title={editingId === (internship.internship_id || internship.id) ? "Cancel Edit" : "Edit Record"}
                     >
-                      📄 View Offer Letter
+                      {editingId === (internship.internship_id || internship.id) ? <FaTimes size={18} /> : <FaEdit size={18} />}
                     </button>
-                  ) : (
-                    <div className="text-sm text-gray-500 italic bg-gray-50 px-3 py-2 rounded-lg">
-                      Offer letter received but not uploaded to system
+                    <button
+                      onClick={() => handleDeleteRecord(internship.internship_id)}
+                      className="p-3 cursor-pointer text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 rounded-xl transition-all duration-200"
+                      title="Delete Record"
+                    >
+                      <FaTrash size={18} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl">
+                    <p className="text-sm text-gray-600 mb-1">Type</p>
+                    <p className="font-semibold text-gray-900">{internship.internship_type}</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl">
+                    <p className="text-sm text-gray-600 mb-1">Duration</p>
+                    <p className="font-semibold text-gray-900">
+                      {internship.duration_months && `${internship.duration_months} months `}
+                      ({internship.duration_weeks && `${internship.duration_weeks} weeks`})
+                    </p>
+                  </div>
+                  <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-4 rounded-xl">
+                    <p className="text-sm text-gray-600 mb-1">Work Mode</p>
+                    <p className="font-semibold text-gray-900">{internship.work_mode}</p>
+                  </div>
+                  {internship.stipend && (
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl">
+                      <p className="text-sm text-gray-600 mb-1">Stipend</p>
+                      <p className="font-semibold text-gray-900">{internship.stipend} {internship.currency}</p>
                     </div>
                   )}
                 </div>
-              )}
 
-              <div className="flex gap-4 mt-4 text-xs text-gray-500">
-                {internship.final_presentation && <span>✓ Final Presentation Given</span>}
-                {internship.offer_letter_received && <span>✓ Offer Letter Received</span>}
+                {internship.description && (
+                  <div className="mb-4">
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <div className="w-1 h-4 bg-blue-500 rounded"></div>
+                      Description
+                    </h4>
+                    <p className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-xl">{internship.description}</p>
+                  </div>
+                )}
+
+                {internship.key_responsibilities && (
+                  <div className="mb-4">
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <div className="w-1 h-4 bg-green-500 rounded"></div>
+                      Key Responsibilities
+                    </h4>
+                    <p className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-xl">{internship.key_responsibilities}</p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                  {internship.skills_learned && internship.skills_learned.length > 0 && (
+                    <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-xl">
+                      <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        Skills Learned
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {internship.skills_learned.map((skill, index) => (
+                          <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium border border-blue-200">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {internship.technologies_used && internship.technologies_used.length > 0 && (
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl">
+                      <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Technologies Used
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {internship.technologies_used.map((tech, index) => (
+                          <span key={index} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium border border-green-200">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {internship.supervisor_name && (
+                  <div className="border-t border-gray-200 pt-4 mb-4">
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <div className="w-1 h-4 bg-purple-500 rounded"></div>
+                      Supervisor Information
+                    </h4>
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl">
+                      <p className="text-gray-700">
+                        <span className="font-semibold">{internship.supervisor_name}</span>
+                        {internship.supervisor_designation && (
+                          <span className="text-gray-600"> - {internship.supervisor_designation}</span>
+                        )}
+                        {internship.supervisor_email && (
+                          <span className="block text-sm text-gray-600 mt-1">✉️ {internship.supervisor_email}</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {(internship.offer_letter || internship.offer_letter_received) && (
+                  <div className="border-t border-gray-200 pt-4 mb-4">
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <div className="w-1 h-4 bg-indigo-500 rounded"></div>
+                      Offer Letter
+                    </h4>
+                    {internship.offer_letter ? (
+                      <button
+                        onClick={() => openImageModal(internship.offer_letter, `Offer Letter - ${internship.company_name}`)}
+                        className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-3 rounded-xl transition-all duration-200 border border-blue-200 hover:border-blue-300"
+                      >
+                        📄 View Offer Letter
+                      </button>
+                    ) : (
+                      <div className="text-sm text-gray-500 italic bg-gray-50 px-4 py-3 rounded-xl border border-gray-200">
+                        Offer letter received but not uploaded to system
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                
+                <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+                  {internship.final_presentation && (
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-200">
+                      ✓ Final Presentation Given
+                    </span>
+                  )}
+                  {internship.offer_letter_received && (
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                      ✓ Offer Letter Received
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
+
+        {/* Image Modal */}
+        <ImageModal />
+      
       </div>
 
-      {/* Image Modal */}
-      <ImageModal />
     </div>
   );
 }
