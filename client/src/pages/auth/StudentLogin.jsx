@@ -6,7 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import bpitLogo from "../../assets/icons/BPIT-logo-transparent.png";
 import campusBackground from "../../assets/images/BPIT.png";
 import Swal from "sweetalert2";
-import AIChatLauncher from "../../components/AIChatLauncher"; // adjust path as needed
+import AIChatLauncher from "../../components/AI/AIChatLauncher"; // adjust path as needed
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -134,7 +134,7 @@ const StudentLogin = () => {
       setSuccess("Login successful! Redirecting...");
 
       // Set login time when user successfully logs in
-      localStorage.setItem('studentLoginTime', Date.now().toString());
+      localStorage.setItem("studentLoginTime", Date.now().toString());
 
       // Update authentication state
       await checkAuthStatus();
@@ -301,7 +301,7 @@ const StudentLogin = () => {
           <div className="relative">
             {/* Glowing Background Effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-green-400 via-blue-400 to-purple-400 rounded-3xl blur-xl opacity-20 animate-pulse"></div>
-            
+
             {/* Main Card */}
             <div className="relative bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl border border-white/50 overflow-hidden">
               {/* Card Header with Gradient */}
@@ -337,8 +337,16 @@ const StudentLogin = () => {
                   <div className="mb-6 p-4 bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg shadow-sm">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
-                        <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        <svg
+                          className="h-5 w-5 text-red-500"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       </div>
                       <div className="ml-3">
@@ -351,14 +359,23 @@ const StudentLogin = () => {
                   <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-100 border-l-4 border-green-500 rounded-lg shadow-sm">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <svg className="h-5 w-5 text-green-500 mr-3" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        <svg
+                          className="h-5 w-5 text-green-500 mr-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                         <p className="text-green-800 font-medium">{success}</p>
                       </div>
                       {step === 2 && otpTimer > 0 && (
                         <span className="text-xs font-bold text-green-700 bg-green-200 px-2 py-1 rounded-full">
-                          {Math.floor(otpTimer / 60)}:{(otpTimer % 60).toString().padStart(2, "0")}
+                          {Math.floor(otpTimer / 60)}:
+                          {(otpTimer % 60).toString().padStart(2, "0")}
                         </span>
                       )}
                     </div>
@@ -369,13 +386,22 @@ const StudentLogin = () => {
                 <div className="mb-8 p-4 bg-gradient-to-r from-green-50 to-blue-100 border border-green-200 rounded-xl">
                   <div className="flex items-start">
                     <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-green-600 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+                      <svg
+                        className="h-5 w-5 text-green-600 mt-0.5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </div>
                     <div className="ml-3">
                       <p className="text-green-800 text-sm font-medium">
-                        Please use your registered student email address. Check spam folder if OTP doesn't arrive.
+                        Please use your registered student email address. Check
+                        spam folder if OTP doesn't arrive.
                       </p>
                     </div>
                   </div>
@@ -385,12 +411,19 @@ const StudentLogin = () => {
                 {step === 1 && (
                   <form className="space-y-6" onSubmit={handleSendOtp}>
                     <div>
-                      <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-3">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-bold text-gray-700 mb-3"
+                      >
                         Student Email Address
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                          <svg className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                          <svg
+                            className="h-5 w-5 text-gray-600"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
                             <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                             <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                           </svg>
@@ -407,31 +440,48 @@ const StudentLogin = () => {
                         />
                       </div>
                       <p className="mt-2 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
-                        💡 <strong>Tip:</strong> You can login with either your personal email or Microsoft email (if registered in your SAR profile)
+                        💡 <strong>Tip:</strong> You can login with either your
+                        personal email or Microsoft email (if registered in your
+                        SAR profile)
                       </p>
                     </div>
 
-                  <div>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full relative cursor-pointer overflow-hidden bg-green-100 hover:bg-green-300 text-black font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                    >
-                      {loading ? (
-                        <div className="flex items-center justify-center">
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Sending OTP...
-                        </div>
-                      ) : (
-                        "Send OTP Code"
-                      )}
-                    </button>
-                  </div>
-                </form>
-              )}
+                    <div>
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full relative cursor-pointer overflow-hidden bg-green-100 hover:bg-green-300 text-black font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                      >
+                        {loading ? (
+                          <div className="flex items-center justify-center">
+                            <svg
+                              className="animate-spin -ml-1 mr-3 h-5 w-5 text-black"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
+                            </svg>
+                            Sending OTP...
+                          </div>
+                        ) : (
+                          "Send OTP Code"
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                )}
 
                 {step === 2 && (
                   <form className="space-y-8" onSubmit={handleVerifyOtp}>
@@ -439,7 +489,10 @@ const StudentLogin = () => {
                       <label className="block text-sm font-bold text-gray-700 mb-4 text-center">
                         Enter 6-Digit Verification Code
                       </label>
-                      <div className="flex gap-3 justify-center" onPaste={handleOtpBoxPaste}>
+                      <div
+                        className="flex gap-3 justify-center"
+                        onPaste={handleOtpBoxPaste}
+                      >
                         {otpDigits.map((digit, idx) => (
                           <input
                             key={idx}
@@ -448,20 +501,24 @@ const StudentLogin = () => {
                             inputMode="numeric"
                             maxLength={1}
                             className={`w-12 h-14 text-center text-2xl font-black border-2 rounded-xl shadow-sm focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 ${
-                              digit ? "border-green-500 bg-green-50 text-green-600" : "border-gray-300 bg-white text-gray-900"
+                              digit
+                                ? "border-green-500 bg-green-50 text-green-600"
+                                : "border-gray-300 bg-white text-gray-900"
                             }`}
                             value={digit}
-                            onChange={(e) => handleOtpBoxChange(idx, e.target.value)}
+                            onChange={(e) =>
+                              handleOtpBoxChange(idx, e.target.value)
+                            }
                             onKeyDown={(e) => handleOtpBoxKeyDown(idx, e)}
                             disabled={otpTimer === 0}
                           />
                         ))}
                       </div>
-                      
+
                       <p className="mt-4 text-xs text-gray-600 text-center">
                         Check your email for the verification code
                       </p>
-                      
+
                       {otpTimer === 0 && (
                         <button
                           type="button"
@@ -471,8 +528,8 @@ const StudentLogin = () => {
                         >
                           {loading ? "Resending..." : "Resend OTP"}
                         </button>
-                    )}
-                  </div>
+                      )}
+                    </div>
 
                     <div className="flex items-center justify-between">
                       <button
@@ -485,12 +542,22 @@ const StudentLogin = () => {
                         className="flex cursor-pointer items-center text-sm font-bold text-green-600 hover:text-green-800 transition-colors duration-200"
                         disabled={loading}
                       >
-                        <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        <svg
+                          className="h-4 w-4 mr-2"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                          />
                         </svg>
                         Change Email
                       </button>
-                      
+
                       <button
                         type="submit"
                         disabled={loading || otp.length !== 6 || otpTimer === 0}
@@ -503,20 +570,21 @@ const StudentLogin = () => {
                 )}
 
                 <div className="mt-6">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300" />
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">
-                      New student?{" "}
-                      <a
-                        href="/registration/student"
-                        className="font-medium text-blue-600 hover:text-blue-500"
-                      >
-                        Create account
-                      </a>
-                    </span>
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-300" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-2 bg-white text-gray-500">
+                        New student?{" "}
+                        <a
+                          href="/registration/student"
+                          className="font-medium text-blue-600 hover:text-blue-500"
+                        >
+                          Create account
+                        </a>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -524,7 +592,6 @@ const StudentLogin = () => {
           </div>
         </div>
       </div>
-    </div>
 
       {/* Persistent Home Navigation Button */}
       <button

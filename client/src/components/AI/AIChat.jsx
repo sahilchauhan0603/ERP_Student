@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { FaPaperPlane, FaRobot, FaTimes, FaUser, FaRegCopy, FaThumbsUp, FaThumbsDown, FaRedoAlt, FaSmile, FaCheck, FaHeart, FaQuestionCircle, FaBook, FaFileAlt, FaUserShield } from "react-icons/fa";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 const INITIAL_MESSAGE = {
   role: "assistant",

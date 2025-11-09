@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { FiHome } from "react-icons/fi";
 import campusBackground from "../../assets/images/BPIT.png"; // Make sure this path is correct
 import bpitLogo from "../../assets/icons/BPIT-logo-transparent.png";
-import AIChatLauncher from "../../components/AIChatLauncher"; // adjust path as needed
+import AIChatLauncher from "../../components/AI/AIChatLauncher"; // adjust path as needed
 
 const RegistrationPage = () => {
   const [loaded, setLoaded] = useState(false);

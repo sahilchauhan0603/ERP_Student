@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaRobot } from "react-icons/fa";
 import CustomModal from "./CustomModal";
-import AIChatLauncher from "./AIChatLauncher";
+import AIChatLauncher from "./AI/AIChatLauncher";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";

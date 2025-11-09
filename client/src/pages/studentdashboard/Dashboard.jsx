@@ -5,7 +5,7 @@ import { formatFamilyIncome } from "../../utils/formatters";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useAuth } from "../../context/AuthContext";
-import AIChatLauncher from "../../components/AIChatLauncher";
+import AIChatLauncher from "../../components/AI/AIChatLauncher";
 
 const StudentDetailsDashboard = () => {
   // Dropdown options from registration form

@@ -1,8 +1,8 @@
 // src/layouts/AdminLayout.jsx
 import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import AdminSidebar from "../components/AdminSidebar";
-import { useAuth } from "../context/AuthContext";
+import AdminSidebar from "./AdminSidebar";
+import { useAuth } from "../../context/AuthContext";
 import Swal from "sweetalert2";
 
 export default function AdminLayout() {

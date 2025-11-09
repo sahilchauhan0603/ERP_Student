@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiLogOut, FiHelpCircle } from "react-icons/fi";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import Swal from "sweetalert2";
-import AIChat from "./AIChat";
-import defaultProfileImg from "../assets/icons/student.svg";
+import AIChat from "../AI/AIChat";
 
 const navItems = [
   {

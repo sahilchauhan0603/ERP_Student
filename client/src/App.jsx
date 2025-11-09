@@ -1,19 +1,24 @@
 // src/App.js
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+
 import { AuthProvider } from './context/AuthContext';
+
 import HomePage from './components/HomePage';
+
 import StudentRegistration from './pages/registration/student/index';
-import FacultyRegistration from './pages/registration/faculty/FacultyRegistration';
-import NonTeachingStaffRegistration from './pages/registration/nonTeachingStaff/NonTeachingStaffRegistration';
+
 import StudentLogin from './pages/auth/StudentLogin';
 import AdminLogin from './pages/auth/AdminLogin';
+
 import StudentDetailsDashboard from './pages/studentdashboard/Dashboard';
 import Help from './pages/studentdashboard/Help';
-import StudentLayout from './components/StudentLayout';
+import StudentLayout from './components/student/StudentLayout';
 import SARBooklet from './pages/studentdashboard/SARBooklet';
+
 import RegistrationPage from './pages/registration/registrationPage';
-import AdminLayout from './components/AdminLayout';
+
+import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminAllStudents from './pages/admin/AdminAllStudents';
 import PendingStudents from './pages/admin/PendingStudents';
@@ -54,8 +59,6 @@ function AppContent() {
       <Route path="/" element={<HomePage />} />
       <Route path="/registration" element={<RegistrationPage />} />
       <Route path="/registration/student" element={<StudentRegistration />} />
-      <Route path="/registration/faculty" element={<FacultyRegistration />} />
-      <Route path="/registration/non-teaching-staff" element={<NonTeachingStaffRegistration />} />
       <Route path="/login" element={<StudentLogin />} />
       <Route path="/admin" element={<AdminLogin />} />
 
