@@ -29,6 +29,25 @@ const convertEnumToRating = (enumValue) => {
   return enumMap[enumValue] || null;
 };
 
+// Helper function to format date to YYYY-MM-DD format
+const formatDateForDB = (dateValue) => {
+  if (!dateValue) return null;
+  
+  try {
+    const date = new Date(dateValue);
+    if (isNaN(date.getTime())) return null;
+    
+    // Format to YYYY-MM-DD
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  } catch (error) {
+    return null;
+  }
+};
+
 // Helper function to safely parse JSON fields
 const safeJsonParse = (jsonString, defaultValue = []) => {
   if (!jsonString) return defaultValue;
@@ -763,7 +782,7 @@ const sarController = {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
         [
           sarId, company_name, position, internship_type || 'summer',
-          start_date || null, end_date || null, 
+          formatDateForDB(start_date), formatDateForDB(end_date), 
           duration_months ? parseFloat(duration_months) : null,
           duration_weeks ? parseInt(duration_weeks) : null, 
           stipend ? parseFloat(stipend) : null, currency || 'INR',
@@ -848,8 +867,8 @@ const sarController = {
           offer_letter_received = ?, offer_letter = ?, status = ?, updated_at = NOW()
          WHERE internship_id = ? AND SAR_id = ?`,
         [
-          company_name, position, internship_type || 'summer', start_date || null,
-          end_date || null, 
+          company_name, position, internship_type || 'summer', formatDateForDB(start_date),
+          formatDateForDB(end_date), 
           duration_months ? parseFloat(duration_months) : null, 
           duration_weeks ? parseInt(duration_weeks) : null,
           stipend ? parseFloat(stipend) : null, currency || 'INR', 
@@ -985,11 +1004,11 @@ const sarController = {
       const studentId = req.user.id;
       const {
         title, category, subcategory, description, achievement_date,
-        event_start_date, event_end_date, level, organization, event_name,
+        date_of_event, level, organization, event_name,
         position_rank, total_participants, team_size, team_members,
         prize_amount, prize_currency, certificate_url, trophy_medal_received,
         media_coverage, media_urls, skills_demonstrated, technologies_used,
-        verification_status, points_awarded, impact_score, tags, semester_achieved
+        tags, semester_achieved
       } = req.body;
 
       // Validate required fields
@@ -1023,23 +1042,22 @@ const sarController = {
       const [result] = await db.execute(
         `INSERT INTO SARAchievements (
           SAR_id, title, category, subcategory, description, achievement_date,
-          event_start_date, event_end_date, level, organization, event_name,
+          date_of_event, level, organization, event_name,
           position_rank, total_participants, team_size, team_members,
           prize_amount, prize_currency, certificate_url, trophy_medal_received,
           media_coverage, media_urls, skills_demonstrated, technologies_used,
-          verification_status, points_awarded, impact_score, tags, semester_achieved,
+          tags, semester_achieved,
           created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
         [
           sarId, title, category, subcategory || null, description || null,
-          achievement_date || null, event_start_date || null, event_end_date || null,
+          formatDateForDB(achievement_date), formatDateForDB(date_of_event),
           level, organization || null, event_name || null, position_rank || null,
           total_participants || null, team_size || 1, JSON.stringify(team_members || []),
           prize_amount || null, prize_currency || 'INR', certificate_url || null,
           trophy_medal_received || false, media_coverage || false,
           JSON.stringify(media_urls || []), JSON.stringify(skills_demonstrated || []),
-          JSON.stringify(technologies_used || []), verification_status || 'pending',
-          points_awarded || 0, impact_score || null, JSON.stringify(tags || []),
+          JSON.stringify(technologies_used || []), JSON.stringify(tags || []),
           semester_achieved || null
         ]
       );
@@ -1095,35 +1113,33 @@ const sarController = {
 
       const {
         title, category, subcategory, description, achievement_date,
-        event_start_date, event_end_date, level, organization, event_name,
+        date_of_event, level, organization, event_name,
         position_rank, total_participants, team_size, team_members,
         prize_amount, prize_currency, certificate_url, trophy_medal_received,
         media_coverage, media_urls, skills_demonstrated, technologies_used,
-        verification_status, points_awarded, impact_score, tags, semester_achieved
+        tags, semester_achieved
       } = req.body;
 
       // Update achievement record
       await db.execute(
         `UPDATE SARAchievements SET
           title = ?, category = ?, subcategory = ?, description = ?, achievement_date = ?,
-          event_start_date = ?, event_end_date = ?, level = ?, organization = ?,
+          date_of_event = ?, level = ?, organization = ?,
           event_name = ?, position_rank = ?, total_participants = ?, team_size = ?,
           team_members = ?, prize_amount = ?, prize_currency = ?, certificate_url = ?,
           trophy_medal_received = ?, media_coverage = ?, media_urls = ?,
-          skills_demonstrated = ?, technologies_used = ?, verification_status = ?,
-          points_awarded = ?, impact_score = ?, tags = ?, semester_achieved = ?,
+          skills_demonstrated = ?, technologies_used = ?, tags = ?, semester_achieved = ?,
           updated_at = NOW()
          WHERE achievement_id = ? AND SAR_id = ?`,
         [
           title, category, subcategory || null, description || null,
-          achievement_date || null, event_start_date || null, event_end_date || null,
+          formatDateForDB(achievement_date), formatDateForDB(date_of_event),
           level, organization || null, event_name || null, position_rank || null,
           total_participants || null, team_size || 1, JSON.stringify(team_members || []),
           prize_amount || null, prize_currency || 'INR', certificate_url || null,
           trophy_medal_received || false, media_coverage || false,
           JSON.stringify(media_urls || []), JSON.stringify(skills_demonstrated || []),
-          JSON.stringify(technologies_used || []), verification_status || 'pending',
-          points_awarded || 0, impact_score || null, JSON.stringify(tags || []),
+          JSON.stringify(technologies_used || []), JSON.stringify(tags || []),
           semester_achieved || null, recordId, sarId
         ]
       );

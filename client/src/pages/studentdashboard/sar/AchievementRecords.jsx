@@ -18,8 +18,7 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
     subcategory: "",
     description: "",
     achievement_date: "",
-    event_start_date: "",
-    event_end_date: "",
+    date_of_event: "",
     level: "college",
     organization: "",
     event_name: "",
@@ -35,9 +34,6 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
     media_urls: [],
     skills_demonstrated: [],
     technologies_used: [],
-    verification_status: "pending",
-    points_awarded: 0,
-    impact_score: "",
     tags: [],
     semester_achieved: ""
   });
@@ -67,16 +63,6 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
       newErrors.achievement_date = "Achievement date is required";
     }
     
-    // Date validation
-    if (achievement.event_start_date && achievement.event_end_date) {
-      const startDate = new Date(achievement.event_start_date);
-      const endDate = new Date(achievement.event_end_date);
-      
-      if (endDate < startDate) {
-        newErrors.event_end_date = "End date must be after start date";
-      }
-    }
-    
     // Numeric validation
     if (achievement.total_participants && (isNaN(achievement.total_participants) || achievement.total_participants < 1)) {
       newErrors.total_participants = "Total participants must be a positive number";
@@ -100,8 +86,7 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
       subcategory: "",
       description: "",
       achievement_date: "",
-      event_start_date: "",
-      event_end_date: "",
+      date_of_event: "",
       level: "college",
       organization: "",
       event_name: "",
@@ -117,9 +102,6 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
       media_urls: [],
       skills_demonstrated: [],
       technologies_used: [],
-      verification_status: "pending",
-      points_awarded: 0,
-      impact_score: "",
       tags: [],
       semester_achieved: ""
     });
@@ -263,10 +245,6 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
           case 'DUPLICATE_ACHIEVEMENT':
             errorMessage = "This achievement already exists. Please check your records.";
             break;
-          case 'INVALID_DATE_RANGE':
-            errorMessage = "Invalid date range. Please check your dates.";
-            setErrors({ event_end_date: "End date must be after start date" });
-            break;
           case 'MISSING_REQUIRED_FIELDS':
             errorMessage = "Please fill in all required fields.";
             break;
@@ -336,9 +314,6 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
           case 'RECORD_NOT_FOUND':
             errorMessage = "Achievement record not found. It may have been already deleted.";
             break;
-          case 'CANNOT_DELETE_VERIFIED':
-            errorMessage = "Cannot delete verified achievement records. Please contact administrator.";
-            break;
           default:
             errorMessage = error.response.data.message || "Failed to delete achievement record. Please try again.";
         }
@@ -378,9 +353,11 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
         (achievement.tags ? achievement.tags.split(',').map(tag => tag.trim()) : []),
       media_urls: Array.isArray(achievement.media_urls) ? achievement.media_urls : 
         (achievement.media_urls ? achievement.media_urls.split(',').map(url => url.trim()) : []),
+      // Ensure date fields are properly formatted for input[type="date"]
+      achievement_date: achievement.achievement_date ? achievement.achievement_date.split('T')[0] : '',
+      date_of_event: achievement.date_of_event ? achievement.date_of_event.split('T')[0] : '',
       // Ensure numeric fields are properly handled
       team_size: achievement.team_size || 1,
-      points_awarded: achievement.points_awarded || 0,
       total_participants: achievement.total_participants || '',
       prize_amount: achievement.prize_amount || '',
       // Ensure boolean fields are properly handled
@@ -388,9 +365,9 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
       media_coverage: !!achievement.media_coverage,
       // Ensure string fields have defaults
       prize_currency: achievement.prize_currency || 'INR',
-      verification_status: achievement.verification_status || 'pending',
       category: achievement.category || 'academic',
-      level: achievement.level || 'college'
+      level: achievement.level || 'college',
+      semester_achieved: achievement.semester_achieved || ''
     };
     
     setEditRecord(formattedAchievement);
@@ -454,9 +431,6 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
             errorMessage = "This achievement already exists. Please check your records.";
             break;
           case 'INVALID_DATE_RANGE':
-            errorMessage = "Invalid date range. Please check your dates.";
-            setErrors({ event_end_date: "End date must be after start date" });
-            break;
           case 'MISSING_REQUIRED_FIELDS':
             errorMessage = "Please fill in all required fields.";
             break;
@@ -489,17 +463,22 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
     setEditRecord(null);
     setEditingId(null);
     setErrors({});
+    // Clear input states
+    setTeamMemberInput('');
+    setSkillInput('');
+    setTechnologyInput('');
+    setTagInput('');
+    setMediaUrlInput('');
   };
 
   const categories = ["academic", "technical", "sports", "cultural", "social", "leadership", "research", "entrepreneurship"];
   const levels = ["college", "university", "state", "national", "international"];
   const currencies = ["INR", "USD", "EUR", "GBP"];
-  const verificationStatuses = ["pending", "verified", "rejected"];
   const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
   const subcategoriesByCategory = {
     academic: ["scholarship", "academic_excellence", "research_paper", "thesis", "dean_list"],
-    technical: ["hackathon", "coding_contest", "project_competition", "innovation", "patent"],
+    technical: ["hackathon", "ideathon", "coding_contest", "project_competition", "innovation", "patent"],
     sports: ["individual", "team", "tournament", "championship", "fitness"],
     cultural: ["music", "dance", "drama", "art", "literature", "debate"],
     social: ["volunteer", "community_service", "ngo_work", "social_impact"],
@@ -783,58 +762,21 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                 placeholder="1"
               />
             </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-semibold text-gray-700">Points Awarded</label>
-              <input
-                type="number"
-                min="0"
-                value={newAchievement.points_awarded}
-                onChange={(e) => setNewAchievement(prev => ({ ...prev, points_awarded: parseInt(e.target.value) }))}
-                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
-                  errors.points_awarded ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
-                }`}
-                placeholder="0"
-              />
-            </div>
           </div>
 
-          {/* Event Dates */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-            <div className="space-y-1">
-              <label className="block text-sm font-semibold text-gray-700">Event Start Date</label>
-              <input
-                type="date"
-                value={newAchievement.event_start_date}
-                onChange={(e) => setNewAchievement(prev => ({ ...prev, event_start_date: e.target.value }))}
-                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
-                  errors.event_start_date ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
-                }`}
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-semibold text-gray-700">Event End Date</label>
-              <input
-                type="date"
-                value={newAchievement.event_end_date}
-                onChange={(e) => setNewAchievement(prev => ({ ...prev, event_end_date: e.target.value }))}
-                className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
-                  errors.event_end_date
-                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100'
-                    : 'border-gray-300 focus:ring-blue-500'
-                }`}
-              />
-              {errors.event_end_date && (
-                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                  <FaExclamationCircle /> {errors.event_end_date}
-                </p>
-              )}
-            </div>
+          {/* Event Date */}
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Date of Event</label>
+            <input
+              type="date"
+              value={newAchievement.date_of_event}
+              onChange={(e) => setNewAchievement(prev => ({ ...prev, date_of_event: e.target.value }))}
+              className="px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 border-gray-200 bg-white hover:border-gray-300"
+            />
           </div>
 
           {/* Prize Information */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Prize Amount</label>
               <input
@@ -858,17 +800,6 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                   <option key={curr} value={curr}>{curr}</option>
                 ))}
               </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Impact Score</label>
-              <input
-                type="text"
-                value={newAchievement.impact_score}
-                onChange={(e) => setNewAchievement(prev => ({ ...prev, impact_score: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="High/Medium/Low"
-              />
             </div>
           </div>
 
@@ -896,28 +827,29 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
               className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 ${
                 errors.certificate_url ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 bg-white hover:border-gray-300'
               }`}
-              placeholder="https://example.com/certificate"
+              placeholder="https://example.com/certificate (drive link or direct URL)"
             />
           </div>
 
           {/* Dynamic Arrays */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+           
             {/* Team Members */}
-            <div className="space-y-1">
-              <label className="block text-sm font-semibold text-gray-700">Team Members</label>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Team Members</label>
               <div className="flex gap-2 mb-2">
                 <input
                   type="text"
                   value={teamMemberInput}
                   onChange={(e) => setTeamMemberInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddTeamMember()}
-                  className="flex-1 px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                   placeholder="Add team member name"
                 />
                 <button
                   type="button"
                   onClick={handleAddTeamMember}
-                  className="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                  className="px-3 py-2 cursor-pointer bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
                 >
                   Add
                 </button>
@@ -1053,7 +985,7 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                 onChange={(e) => setMediaUrlInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleAddMediaUrl()}
                 className="flex-1 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                placeholder="Add media URL (news, videos, photos)"
+                placeholder="Add media URL (news, videos, photos) - (drive link or direct URL)"
               />
               <button
                 type="button"
@@ -1105,7 +1037,7 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
           <div className="flex gap-2 pt-3 border-t border-gray-200">
             <button
               onClick={handleSubmitAchievement}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
+              className={`px-4 py-2 rounded-lg cursor-pointer font-medium transition-all duration-200 flex items-center gap-2 ${
                 isSubmitting || !newAchievement.title
                   ? 'bg-gray-400 cursor-not-allowed text-white'
                   : 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white shadow-md hover:shadow-lg'
@@ -1117,7 +1049,7 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
             </button>
             <button
               onClick={resetForm}
-              className="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 border-2 border-gray-200 hover:border-gray-300"
+              className="px-4 py-2 rounded-lg cursor-pointer font-medium transition-all duration-200 flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 border-2 border-gray-200 hover:border-gray-300"
             >
               <FaTimes className="text-sm" />
               Cancel
@@ -1185,12 +1117,6 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                           <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
                             <FaCertificate className="text-gray-400" />
                             Semester {achievement.semester_achieved}
-                          </span>
-                        )}
-                        {achievement.points_awarded > 0 && (
-                          <span className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg">
-                            <FaTrophy className="text-gray-400" />
-                            {achievement.points_awarded} Points
                           </span>
                         )}
                       </div>
@@ -1377,7 +1303,7 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                     <div className="w-1 h-4 bg-indigo-500 rounded"></div>
                     Links & Media
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-2 space-x-3">
                     {achievement.certificate_url && (
                       <a 
                         href={achievement.certificate_url} 
@@ -1403,23 +1329,23 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                 </div>
               )}
 
-              <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
-                {achievement.trophy_medal_received && (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-yellow-700 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-200">
-                    🏆 Trophy/Medal Received
-                  </span>
-                )}
-                {achievement.media_coverage && (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-                    📰 Media Coverage
-                  </span>
-                )}
-                {achievement.verification_status === 'verified' && (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-200">
-                    ✅ Verified
-                  </span>
-                )}
-              </div>
+              {(achievement.trophy_medal_received || achievement.media_coverage) && (
+                <div className="pt-4 border-t border-gray-200">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Recognition & Visibility</h4>
+                  <div className="flex flex-wrap gap-3">
+                    {achievement.trophy_medal_received && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-yellow-700 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-200">
+                        🏆 Trophy/Medal Received
+                      </span>
+                    )}
+                    {achievement.media_coverage && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                        📰 Media Coverage
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
                 </>
               ) : (
                 /* Inline Edit Form */
@@ -1511,6 +1437,30 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                             <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" /> {errors.achievement_date}
                           </p>
                         )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Semester Achieved</label>
+                        <select
+                          value={editRecord.semester_achieved || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, semester_achieved: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                        >
+                          <option value="">Select Semester</option>
+                          {semesters.map(sem => (
+                            <option key={sem} value={sem}>Semester {sem}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-sm font-semibold text-gray-700">Date of Event</label>
+                        <input
+                          type="date"
+                          value={editRecord.date_of_event || ""}
+                          onChange={(e) => setEditRecord(prev => ({ ...prev, date_of_event: e.target.value }))}
+                          className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
+                        />
                       </div>
 
                       <div className="space-y-1">
@@ -1626,49 +1576,302 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                    <div className="space-y-1">
-                      <label className="block text-sm font-semibold text-gray-700">Team Members (comma-separated)</label>
-                      <input
-                        type="text"
-                        value={Array.isArray(editRecord.team_members) ? editRecord.team_members.join(', ') : editRecord.team_members || ''}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, team_members: e.target.value.split(',').map(m => m.trim()).filter(m => m) }))}
-                        className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
-                        placeholder="Enter team member names separated by commas"
-                      />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    {/* Team Members */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">Team Members</label>
+                      <div className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          value={teamMemberInput}
+                          onChange={(e) => setTeamMemberInput(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if (teamMemberInput.trim()) {
+                                setEditRecord(prev => ({
+                                  ...prev,
+                                  team_members: [...(prev.team_members || []), teamMemberInput.trim()]
+                                }));
+                                setTeamMemberInput('');
+                              }
+                            }
+                          }}
+                          className="flex-1 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                          placeholder="Add team member name"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (teamMemberInput.trim()) {
+                              setEditRecord(prev => ({
+                                ...prev,
+                                team_members: [...(prev.team_members || []), teamMemberInput.trim()]
+                              }));
+                              setTeamMemberInput('');
+                            }
+                          }}
+                          className="px-3 py-2 cursor-pointer bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                        >
+                          Add
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {(editRecord.team_members || []).map((member, index) => (
+                          <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                            {member}
+                            <button
+                              onClick={() => {
+                                setEditRecord(prev => ({
+                                  ...prev,
+                                  team_members: prev.team_members.filter((_, i) => i !== index)
+                                }));
+                              }}
+                              className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="block text-sm font-semibold text-gray-700">Skills Demonstrated (comma-separated)</label>
-                      <input
-                        type="text"
-                        value={Array.isArray(editRecord.skills_demonstrated) ? editRecord.skills_demonstrated.join(', ') : editRecord.skills_demonstrated || ''}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, skills_demonstrated: e.target.value.split(',').map(s => s.trim()).filter(s => s) }))}
-                        className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
-                        placeholder="Enter skills separated by commas"
-                      />
+                    {/* Skills Demonstrated */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Skills Demonstrated</label>
+                      <div className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          value={skillInput}
+                          onChange={(e) => setSkillInput(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if (skillInput.trim()) {
+                                setEditRecord(prev => ({
+                                  ...prev,
+                                  skills_demonstrated: [...(prev.skills_demonstrated || []), skillInput.trim()]
+                                }));
+                                setSkillInput('');
+                              }
+                            }
+                          }}
+                          className="flex-1 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                          placeholder="Add a skill"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (skillInput.trim()) {
+                              setEditRecord(prev => ({
+                                ...prev,
+                                skills_demonstrated: [...(prev.skills_demonstrated || []), skillInput.trim()]
+                              }));
+                              setSkillInput('');
+                            }
+                          }}
+                          className="px-3 py-2 bg-green-600 text-white cursor-pointer rounded hover:bg-green-700 text-sm"
+                        >
+                          Add
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {(editRecord.skills_demonstrated || []).map((skill, index) => (
+                          <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                            {skill}
+                            <button
+                              onClick={() => {
+                                setEditRecord(prev => ({
+                                  ...prev,
+                                  skills_demonstrated: prev.skills_demonstrated.filter((_, i) => i !== index)
+                                }));
+                              }}
+                              className="text-green-600 hover:text-green-800 cursor-pointer"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="block text-sm font-semibold text-gray-700">Technologies Used (comma-separated)</label>
-                      <input
-                        type="text"
-                        value={Array.isArray(editRecord.technologies_used) ? editRecord.technologies_used.join(', ') : editRecord.technologies_used || ''}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, technologies_used: e.target.value.split(',').map(t => t.trim()).filter(t => t) }))}
-                        className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
-                        placeholder="Enter technologies separated by commas"
-                      />
+                    {/* Technologies Used */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Technologies Used</label>
+                      <div className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          value={technologyInput}
+                          onChange={(e) => setTechnologyInput(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if (technologyInput.trim()) {
+                                setEditRecord(prev => ({
+                                  ...prev,
+                                  technologies_used: [...(prev.technologies_used || []), technologyInput.trim()]
+                                }));
+                                setTechnologyInput('');
+                              }
+                            }
+                          }}
+                          className="flex-1 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                          placeholder="Add a technology"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (technologyInput.trim()) {
+                              setEditRecord(prev => ({
+                                ...prev,
+                                technologies_used: [...(prev.technologies_used || []), technologyInput.trim()]
+                              }));
+                              setTechnologyInput('');
+                            }
+                          }}
+                          className="px-3 py-2 cursor-pointer bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
+                        >
+                          Add
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {(editRecord.technologies_used || []).map((tech, index) => (
+                          <span key={index} className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                            {tech}
+                            <button
+                              onClick={() => {
+                                setEditRecord(prev => ({
+                                  ...prev,
+                                  technologies_used: prev.technologies_used.filter((_, i) => i !== index)
+                                }));
+                              }}
+                              className="text-purple-600 hover:text-purple-800 cursor-pointer"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="block text-sm font-semibold text-gray-700">Tags (comma-separated)</label>
+                    {/* Tags */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                      <div className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          value={tagInput}
+                          onChange={(e) => setTagInput(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if (tagInput.trim()) {
+                                setEditRecord(prev => ({
+                                  ...prev,
+                                  tags: [...(prev.tags || []), tagInput.trim()]
+                                }));
+                                setTagInput('');
+                              }
+                            }
+                          }}
+                          className="flex-1 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                          placeholder="Add a tag"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (tagInput.trim()) {
+                              setEditRecord(prev => ({
+                                ...prev,
+                                tags: [...(prev.tags || []), tagInput.trim()]
+                              }));
+                              setTagInput('');
+                            }
+                          }}
+                          className="px-3 py-2 cursor-pointer bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm"
+                        >
+                          Add
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {(editRecord.tags || []).map((tag, index) => (
+                          <span key={index} className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                            {tag}
+                            <button
+                              onClick={() => {
+                                setEditRecord(prev => ({
+                                  ...prev,
+                                  tags: prev.tags.filter((_, i) => i !== index)
+                                }));
+                              }}
+                              className="text-yellow-600 hover:text-yellow-800 cursor-pointer"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Media URLs */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Media URLs</label>
+                    <div className="flex gap-2 mb-2">
                       <input
-                        type="text"
-                        value={Array.isArray(editRecord.tags) ? editRecord.tags.join(', ') : editRecord.tags || ''}
-                        onChange={(e) => setEditRecord(prev => ({ ...prev, tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag) }))}
-                        className="w-full px-3 py-2 border-2 border-gray-200 bg-white rounded-lg transition-all duration-200 focus:ring-2 focus:ring-yellow-100 focus:border-yellow-500 hover:border-gray-300"
-                        placeholder="Enter tags separated by commas"
+                        type="url"
+                        value={mediaUrlInput}
+                        onChange={(e) => setMediaUrlInput(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (mediaUrlInput.trim()) {
+                              setEditRecord(prev => ({
+                                ...prev,
+                                media_urls: [...(prev.media_urls || []), mediaUrlInput.trim()]
+                              }));
+                              setMediaUrlInput('');
+                            }
+                          }
+                        }}
+                        className="flex-1 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                        placeholder="Add media URL (news, videos, photos) - (drive link or direct URL)"
                       />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (mediaUrlInput.trim()) {
+                            setEditRecord(prev => ({
+                              ...prev,
+                              media_urls: [...(prev.media_urls || []), mediaUrlInput.trim()]
+                            }));
+                            setMediaUrlInput('');
+                          }
+                        }}
+                        className="px-3 py-2 cursor-pointer bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                      >
+                        Add URL
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      {(editRecord.media_urls || []).map((url, index) => (
+                        <div key={index} className="flex items-center gap-2 text-sm">
+                          <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex-1">
+                            {url}
+                          </a>
+                          <button
+                            onClick={() => {
+                              setEditRecord(prev => ({
+                                ...prev,
+                                media_urls: prev.media_urls.filter((_, i) => i !== index)
+                              }));
+                            }}
+                            className="text-red-600 hover:text-red-800 cursor-pointer"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </div>
 

@@ -31,8 +31,8 @@ function SARContainerContent() {
       profile_completion_percentage: 0
     },
     academicRecords: [], // Array of semester records
-    internships: [], // Array of internship records
-    achievements: [] // Array of achievement records
+    internships: [],     // Array of internship records
+    achievements: []     // Array of achievement records
   });
 
   useEffect(() => {
@@ -93,8 +93,7 @@ function SARContainerContent() {
     }));
   };
 
-  // Legacy functions - will be replaced by improved versions below
-
+  /* Add new record functions */
   const addInternshipRecord = async (record) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9080/api';
@@ -147,7 +146,6 @@ function SARContainerContent() {
     }
   };
 
-  // Add new record functions with improved error handling
   const addAcademicRecord = async (record) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9080/api';
@@ -203,6 +201,8 @@ function SARContainerContent() {
     }
   };
 
+
+  /* Update record functions */
   const updateAcademicRecord = async (id, updatedRecord) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9080/api';
@@ -312,7 +312,8 @@ function SARContainerContent() {
     }
   };
 
-  // Delete record functions
+
+  /* Delete record functions */
   const deleteAcademicRecord = async (id) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9080/api';
@@ -461,6 +462,7 @@ function SARContainerContent() {
     }
   };
 
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -480,6 +482,7 @@ function SARContainerContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50">
       <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6">
+       
         {/* Header Section */}
         <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-4 sm:p-6 mb-6 mt-4 sm:mt-6">
           <div className="flex items-center gap-3 mb-3">
