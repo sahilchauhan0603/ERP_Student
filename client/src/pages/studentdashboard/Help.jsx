@@ -17,7 +17,7 @@ export default function Help() {
     {
       question: "How do I update my personal information?",
       answer:
-        "Navigate to the SAR Booklet section and click the 'Edit' button next to Personal Details. Make your changes and click 'Save'.",
+        "Navigate to the SAR Booklet section and click the 'Edit' button next to Personal Info. Make your changes and click 'Save'.",
     },
     {
       question: "What is the SAR Booklet?",
@@ -27,12 +27,12 @@ export default function Help() {
     {
       question: "How can I contact support?",
       answer:
-        "You can reach our support team at support@studentportal.edu or call us at (555) 123-4567 during business hours (9 AM - 5 PM, Monday to Friday).",
+        "You can reach our support team at bpitindia@yahoo.com or call us at (011)-2757-2900 during business hours (9 AM - 5 PM, Monday to Friday).",
     },
     {
       question: "How do I report a technical issue?",
       answer:
-        "Please use the AI Assistant feature to report technical issues, or email technical-support@studentportal.edu with details about the problem you're experiencing.",
+        "Please use the AI Assistant feature to report technical issues, or email technical-bpitindia@yahoo.com with details about the problem you're experiencing.",
     },
     {
       question: "Is my data secure?",
