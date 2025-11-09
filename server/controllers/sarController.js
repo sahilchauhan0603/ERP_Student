@@ -293,6 +293,171 @@ const sarController = {
     }
   },
 
+  // Update Student Info
+  updateStudentInfo: async (req, res) => {
+    try {
+      const studentId = req.user.id;
+      const { 
+        firstName, middleName, lastName, email, mobile, 
+        dob, placeOfBirth, gender, currentAddress, course, batch 
+      } = req.body;
+
+      // Validate required fields
+      if (!firstName || !lastName || !email || !mobile || !dob || !gender || !course || !batch) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide all required fields'
+        });
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid email format'
+        });
+      }
+
+      // Validate mobile number (10 digits)
+      const mobileRegex = /^[0-9]{10}$/;
+      if (!mobileRegex.test(mobile.replace(/\s/g, ''))) {
+        return res.status(400).json({
+          success: false,
+          message: 'Mobile number must be 10 digits'
+        });
+      }
+
+      // Format date for MySQL
+      const formattedDob = formatDateForDB(dob);
+
+      // Update student information
+      await db.execute(
+        `UPDATE students 
+         SET firstName = ?, middleName = ?, lastName = ?, email = ?, mobile = ?,
+             dob = ?, placeOfBirth = ?, gender = ?, currentAddress = ?, 
+             course = ?, batch = ?
+         WHERE id = ?`,
+        [
+          firstName, middleName || null, lastName, email, mobile,
+          formattedDob, placeOfBirth || null, gender, currentAddress || null,
+          course, batch, studentId
+        ]
+      );
+
+      res.json({
+        success: true,
+        message: 'Student information updated successfully'
+      });
+
+    } catch (error) {
+      console.error('Error updating student info:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error'
+      });
+    }
+  },
+
+  // Update Parents Information
+  updateParentsInfo: async (req, res) => {
+    try {
+      const studentId = req.user.id;
+      const {
+        fatherName,
+        fatherOccupation,
+        fatherEmail,
+        fatherMobile,
+        fatherOfficeAddress,
+        motherName,
+        motherOccupation,
+        motherEmail,
+        motherMobile,
+        motherOfficeAddress,
+        familyIncome
+      } = req.body;
+
+      // Validate required fields
+      if (!fatherName || !motherName) {
+        return res.status(400).json({
+          success: false,
+          message: 'Father\'s name and Mother\'s name are required',
+          errorCode: 'MISSING_REQUIRED_FIELDS'
+        });
+      }
+
+      // Validate email formats if provided
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (fatherEmail && !emailRegex.test(fatherEmail)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid father\'s email format',
+          errorCode: 'INVALID_EMAIL_FORMAT'
+        });
+      }
+      if (motherEmail && !emailRegex.test(motherEmail)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid mother\'s email format',
+          errorCode: 'INVALID_EMAIL_FORMAT'
+        });
+      }
+
+      // Validate mobile numbers if provided
+      const mobileRegex = /^[0-9]{10}$/;
+      if (fatherMobile && !mobileRegex.test(fatherMobile.replace(/\s/g, ''))) {
+        return res.status(400).json({
+          success: false,
+          message: 'Father\'s mobile number must be 10 digits',
+          errorCode: 'INVALID_MOBILE_FORMAT'
+        });
+      }
+      if (motherMobile && !mobileRegex.test(motherMobile.replace(/\s/g, ''))) {
+        return res.status(400).json({
+          success: false,
+          message: 'Mother\'s mobile number must be 10 digits',
+          errorCode: 'INVALID_MOBILE_FORMAT'
+        });
+      }
+
+      // Update in database using flat column structure
+      await db.query(
+        `UPDATE students 
+         SET father_name = ?, 
+             father_occupation = ?,
+             father_email = ?,
+             father_mobile = ?,
+             father_officeAddress = ?,
+             mother_name = ?,
+             mother_occupation = ?,
+             mother_email = ?,
+             mother_mobile = ?,
+             mother_officeAddress = ?,
+             familyIncome = ?
+         WHERE id = ?`,
+        [
+          fatherName, fatherOccupation || null, fatherEmail || null, 
+          fatherMobile || null, fatherOfficeAddress || null,
+          motherName, motherOccupation || null, motherEmail || null,
+          motherMobile || null, motherOfficeAddress || null,
+          familyIncome || null, studentId
+        ]
+      );
+
+      res.json({
+        success: true,
+        message: 'Parents information updated successfully'
+      });
+
+    } catch (error) {
+      console.error('Error updating parents info:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error'
+      });
+    }
+  },
+
 
 
   /* ACADEMIC RECORDS */

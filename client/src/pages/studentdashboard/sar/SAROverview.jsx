@@ -239,6 +239,24 @@ export default function SAROverview({ student, sarData, updateSAROverview }) {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Branch
+                </label>
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-900">
+                  {student?.course || "Not available"}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Batch
+                </label>
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-900">
+                  {student?.batch || "Not available"}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Enrollment Number
                 </label>
                 {isEditing ? (

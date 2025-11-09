@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
 import SAROverview from "./SAROverview";
+import StudentInfo from "./StudentInfo";
+import ParentsInfo from "./ParentsInfo";
 import AcademicRecords from "./AcademicRecords";
 import InternshipRecords from "./InternshipRecords";
 import AchievementRecords from "./AchievementRecords";
@@ -16,6 +18,8 @@ function SARContainerContent() {
 
   const sectionTabs = [
     { key: "overview", label: "SAR Overview" },
+    { key: "studentinfo", label: "Student Info" },
+    { key: "parentsinfo", label: "Parents Info" },
     { key: "academic", label: "Academic Records" },
     { key: "internships", label: "Internships" },
     { key: "achievements", label: "Achievements" },
@@ -462,6 +466,78 @@ function SARContainerContent() {
     }
   };
 
+  // Update student info function
+  const updateStudentInfo = async (updatedInfo) => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9080/api';
+      const response = await axios.put(`${apiUrl}/sar/student-info`, updatedInfo, { withCredentials: true });
+      
+      if (response.data.success) {
+        Swal.fire({
+          title: 'Success!',
+          text: 'Student information updated successfully!',
+          icon: 'success',
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+        setStudent(prev => ({
+          ...prev,
+          ...updatedInfo
+        }));
+      }
+    } catch (error) {
+      console.error('Error updating student info:', error);
+      
+      const errorMessage = error.response?.data?.message || 'Failed to update student information. Please try again.';
+      
+      throw new Error(errorMessage);
+    }
+  };
+
+  // Update parents info function
+  const updateParentsInfo = async (updatedInfo) => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9080/api';
+      const response = await axios.put(`${apiUrl}/sar/parents-info`, updatedInfo, { withCredentials: true });
+      
+      if (response.data.success) {
+        Swal.fire({
+          title: 'Success!',
+          text: 'Parents information updated successfully!',
+          icon: 'success',
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+        setStudent(prev => ({
+          ...prev,
+          father_name: updatedInfo.fatherName,
+          father_occupation: updatedInfo.fatherOccupation,
+          father_email: updatedInfo.fatherEmail,
+          father_mobile: updatedInfo.fatherMobile,
+          father_officeAddress: updatedInfo.fatherOfficeAddress,
+          mother_name: updatedInfo.motherName,
+          mother_occupation: updatedInfo.motherOccupation,
+          mother_email: updatedInfo.motherEmail,
+          mother_mobile: updatedInfo.motherMobile,
+          mother_officeAddress: updatedInfo.motherOfficeAddress,
+          familyIncome: updatedInfo.familyIncome
+        }));
+      }
+    } catch (error) {
+      console.error('Error updating parents info:', error);
+      
+      const errorMessage = error.response?.data?.message || 'Failed to update parents information. Please try again.';
+      
+      throw new Error(errorMessage);
+    }
+  };
+
 
   if (loading) {
     return (
@@ -544,6 +620,20 @@ function SARContainerContent() {
               student={student} 
               sarData={sarData} 
               updateSAROverview={updateSAROverview}
+            />
+          )}
+
+          {activeSection === "studentinfo" && (
+            <StudentInfo 
+              student={student} 
+              updateStudentInfo={updateStudentInfo}
+            />
+          )}
+
+          {activeSection === "parentsinfo" && (
+            <ParentsInfo 
+              student={student} 
+              updateParentsInfo={updateParentsInfo}
             />
           )}
 

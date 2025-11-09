@@ -11,6 +11,12 @@ router.use(authenticate);
 router.get('/overview', sarController.getSAROverview);
 router.put('/overview', sarController.updateSAROverview);
 
+// Student Info Routes
+router.put('/student-info', sarController.updateStudentInfo);
+
+// Parents Info Routes
+router.put('/parents-info', sarController.updateParentsInfo);
+
 // Academic Records Routes
 router.get('/academic', sarController.getAcademicRecords);
 router.post('/academic', sarController.createAcademicRecord);

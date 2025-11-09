@@ -375,9 +375,9 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
                       <p className="font-bold text-white text-sm truncate">
                         {studentInfo?.firstName || "Student"} {studentInfo?.lastName || ""}
                       </p>
-                      <span className="px-1.5 py-0.5 text-xs font-medium bg-gradient-to-r from-green-500/20 to-blue-500/20 text-green-200 rounded-md border border-green-500/20">
+                      {/* <span className="px-1.5 py-0.5 text-xs font-medium bg-gradient-to-r from-green-500/20 to-blue-500/20 text-green-200 rounded-md border border-green-500/20">
                         Active
-                      </span>
+                      </span> */}
                     </div>
                     {/* Full email display with proper wrapping */}
                     <p className="text-xs text-slate-300 break-all leading-tight">
