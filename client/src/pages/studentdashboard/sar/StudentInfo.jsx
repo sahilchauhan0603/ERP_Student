@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { FaEdit, FaSave, FaTimes, FaUser, FaEnvelope, FaPhone, FaBirthdayCake, FaMapMarkerAlt, FaVenusMars, FaHome, FaGraduationCap, FaCalendarAlt, FaExclamationCircle, FaSpinner } from "react-icons/fa";
+import { FaEdit, FaSave, FaTimes, FaUser, FaEnvelope, FaPhone, FaBirthdayCake, FaMapMarkerAlt, FaVenusMars, FaHome, FaGraduationCap, FaCalendarAlt, FaExclamationCircle, FaSpinner, FaCamera, FaImage, FaEye } from "react-icons/fa";
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 export default function StudentInfo({ student, updateStudentInfo }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -15,11 +16,15 @@ export default function StudentInfo({ student, updateStudentInfo }) {
     gender: student?.gender || '',
     currentAddress: student?.currentAddress || '',
     course: student?.course || '',
-    batch: student?.batch || ''
+    batch: student?.batch || '',
+    photo: student?.photo || ''
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -34,7 +39,8 @@ export default function StudentInfo({ student, updateStudentInfo }) {
       gender: student?.gender || '',
       currentAddress: student?.currentAddress || '',
       course: student?.course || '',
-      batch: student?.batch || ''
+      batch: student?.batch || '',
+      photo: student?.photo || ''
     });
   };
 
@@ -100,7 +106,28 @@ export default function StudentInfo({ student, updateStudentInfo }) {
 
       setIsSubmitting(true);
 
-      await updateStudentInfo(editForm);
+      // Upload photo to Cloudinary if a new file was selected
+      let photoUrl = editForm.photo;
+      if (photoFile) {
+        setUploadingPhoto(true);
+        try {
+          photoUrl = await uploadToCloudinary(photoFile);
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Photo Upload Failed',
+            text: 'Failed to upload photo. Please try again.',
+            confirmButtonColor: '#dc3545'
+          });
+          setUploadingPhoto(false);
+          setIsSubmitting(false);
+          return;
+        }
+        setUploadingPhoto(false);
+      }
+
+      // Update student info with the photo URL
+      await updateStudentInfo({ ...editForm, photo: photoUrl });
 
       await Swal.fire({
         icon: 'success',
@@ -109,6 +136,7 @@ export default function StudentInfo({ student, updateStudentInfo }) {
         confirmButtonColor: '#28a745'
       });
 
+      setPhotoFile(null);
       setIsEditing(false);
 
     } catch (error) {
@@ -134,6 +162,7 @@ export default function StudentInfo({ student, updateStudentInfo }) {
   const handleCancel = () => {
     setIsEditing(false);
     setErrors({});
+    setPhotoFile(null);
   };
 
   const formatDate = (dateString) => {
@@ -141,9 +170,115 @@ export default function StudentInfo({ student, updateStudentInfo }) {
     return new Date(dateString).toLocaleDateString('en-GB');
   };
 
+  const handlePhotoUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid File',
+        text: 'Please select an image file',
+        confirmButtonColor: '#dc3545'
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      Swal.fire({
+        icon: 'error',
+        title: 'File Too Large',
+        text: 'Image size should not exceed 5MB',
+        confirmButtonColor: '#dc3545'
+      });
+      return;
+    }
+
+    // Store the file locally (will upload to Cloudinary on save)
+    setPhotoFile(file);
+    
+    Swal.fire({
+      icon: 'info',
+      title: 'Photo Selected',
+      text: 'Photo will be uploaded when you click Save',
+      timer: 2000,
+      showConfirmButton: false
+    });
+  };
+
+  // Direct Cloudinary signed upload function with axios
+  const uploadToCloudinary = async (file) => {
+    try {
+      // Step 1: Get signature from backend
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9080/api';
+      const signatureResponse = await axios.post(
+        `${apiUrl}/sar/upload-signature`,
+        { folder: 'student_photos' },
+        { withCredentials: true }
+      );
+
+      const { signature, timestamp, cloud_name, api_key } = signatureResponse.data;
+
+      // Step 2: Upload to Cloudinary with signature
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('signature', signature);
+      formData.append('timestamp', timestamp);
+      formData.append('api_key', api_key);
+      formData.append('folder', 'student_photos');
+
+      const uploadResponse = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      return uploadResponse.data.secure_url;
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      throw error;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-100 p-3 sm:p-4">
       <div className="max-w-6xl mx-auto">
+        {/* Photo Modal */}
+        {showPhotoModal && (
+          <div className="fixed inset-0 bg-black/40 bg-opacity-75 flex items-center justify-center z-50 p-4" onClick={() => setShowPhotoModal(false)}>
+            <div className="relative bg-white rounded-lg p-2 max-w-md" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => setShowPhotoModal(false)}
+                className="absolute cursor-pointer -top-3 -right-3 bg-white text-gray-700 hover:text-gray-900 rounded-full p-2 shadow-lg transition-colors"
+              >
+                <FaTimes className="text-lg" />
+              </button>
+              {(student?.photo || editForm.photo) ? (
+                <img
+                  src={student?.photo || editForm.photo}
+                  alt="Student"
+                  className="w-full h-auto rounded-lg"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="%23f3f4f6"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%239ca3af" font-family="Arial" font-size="20">Image Not Available</text></svg>';
+                  }}
+                />
+              ) : (
+                <div className="w-96 h-96 bg-gray-100 rounded-lg flex flex-col items-center justify-center">
+                  <FaImage className="text-gray-400 text-6xl mb-3" />
+                  <p className="text-gray-500 font-medium">No Photo Available</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
           <div className="flex items-center gap-2">
@@ -217,6 +352,95 @@ export default function StudentInfo({ student, updateStudentInfo }) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Photo Field - Full Width */}
+            <div className="md:col-span-2 lg:col-span-3">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Student Photo
+              </label>
+              <div className="flex flex-col sm:flex-row gap-4 items-start">
+                {/* Photo Preview */}
+                <div className="flex-shrink-0">
+                  {(photoFile || student?.photo || editForm.photo) ? (
+                    <div className="relative group">
+                      <img
+                        src={photoFile ? URL.createObjectURL(photoFile) : (editForm.photo || student?.photo)}
+                        alt="Student"
+                        className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200 shadow-md"
+                      />
+                      <button
+                        onClick={() => setShowPhotoModal(true)}
+                        className="absolute inset-0 cursor-pointer bg-black/40 bg-opacity-0 group-hover:bg-opacity-50 rounded-lg transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                      >
+                        <FaEye className="text-white text-2xl" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-32 h-32 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                      <FaImage className="text-gray-400 text-3xl" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Upload Controls */}
+                {isEditing && (
+                  <div className="flex-1">
+                    <div className="flex flex-col gap-2">
+                      <label className="cursor-pointer">
+                        <div className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-pink-300 bg-pink-50 hover:bg-pink-100 transition-colors text-pink-700 font-medium text-sm w-fit ${
+                          uploadingPhoto ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}>
+                          {uploadingPhoto ? (
+                            <>
+                              <FaSpinner className="animate-spin" />
+                              Uploading...
+                            </>
+                          ) : (
+                            <>
+                              <FaCamera />
+                              {photoFile ? 'Change Photo' : ((student?.photo || editForm.photo) ? 'Change Photo' : 'Upload Photo')}
+                            </>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handlePhotoUpload}
+                          disabled={uploadingPhoto}
+                          className="hidden"
+                        />
+                      </label>
+                      {photoFile ? (
+                        <p className="text-xs text-pink-600 font-medium">
+                          📷 Photo ready. Click Save to upload.
+                        </p>
+                      ) : (
+                        <p className="text-xs text-gray-500">
+                          Maximum file size: 5MB. Supported formats: JPG, PNG, GIF
+                        </p>
+                      )}
+                      {(editForm.photo || photoFile) && (
+                        <button
+                          onClick={() => {
+                            setEditForm(prev => ({ ...prev, photo: '' }));
+                            setPhotoFile(null);
+                          }}
+                          className="text-xs cursor-pointer text-red-600 hover:text-red-700 font-medium w-fit"
+                        >
+                          Remove Photo
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {!isEditing && !(student?.photo || editForm.photo) && (
+                  <div className="text-sm text-gray-500">
+                    No photo uploaded
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* First Name */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">

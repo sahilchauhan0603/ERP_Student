@@ -1637,7 +1637,7 @@ export default function InternshipRecords({
                               !editRecord.company_name ||
                               !editRecord.position
                                 ? "bg-gray-400 cursor-not-allowed text-white"
-                                : "bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                                : "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                             }`}
                           >
                             {isSubmitting ? (

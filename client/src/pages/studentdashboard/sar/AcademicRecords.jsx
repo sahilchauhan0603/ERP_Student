@@ -1568,9 +1568,9 @@ export default function AcademicRecords({ academicRecords, currentSemester, addR
                           !editRecord.semester ||
                           !editRecord.academic_year
                             ? "bg-gray-400 cursor-not-allowed text-white"
-                            : "bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                            : "bg-purple-600 hover:bg-purple-700 text-white cursor-pointer"
                         }`}
-                      >
+                            >
                         {isSubmitting ? (
                           <>
                             <FaSpinner className="animate-spin text-xs" />

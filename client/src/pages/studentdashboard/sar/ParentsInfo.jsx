@@ -150,7 +150,7 @@ export default function ParentsInfo({ student, updateParentsInfo }) {
             </button>
           ) : (            
             <div className="flex gap-2 w-full sm:w-auto">
-                {isEditing && (
+            {isEditing && (
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1 bg-green-600 text-white rounded-full text-xs font-semibold">
                   Editing Mode

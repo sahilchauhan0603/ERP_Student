@@ -50,7 +50,12 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
           { withCredentials: true }
         );
         const s = res.data.data || {};
-        setStudentInfo(s.personal || {});
+        // Merge personal info with photo from documents if it exists
+        const personalInfo = s.personal || {};
+        if (s.documents?.photo) {
+          personalInfo.photo = s.documents.photo;
+        }
+        setStudentInfo(personalInfo);
       } catch {
         setStudentInfo({});
       }
@@ -349,9 +354,9 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
                 <div className="flex items-center space-x-2 mb-2">
                   {/* Profile Image */}
                   <div className="relative">
-                    {studentInfo?.profileImage ? (
+                    {(studentInfo?.photo || studentInfo?.profileImage) ? (
                       <img
-                        src={studentInfo.profileImage}
+                        src={studentInfo?.photo || studentInfo?.profileImage}
                         alt="Profile"
                         className="w-10 h-10 rounded-xl object-cover shadow-lg border-2 border-green-400/50"
                         onError={(e) => {
@@ -360,7 +365,7 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
                         }}
                       />
                     ) : null}
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg ${studentInfo?.profileImage ? 'hidden' : 'flex'}`}>
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg ${(studentInfo?.photo || studentInfo?.profileImage) ? 'hidden' : 'flex'}`}>
                       {studentInfo?.firstName
                         ? studentInfo.firstName.charAt(0).toUpperCase()
                         : "S"}
@@ -413,9 +418,9 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
               {/* Collapsed Avatar */}
               <div className="flex justify-center mb-3">
                 <div className="relative">
-                  {studentInfo?.profileImage ? (
+                  {(studentInfo?.photo || studentInfo?.profileImage) ? (
                     <img
-                      src={studentInfo.profileImage}
+                      src={studentInfo?.photo || studentInfo?.profileImage}
                       alt="Profile"
                       className="w-10 h-10 rounded-xl object-cover shadow-lg border-2 border-green-400/50"
                       onError={(e) => {
@@ -424,7 +429,7 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
                       }}
                     />
                   ) : null}
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg ${studentInfo?.profileImage ? 'hidden' : 'flex'}`}>
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg ${(studentInfo?.photo || studentInfo?.profileImage) ? 'hidden' : 'flex'}`}>
                     {studentInfo?.firstName
                       ? studentInfo.firstName.charAt(0).toUpperCase()
                       : "S"}

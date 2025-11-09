@@ -556,7 +556,7 @@ function SARContainerContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6">
        
         {/* Header Section */}

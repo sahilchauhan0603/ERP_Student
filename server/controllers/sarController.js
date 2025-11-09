@@ -299,7 +299,7 @@ const sarController = {
       const studentId = req.user.id;
       const { 
         firstName, middleName, lastName, email, mobile, 
-        dob, placeOfBirth, gender, currentAddress, course, batch 
+        dob, placeOfBirth, gender, currentAddress, course, batch, photo 
       } = req.body;
 
       // Validate required fields
@@ -336,12 +336,12 @@ const sarController = {
         `UPDATE students 
          SET firstName = ?, middleName = ?, lastName = ?, email = ?, mobile = ?,
              dob = ?, placeOfBirth = ?, gender = ?, currentAddress = ?, 
-             course = ?, batch = ?
+             course = ?, batch = ?, photo = ?
          WHERE id = ?`,
         [
           firstName, middleName || null, lastName, email, mobile,
           formattedDob, placeOfBirth || null, gender, currentAddress || null,
-          course, batch, studentId
+          course, batch, photo || null, studentId
         ]
       );
 
@@ -1532,10 +1532,13 @@ const sarController = {
     try {
       const timestamp = Math.round(new Date().getTime() / 1000);
       
+      // Get folder from request body, default to internship-documents
+      const folder = req.body.folder || 'internship-documents';
+      
       // Only include parameters that are supported for signature generation
       const params = {
         timestamp: timestamp,
-        folder: 'internship-documents'
+        folder: folder
       };
 
       const signature = cloudinary.utils.api_sign_request(params, process.env.CLOUDINARY_API_SECRET);

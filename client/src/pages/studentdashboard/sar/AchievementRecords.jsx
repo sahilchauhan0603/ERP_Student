@@ -1162,7 +1162,7 @@ export default function AchievementRecords({ achievements, addRecord, updateReco
                           !editRecord.title ||
                           !editRecord.organization
                             ? "bg-gray-400 cursor-not-allowed text-white"
-                            : "bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                            : "bg-yellow-600 hover:bg-yellow-700 text-white cursor-pointer"
                         }`}
                       >
                         {isSubmitting ? (

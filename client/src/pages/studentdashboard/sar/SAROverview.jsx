@@ -184,13 +184,20 @@ export default function SAROverview({ student, sarData, updateSAROverview }) {
             </button>
           ) : (
             <div className="flex gap-2 w-full sm:w-auto">
+              {isEditing && (
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-semibold">
+                    Editing Mode
+                  </span>
+                </div>
+              )}
               <button
                 onClick={handleSave}
                 disabled={isSubmitting}
                 className={`flex items-center cursor-pointer gap-2 px-3 py-2 rounded-lg font-medium transition-colors text-sm flex-1 sm:flex-none justify-center ${
                   isSubmitting
                     ? 'bg-gray-400 cursor-not-allowed text-white'
-                    : 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
                 }`}
               >
                 {isSubmitting ? (
