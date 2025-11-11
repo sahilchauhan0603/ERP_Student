@@ -1558,6 +1558,158 @@ const sarController = {
         message: 'Failed to generate upload signature'
       });
     }
+  },
+
+  // Get student details by enrollment number (unprotected for testing)
+  getStudentByEnrollment: async (req, res) => {
+    try {
+      const { enrollmentNo } = req.params;
+
+      if (!enrollmentNo) {
+        return res.status(400).json({
+          success: false,
+          message: 'Enrollment number is required'
+        });
+      }
+
+      // First, get student_id from Student_SAR table using enrollment_no
+      const [sarRecords] = await db.query(
+        'SELECT student_id FROM Student_SAR WHERE enrollment_no = ?',
+        [enrollmentNo]
+      );
+
+      if (!sarRecords || sarRecords.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'No SAR record found for this enrollment number'
+        });
+      }
+
+      const studentId = sarRecords[0].student_id;
+
+      // Get student basic info from students table
+      const [students] = await db.query(
+        'SELECT * FROM students WHERE id = ?',
+        [studentId]
+      );
+
+      if (!students || students.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Student not found'
+        });
+      }
+
+      const student = students[0];
+
+      // Get SAR info from Student_SAR table
+      const [sarInfo] = await db.query(
+        'SELECT * FROM Student_SAR WHERE student_id = ?',
+        [studentId]
+      );
+
+      // Get all SAR data in parallel
+      const [
+        [academicRecords],
+        [internshipRecords],
+        [achievementRecords]
+      ] = await Promise.all([
+        db.query('SELECT * FROM SARacademic WHERE SAR_id = ? ORDER BY semester', [studentId]),
+        db.query('SELECT * FROM SARintern WHERE SAR_id = ? ORDER BY start_date DESC', [studentId]),
+        db.query('SELECT * FROM SARAchievements WHERE SAR_id = ? ORDER BY achievement_date DESC', [studentId])
+      ]);
+
+      // Parse academic records
+      const parsedAcademicRecords = academicRecords.map(record => ({
+        ...record,
+        subjects: safeJsonParse(record.subjects, [])
+      }));
+
+      // Parse achievement records
+      const parsedAchievementRecords = achievementRecords.map(record => ({
+        ...record,
+        team_members: safeJsonParse(record.team_members, []),
+        mentors: safeJsonParse(record.mentors, []),
+        skills_developed: safeJsonParse(record.skills_developed, [])
+      }));
+
+      // Construct response
+      const response = {
+        success: true,
+        data: {
+          student: {
+            id: student.id,
+            firstName: student.firstName,
+            middleName: student.middleName,
+            lastName: student.lastName,
+            email: student.email,
+            mobile: student.mobile,
+            dob: student.dob,
+            placeOfBirth: student.placeOfBirth,
+            gender: student.gender,
+            category: student.category,
+            subCategory: student.subCategory,
+            region: student.region,
+            currentAddress: student.currentAddress,
+            permanentAddress: student.permanentAddress,
+            course: student.course,
+            examRoll: student.examRoll,
+            examRank: student.examRank,
+            abcId: student.abcId,
+            batch: student.batch,
+            status: student.status,
+            photo: student.photo,
+            created_at: student.created_at
+          },
+          parents: {
+            father: {
+              name: student.father_name,
+              qualification: student.father_qualification,
+              occupation: student.father_occupation,
+              email: student.father_email,
+              mobile: student.father_mobile,
+              officeAddress: student.father_officeAddress
+            },
+            mother: {
+              name: student.mother_name,
+              qualification: student.mother_qualification,
+              occupation: student.mother_occupation,
+              email: student.mother_email,
+              mobile: student.mother_mobile,
+              officeAddress: student.mother_officeAddress
+            },
+            familyIncome: student.familyIncome
+          },
+          sarInfo: sarInfo[0] ? {
+            enrollment_no: sarInfo[0].enrollment_no,
+            microsoft_email: sarInfo[0].microsoft_email,
+            current_semester: sarInfo[0].current_semester,
+            sar_status: sarInfo[0].sar_status,
+            profile_completion_percentage: sarInfo[0].profile_completion_percentage
+          } : null,
+          sar: {
+            academic: parsedAcademicRecords,
+            internships: internshipRecords,
+            achievements: parsedAchievementRecords,
+            statistics: {
+              totalAcademicRecords: parsedAcademicRecords.length,
+              totalInternships: internshipRecords.length,
+              totalAchievements: parsedAchievementRecords.length
+            }
+          }
+        }
+      };
+
+      res.json(response);
+
+    } catch (error) {
+      console.error('Error fetching student by enrollment:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch student details',
+        error: error.message
+      });
+    }
   }
 };
 
