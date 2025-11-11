@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
 import { useSARData } from "../../../context/SARDataContext";
+import { useStudentData } from "../../../context/StudentDataContext";
 import SAROverview from "./SAROverview";
 import StudentInfo from "./StudentInfo";
 import ParentsInfo from "./ParentsInfo";
@@ -12,7 +13,8 @@ import CompleteSAR from "./CompleteSAR";
 import ErrorBoundary from "../../../components/ErrorBoundary";
 
 function SARContainerContent() {
-  const { sarData, student, loading, error: contextError, loadSARData, updateSARData, refreshSARSection, updateStudent } = useSARData();
+  const { sarData, student, loading, error: contextError, loadSARData, updateSARData, refreshSARSection, updateStudent: updateSARStudent } = useSARData();
+  const { markChanges } = useStudentData();
   const [error, setError] = useState("");
   const [activeSection, setActiveSection] = useState("overview");
 
@@ -370,8 +372,9 @@ function SARContainerContent() {
           icon: 'success',
           confirmButtonColor: '#28a745'
         });
-        // Update student data in context
-        updateStudent(updatedInfo);
+        // Update student data in SAR context and mark changes for Dashboard
+        updateSARStudent(updatedInfo);
+        markChanges();
       } else {
         // If response doesn't have success: true, throw an error
         throw new Error(response.data.message || 'Update failed');
@@ -398,8 +401,8 @@ function SARContainerContent() {
           icon: 'success',
           confirmButtonColor: '#28a745'
         });
-        // Update student data in context
-        updateStudent({
+        // Update student data in SAR context and mark changes for Dashboard
+        const parentData = {
           father_name: updatedInfo.fatherName,
           father_occupation: updatedInfo.fatherOccupation,
           father_email: updatedInfo.fatherEmail,
@@ -411,7 +414,9 @@ function SARContainerContent() {
           mother_mobile: updatedInfo.motherMobile,
           mother_officeAddress: updatedInfo.motherOfficeAddress,
           familyIncome: updatedInfo.familyIncome
-        });
+        };
+        updateSARStudent(parentData);
+        markChanges();
       } else {
         throw new Error(response.data.message || 'Update failed');
       }

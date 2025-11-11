@@ -8,6 +8,7 @@ export const StudentDataProvider = ({ children }) => {
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [hasPendingChanges, setHasPendingChanges] = useState(false);
   const { isAuthenticated, userRole } = useAuth();
 
   // Fetch student data when authenticated as student
@@ -52,10 +53,38 @@ export const StudentDataProvider = ({ children }) => {
     };
   }, [isAuthenticated, userRole]);
 
+  // Function to mark that changes were made (called from SAR updates)
+  const markChanges = () => {
+    setHasPendingChanges(true);
+  };
+
+  // Function to refresh student data from API
+  const refreshStudentData = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/student/students/me/details`,
+        { withCredentials: true }
+      );
+      
+      setStudentData(res.data.data || null);
+      setHasPendingChanges(false);
+      setError(null);
+    } catch (err) {
+      console.error('Error refreshing student data:', err);
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value = {
     studentData,
     loading,
-    error
+    error,
+    hasPendingChanges,
+    markChanges,
+    refreshStudentData
   };
 
   return (
