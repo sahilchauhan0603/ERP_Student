@@ -5,6 +5,7 @@ import { formatFamilyIncome } from "../../utils/formatters";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useAuth } from "../../context/AuthContext";
+import { useStudentData } from "../../context/StudentDataContext";
 import AIChatLauncher from "../../components/AI/AIChatLauncher";
 
 const StudentDetailsDashboard = () => {
@@ -54,76 +55,41 @@ const StudentDetailsDashboard = () => {
   const [updatedDocuments, setUpdatedDocuments] = useState({});
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { studentData, loading: contextLoading, error: contextError } = useStudentData();
 
   useEffect(() => {
-    const fetchStudentDetails = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/student/students/me/details`,
-          { withCredentials: true }
-        );
-        if (response.data.success && response.data.data) {
-          // Format the date of birth to YYYY-MM-DD for the date input
-          const formattedData = { ...response.data.data };
-          if (formattedData.personal && formattedData.personal.dob) {
-            const dobDate = new Date(formattedData.personal.dob);
-            if (!isNaN(dobDate.getTime())) {
-              formattedData.personal.dob = dobDate.toISOString().split('T')[0];
-            }
-          }
-
-          setDetails(response.data.data);
-          setFormData(formattedData);
-          if (response.data.data.declinedFields) {
-            const fields = Array.isArray(response.data.data.declinedFields)
-              ? response.data.data.declinedFields
-              : JSON.parse(response.data.data.declinedFields || "[]");
-            setDeclinedFields(fields);
-          }
-        } else {
-          // Format the date of birth for direct response data
-          const formattedData = { ...response.data };
-          if (formattedData.personal && formattedData.personal.dob) {
-            const dobDate = new Date(formattedData.personal.dob);
-            if (!isNaN(dobDate.getTime())) {
-              formattedData.personal.dob = dobDate.toISOString().split('T')[0];
-            }
-          }
-
-          setDetails(response.data);
-          setFormData(formattedData);
+    // Use data from context
+    if (studentData) {
+      const formattedData = { ...studentData };
+      if (formattedData.personal && formattedData.personal.dob) {
+        const dobDate = new Date(formattedData.personal.dob);
+        if (!isNaN(dobDate.getTime())) {
+          formattedData.personal.dob = dobDate.toISOString().split('T')[0];
         }
-      } catch (err) {
-        // Failed to fetch student details
-        if (err.response?.status === 401 || err.response?.status === 403) {
-          Swal.fire({
-            icon: "error",
-            title: "Unauthorized Access",
-            text: "This page can only be accessed by authorized students.",
-            timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-          }).then(() => {
-            window.location.href = "/login";
-          });
-        } else if (err.response?.status === 404) {
-          setError("Student not found");
-        } else if (err.response?.status === 400) {
-          setError("Invalid student ID");
-        } else if (err.response?.status >= 500) {
-          setError("Server error. Please try again later.");
-        } else {
-          setError("Failed to load student details");
-        }
-        setDetails(null);
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchStudentDetails();
-  }, []);
+
+      setDetails(studentData);
+      setFormData(formattedData);
+      if (studentData.declinedFields) {
+        const fields = Array.isArray(studentData.declinedFields)
+          ? studentData.declinedFields
+          : JSON.parse(studentData.declinedFields || "[]");
+        setDeclinedFields(fields);
+      }
+      setLoading(false);
+    } else if (!contextLoading && contextError) {
+      // Context finished loading but has error
+      setError("Failed to load student details");
+      setLoading(false);
+    } else if (!contextLoading && !studentData) {
+      // Context finished loading but no data
+      setError("Failed to load student details");
+      setLoading(false);
+    } else {
+      // Context is still loading
+      setLoading(contextLoading);
+    }
+  }, [studentData, contextLoading, contextError]);
 
   const handleLogout = async () => {
     try {

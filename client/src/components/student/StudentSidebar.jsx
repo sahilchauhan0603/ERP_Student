@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiLogOut, FiHelpCircle } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
+import { useStudentData } from "../../context/StudentDataContext";
 import Swal from "sweetalert2";
 import AIChat from "../AI/AIChat";
 
@@ -27,6 +27,7 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { studentData } = useStudentData(); // Use shared context
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [studentInfo, setStudentInfo] = useState({});
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -42,26 +43,18 @@ export default function StudentSidebar({ open = true, onToggle, onClose }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Update studentInfo when studentData from context changes
   useEffect(() => {
-    async function fetchStudentInfo() {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/student/students/me/details`,
-          { withCredentials: true }
-        );
-        const s = res.data.data || {};
-        // Merge personal info with photo from documents if it exists
-        const personalInfo = s.personal || {};
-        if (s.documents?.photo) {
-          personalInfo.photo = s.documents.photo;
-        }
-        setStudentInfo(personalInfo);
-      } catch {
-        setStudentInfo({});
+    if (studentData) {
+      const personalInfo = studentData.personal || {};
+      if (studentData.documents?.photo) {
+        personalInfo.photo = studentData.documents.photo;
       }
+      setStudentInfo(personalInfo);
     }
-    fetchStudentInfo();
+  }, [studentData]);
 
+  useEffect(() => {
     // Set login time and start session duration tracking
     let loginTimeStamp = localStorage.getItem('studentLoginTime');
     

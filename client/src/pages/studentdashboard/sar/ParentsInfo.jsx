@@ -92,13 +92,6 @@ export default function ParentsInfo({ student, updateParentsInfo }) {
 
       await updateParentsInfo(editForm);
 
-      await Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Parents information updated successfully!',
-        confirmButtonColor: '#28a745'
-      });
-
       setIsEditing(false);
 
     } catch (error) {

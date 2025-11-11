@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
+import { useSARData } from "../../../context/SARDataContext";
 import SAROverview from "./SAROverview";
 import StudentInfo from "./StudentInfo";
 import ParentsInfo from "./ParentsInfo";
@@ -11,9 +12,8 @@ import CompleteSAR from "./CompleteSAR";
 import ErrorBoundary from "../../../components/ErrorBoundary";
 
 function SARContainerContent() {
-  const [loading, setLoading] = useState(true);
+  const { sarData, student, loading, error: contextError, loadSARData, updateSARData, refreshSARSection, updateStudent } = useSARData();
   const [error, setError] = useState("");
-  const [student, setStudent] = useState(null);
   const [activeSection, setActiveSection] = useState("overview");
 
   const sectionTabs = [
@@ -26,76 +26,17 @@ function SARContainerContent() {
     { key: "viewall", label: "Complete SAR" },
   ];
 
-  // SAR Data State
-  const [sarData, setSarData] = useState({
-    sarInfo: {
-      enrollment_no: "",
-      microsoft_email: "",
-      current_semester: 1,
-      profile_completion_percentage: 0
-    },
-    academicRecords: [], // Array of semester records
-    internships: [],     // Array of internship records
-    achievements: []     // Array of achievement records
-  });
-
+  // Load SAR data when component mounts
   useEffect(() => {
-    const fetchSARData = async () => {
-      try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9080/api';
-        
-        // Fetch SAR overview data
-        const sarResponse = await axios.get(
-          `${apiUrl}/sar/overview`,
-          { withCredentials: true }
-        );
-
-        if (sarResponse.data.success) {
-          const { student, sarInfo } = sarResponse.data.data;
-          setStudent(student);
-          
-          // Fetch all SAR records
-          const [academicRes, internshipsRes, achievementsRes] = await Promise.all([
-            axios.get(`${apiUrl}/sar/academic`, { withCredentials: true }),
-            axios.get(`${apiUrl}/sar/internships`, { withCredentials: true }),
-            axios.get(`${apiUrl}/sar/achievements`, { withCredentials: true })
-          ]);
-
-          setSarData({
-            sarInfo: {
-              enrollment_no: sarInfo.enrollment_no || student.examRoll || "",
-              microsoft_email: sarInfo.microsoft_email || "",
-              current_semester: sarInfo.current_semester || 1,
-              profile_completion_percentage: sarInfo.profile_completion_percentage || 0
-            },
-            academicRecords: academicRes.data.success ? academicRes.data.data : [],
-            internships: internshipsRes.data.success ? internshipsRes.data.data : [],
-            achievements: achievementsRes.data.success ? achievementsRes.data.data : []
-          });
-        }
-        
-      } catch (error) {
-        console.error("Error fetching SAR data:", error);
-        if (error.response?.status === 401 || error.response?.status === 403) {
-          setError("Session expired. Please login again.");
-        } else {
-          setError("Failed to fetch SAR data. Please try again.");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSARData();
+    loadSARData();
   }, []);
 
-  // Update SAR data function to pass to child components
-  const updateSARData = (section, data) => {
-    setSarData(prev => ({
-      ...prev,
-      [section]: data
-    }));
-  };
+  // Set error from context if exists
+  useEffect(() => {
+    if (contextError) {
+      setError("Failed to fetch SAR data. Please try again.");
+    }
+  }, [contextError]);
 
   /* Add new record functions */
   const addInternshipRecord = async (record) => {
@@ -104,13 +45,7 @@ function SARContainerContent() {
       const response = await axios.post(`${apiUrl}/sar/internships`, record, { withCredentials: true });
       
       if (response.data.success) {
-        const internshipsRes = await axios.get(`${apiUrl}/sar/internships`, { withCredentials: true });
-        if (internshipsRes.data.success) {
-          setSarData(prev => ({
-            ...prev,
-            internships: internshipsRes.data.data
-          }));
-        }
+        await refreshSARSection('internships'); // Use context refresh
       }
     } catch (error) {
       console.error('Error adding internship record:', error);
@@ -130,13 +65,7 @@ function SARContainerContent() {
       const response = await axios.post(`${apiUrl}/sar/achievements`, record, { withCredentials: true });
       
       if (response.data.success) {
-        const achievementsRes = await axios.get(`${apiUrl}/sar/achievements`, { withCredentials: true });
-        if (achievementsRes.data.success) {
-          setSarData(prev => ({
-            ...prev,
-            achievements: achievementsRes.data.data
-          }));
-        }
+        await refreshSARSection('achievements'); // Use context refresh
       }
     } catch (error) {
       console.error('Error adding achievement record:', error);
@@ -167,14 +96,7 @@ function SARContainerContent() {
           position: 'top-end'
         });
         
-        // Refresh academic records
-        const academicRes = await axios.get(`${apiUrl}/sar/academic`, { withCredentials: true });
-        if (academicRes.data.success) {
-          setSarData(prev => ({
-            ...prev,
-            academicRecords: academicRes.data.data
-          }));
-        }
+        await refreshSARSection('academic'); // Use context refresh
       }
     } catch (error) {
       console.error('Error adding academic record:', error);
@@ -224,14 +146,7 @@ function SARContainerContent() {
           position: 'top-end'
         });
         
-        // Refresh academic records
-        const academicRes = await axios.get(`${apiUrl}/sar/academic`, { withCredentials: true });
-        if (academicRes.data.success) {
-          setSarData(prev => ({
-            ...prev,
-            academicRecords: academicRes.data.data
-          }));
-        }
+        await refreshSARSection('academic'); // Use context refresh
       }
     } catch (error) {
       console.error('Error updating academic record:', error);
@@ -270,13 +185,7 @@ function SARContainerContent() {
       const response = await axios.put(`${apiUrl}/sar/internships/${id}`, updatedRecord, { withCredentials: true });
       
       if (response.data.success) {
-        const internshipsRes = await axios.get(`${apiUrl}/sar/internships`, { withCredentials: true });
-        if (internshipsRes.data.success) {
-          setSarData(prev => ({
-            ...prev,
-            internships: internshipsRes.data.data
-          }));
-        }
+        await refreshSARSection('internships');
       }
     } catch (error) {
       console.error('Error updating internship record:', error);
@@ -296,13 +205,7 @@ function SARContainerContent() {
       const response = await axios.put(`${apiUrl}/sar/achievements/${id}`, updatedRecord, { withCredentials: true });
       
       if (response.data.success) {
-        const achievementsRes = await axios.get(`${apiUrl}/sar/achievements`, { withCredentials: true });
-        if (achievementsRes.data.success) {
-          setSarData(prev => ({
-            ...prev,
-            achievements: achievementsRes.data.data
-          }));
-        }
+        await refreshSARSection('achievements');
       }
     } catch (error) {
       console.error('Error updating achievement record:', error);
@@ -334,10 +237,7 @@ function SARContainerContent() {
           toast: true,
           position: 'top-end'
         });
-        setSarData(prev => ({
-          ...prev,
-          academicRecords: prev.academicRecords.filter(record => record.id !== id)
-        }));
+        await refreshSARSection('academic');
       }
     } catch (error) {
       console.error('Error deleting academic record:', error);
@@ -372,10 +272,7 @@ function SARContainerContent() {
       const response = await axios.delete(`${apiUrl}/sar/internships/${id}`, { withCredentials: true });
       
       if (response.data.success) {
-        setSarData(prev => ({
-          ...prev,
-          internships: prev.internships.filter(record => record.id !== id)
-        }));
+        await refreshSARSection('internships');
       }
     } catch (error) {
       console.error('Error deleting internship record:', error);
@@ -395,10 +292,7 @@ function SARContainerContent() {
       const response = await axios.delete(`${apiUrl}/sar/achievements/${id}`, { withCredentials: true });
       
       if (response.data.success) {
-        setSarData(prev => ({
-          ...prev,
-          achievements: prev.achievements.filter(record => record.id !== id)
-        }));
+        await refreshSARSection('achievements');
       }
     } catch (error) {
       console.error('Error deleting achievement record:', error);
@@ -429,13 +323,10 @@ function SARContainerContent() {
           toast: true,
           position: 'top-end'
         });
-        setSarData(prev => ({
-          ...prev,
-          sarInfo: {
-            ...prev.sarInfo,
-            ...updatedInfo
-          }
-        }));
+        updateSARData('sarInfo', {
+          ...sarData.sarInfo,
+          ...updatedInfo
+        });
       }
     } catch (error) {
       console.error('Error updating SAR overview:', error);
@@ -477,21 +368,18 @@ function SARContainerContent() {
           title: 'Success!',
           text: 'Student information updated successfully!',
           icon: 'success',
-          timer: 2000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-          toast: true,
-          position: 'top-end'
+          confirmButtonColor: '#28a745'
         });
-        setStudent(prev => ({
-          ...prev,
-          ...updatedInfo
-        }));
+        // Update student data in context
+        updateStudent(updatedInfo);
+      } else {
+        // If response doesn't have success: true, throw an error
+        throw new Error(response.data.message || 'Update failed');
       }
     } catch (error) {
       console.error('Error updating student info:', error);
       
-      const errorMessage = error.response?.data?.message || 'Failed to update student information. Please try again.';
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update student information. Please try again.';
       
       throw new Error(errorMessage);
     }
@@ -508,14 +396,10 @@ function SARContainerContent() {
           title: 'Success!',
           text: 'Parents information updated successfully!',
           icon: 'success',
-          timer: 2000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-          toast: true,
-          position: 'top-end'
+          confirmButtonColor: '#28a745'
         });
-        setStudent(prev => ({
-          ...prev,
+        // Update student data in context
+        updateStudent({
           father_name: updatedInfo.fatherName,
           father_occupation: updatedInfo.fatherOccupation,
           father_email: updatedInfo.fatherEmail,
@@ -527,12 +411,14 @@ function SARContainerContent() {
           mother_mobile: updatedInfo.motherMobile,
           mother_officeAddress: updatedInfo.motherOfficeAddress,
           familyIncome: updatedInfo.familyIncome
-        }));
+        });
+      } else {
+        throw new Error(response.data.message || 'Update failed');
       }
     } catch (error) {
       console.error('Error updating parents info:', error);
       
-      const errorMessage = error.response?.data?.message || 'Failed to update parents information. Please try again.';
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update parents information. Please try again.';
       
       throw new Error(errorMessage);
     }

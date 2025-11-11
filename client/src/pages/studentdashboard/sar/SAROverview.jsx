@@ -246,7 +246,7 @@ export default function SAROverview({ student, sarData, updateSAROverview }) {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Branch
+                  Course
                 </label>
                 <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-900">
                   {student?.course || "Not available"}

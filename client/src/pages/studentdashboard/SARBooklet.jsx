@@ -1,33 +1,22 @@
 ﻿import React, { useState, useEffect } from "react";
-import axios from "axios";
 import SARContainer from "./sar/SARContainer";
 import { FaExclamationTriangle, FaHourglassHalf, FaTimesCircle, FaSpinner } from "react-icons/fa";
+import { useStudentData } from "../../context/StudentDataContext";
 
 export default function SARBooklet() {
+  const { studentData, loading: contextLoading } = useStudentData();
   const [studentStatus, setStudentStatus] = useState(null);
-  const [loading, setLoading] = useState(true);
 
+  // Update student status from context data
   useEffect(() => {
-    async function fetchStudentStatus() {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/student/students/me/details`,
-          { withCredentials: true }
-        );
-        const status = res.data.data?.personal?.status || 'pending';
-        setStudentStatus(status);
-      } catch (error) {
-        console.error('Error fetching student status:', error);
-        setStudentStatus('pending');
-      } finally {
-        setLoading(false);
-      }
+    if (studentData) {
+      const status = studentData?.personal?.status || 'pending';
+      setStudentStatus(status);
     }
-    fetchStudentStatus();
-  }, []);
+  }, [studentData]);
 
   // Loading state
-  if (loading) {
+  if (contextLoading || studentStatus === null) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 flex items-center justify-center">
         <div className="text-center">

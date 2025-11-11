@@ -3,6 +3,8 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 import { AuthProvider } from './context/AuthContext';
+import { StudentDataProvider } from './context/StudentDataContext';
+import { SARDataProvider } from './context/SARDataContext';
 
 import HomePage from './components/HomePage';
 
@@ -88,7 +90,11 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AppContent />
+        <StudentDataProvider>
+          <SARDataProvider>
+            <AppContent />
+          </SARDataProvider>
+        </StudentDataProvider>
       </AuthProvider>
     </Router>
   );

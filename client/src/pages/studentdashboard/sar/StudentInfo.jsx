@@ -4,6 +4,21 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 export default function StudentInfo({ student, updateStudentInfo }) {
+  const courses = [
+    "B.Tech Computer Science Engineering (CSE)",
+    "B.Tech Information Technology Engineering (IT)",
+    "B.Tech Electronics and Communication Engineering (ECE)",
+    "B.Tech Electrical and Electronics Engineering (EEE)",
+    "B.Tech Artificial Intelligence and Data Science Engineering (AI-DS)",
+    "B.Tech Computer Science Engineering with specialization in Data Science (CSE-DS)",
+    "LE-B.Tech Computer Science Engineering (CSE)",
+    "LE-B.Tech Information Technology Engineering (IT)",
+    "LE-B.Tech Electronics and Communication Engineering (ECE)",
+    "LE-B.Tech Electrical and Electronics Engineering (EEE)",
+    "BBA",
+    "MBA",
+  ];
+
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
     firstName: student?.firstName || '',
@@ -129,22 +144,19 @@ export default function StudentInfo({ student, updateStudentInfo }) {
       // Update student info with the photo URL
       await updateStudentInfo({ ...editForm, photo: photoUrl });
 
-      await Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Student information updated successfully!',
-        confirmButtonColor: '#28a745'
-      });
-
+      // Success - close edit mode (success alert is shown by SARContainer)
       setPhotoFile(null);
       setIsEditing(false);
 
     } catch (error) {
       console.error('Error updating student info:', error);
 
+      // Only show error if it's an actual error (not success)
       let errorMessage = "Failed to update student information. Please try again.";
 
-      if (error.response?.data?.message) {
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       }
 
@@ -691,8 +703,7 @@ export default function StudentInfo({ student, updateStudentInfo }) {
               </label>
               {isEditing ? (
                 <div>
-                  <input
-                    type="text"
+                  <select
                     value={editForm.course}
                     onChange={(e) => setEditForm(prev => ({ ...prev, course: e.target.value }))}
                     className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-pink-100 focus:border-pink-500 ${
@@ -700,8 +711,14 @@ export default function StudentInfo({ student, updateStudentInfo }) {
                         ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-100'
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
-                    placeholder="e.g., B.Tech, M.Tech"
-                  />
+                  >
+                    <option value="">Select Course</option>
+                    {courses.map((course, index) => (
+                      <option key={index} value={course}>
+                        {course}
+                      </option>
+                    ))}
+                  </select>
                   {errors.course && (
                     <p className="text-xs text-red-600 flex items-center gap-1 bg-red-50 p-1 rounded mt-1">
                       <FaExclamationCircle className="text-red-500 flex-shrink-0 text-xs" />

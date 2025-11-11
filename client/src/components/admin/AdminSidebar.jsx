@@ -285,11 +285,11 @@ export default function AdminSidebar({ open, onClose }) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-1">
                   <p className="font-bold text-white text-sm">Admin</p>
-                  <span className="px-1.5 py-0.5 text-xs font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-200 rounded-md border border-blue-500/20">
+                  {/* <span className="px-1.5 py-0.5 text-xs font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-200 rounded-md border border-blue-500/20">
                     Super
-                  </span>
+                  </span> */}
                 </div>
-                <p className="text-xs text-slate-300 truncate">
+                <p className="text-xs text-slate-300 break-all leading-tight">
                   {adminEmail || "admin@bpit.ac.in"}
                 </p>
               </div>
