@@ -7,9 +7,11 @@ const connection = mysql.createConnection({
   port: process.env.DB_PORT,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  acquireTimeout: 60000,
-  timeout: 60000,
-  reconnect: true
+  // Removed invalid options: acquireTimeout, timeout, reconnect
+  // These are only valid for connection pools, not single connections
+  connectTimeout: 60000, // Valid option for single connections (60 seconds)
+  enableKeepAlive: true, // Keep connection alive
+  keepAliveInitialDelay: 0 // Start keep-alive immediately
 });
 
 connection.connect((err) => {

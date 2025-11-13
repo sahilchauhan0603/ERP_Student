@@ -66,10 +66,10 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/ai', require('./routes/ai'));
 app.use('/api/sar', require('./routes/sar'));
 
-// Test route
-app.get('/', (req, res) => {
-  res.send('✅ MySQL API is running.....');
-});
+// // Test route
+// app.get('/', (req, res) => {
+//   res.send('✅ MySQL API is running.....');
+// });
 
 // Start server
 app.listen(PORT, () => {
