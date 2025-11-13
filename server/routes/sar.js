@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const sarController = require("../controllers/sarController");
-const { authenticate } = require("../middleware/auth");
+const { authenticate, authorizeRole } = require("../middleware/auth");
 
 // Unprotected route for testing - Get student details by enrollment number
 router.get('/student/:enrollmentNo', sarController.getStudentByEnrollment);
+
+// Admin-protected route to get student details by enrollment number
+router.get('/admin/student/:enrollmentNo', authenticate, authorizeRole('admin'), sarController.getStudentByEnrollment);
 
 // Apply authentication middleware to all SAR routes
 router.use(authenticate);

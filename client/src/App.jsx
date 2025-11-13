@@ -26,6 +26,7 @@ import AdminAllStudents from './pages/admin/AdminAllStudents';
 import PendingStudents from './pages/admin/PendingStudents';
 import ApprovedStudents from './pages/admin/ApprovedStudents';
 import DeclinedStudents from './pages/admin/DeclinedStudents';
+import StudentSearch from './pages/admin/StudentSearch';
 
 function AppContent() {
   const location = useLocation();
@@ -44,6 +45,7 @@ function AppContent() {
       '/student/sar': 'Student SAR Booklet | ERP-Student',
       '/student/help': 'Student Help | ERP-Student',
       '/admin/dashboard': 'Admin Dashboard | ERP-Student',
+      '/admin/student-search': 'Student Search | ERP-Student',
       '/admin/students': 'All Students | ERP-Student',
       '/admin/students/pending': 'Pending Students | ERP-Student',
       '/admin/students/approved': 'Approved Students | ERP-Student',
@@ -74,6 +76,7 @@ function AppContent() {
       {/* Admin Routes - Authentication handled at AdminLayout level */}
       <Route element={<AdminLayout />}>
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/student-search" element={<StudentSearch />} />
         <Route path="/admin/students" element={<AdminAllStudents />} />
         <Route path="/admin/students/pending" element={<PendingStudents />} />
         <Route path="/admin/students/approved" element={<ApprovedStudents />} />
