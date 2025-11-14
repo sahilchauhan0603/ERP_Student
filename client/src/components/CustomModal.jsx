@@ -140,7 +140,7 @@ const CustomModal = ({ isOpen, onClose, title, message, type = "info", duration 
       </div>
       
       {/* Custom animation keyframes */}
-      <style jsx>{`
+      <style jsx="true">{`
         @keyframes shrink {
           from { width: 100%; }
           to { width: 0%; }

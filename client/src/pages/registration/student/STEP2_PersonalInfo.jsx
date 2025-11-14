@@ -405,8 +405,8 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
             onChange={handleChange}
             className={`w-full px-5 py-4 border-2 rounded-xl focus:ring-4 transition-all duration-300 bg-white text-gray-900 shadow-sm font-medium ${
               incompleteFields.includes("course")
-                ? "border-gray-600 focus:border-black focus:ring-gray-300"
-                : "border-gray-300 focus:border-black focus:ring-gray-200 hover:border-gray-400"
+                ? "border-red-500 focus:border-red-500 focus:ring-red-300"
+                : "border-gray-400 focus:border-gray-400 focus:ring-gray-400 hover:border-gray-400"
             }`}
             required
           >
@@ -420,10 +420,10 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
             ))}
           </select>
           {incompleteFields.includes("course") && (
-            <div className="text-xs text-gray-700 mt-2 font-medium flex items-center">
-              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <div className="text-xs text-red-500 mt-2 flex items-center">
+              {/* <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
+              </svg> */}
               Course selection is required
             </div>
           )}
@@ -453,6 +453,7 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+           
             {/* Name Fields */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-black">
@@ -463,18 +464,15 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 placeholder="Enter your first name"
                 value={formData.personal.firstName || ""}
                 onChange={handleNameChange}
-                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 transition-all duration-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm font-medium ${
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold ${
                   incompleteFields.includes("firstName") || nameError
-                    ? "border-gray-600 focus:border-black focus:ring-gray-300"
-                    : "border-gray-300 focus:border-black focus:ring-gray-200 hover:border-gray-400"
+                    ? "border-red-500"
+                    : "border-gray-400"
                 }`}
                 required
               />
               {(incompleteFields.includes("firstName") || nameError) && (
-                <div className="text-xs text-gray-700 mt-1 font-medium flex items-center">
-                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
+                <div className="text-xs text-red-500 mt-1">
                   {nameError || "First name is required"}
                 </div>
               )}
@@ -585,8 +583,12 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 <select
                   value={birthCountry}
                   onChange={handleBirthCountryChange}
-                  className="w-full sm:w-1/2 px-4 py-3 border-2 rounded-xl border-gray-400 focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
-                  required
+                  className={`w-full sm:w-auto px-2 py-3 border-2 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400 ${
+                    incompleteFields.includes("placeOfBirth")
+                      ? "border-red-500"
+                      : "border-gray-400"
+                  }`}
+                  style={{ minWidth: 120 }}
                 >
                   {countries.map((country) => (
                     <option key={country} value={country}>{country}</option>
@@ -596,13 +598,17 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                   <select
                     value={birthState}
                     onChange={handleBirthStateChange}
-                    className="w-full sm:w-1/2 px-4 py-3 border-2 border-gray-400 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 font-semibold"
-                    required
+                    className={`w-full sm:w-auto px-2 py-3 border-2 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400 ${
+                    incompleteFields.includes("placeOfBirth")
+                      ? "border-red-500"
+                      : "border-gray-400"
+                  }`}
+                  style={{ minWidth: 120 }}
                   >
                     <option value="">-- State --</option>
                     {indianStates.map((state) => (
                       <option key={state} value={state}>{state}</option>
-                    ))}
+                      ))}
                   </select>
                 )}
                 {birthCountry === "United States" && (
@@ -754,8 +760,13 @@ const PersonalInfo = ({ formData, setFormData, incompleteFields = [] }) => {
                 <select
                   value={emailDomain}
                   onChange={handleEmailDomainChange}
-                  className="flex-shrink-0 w-full sm:w-40 px-4 py-3 border-2 border-gray-400 rounded-xl bg-white text-gray-900 font-semibold focus:ring-2 focus:ring-red-400 focus:border-red-400 text-base sm:text-base transition-all duration-300 truncate text-ellipsis"
-                  style={{ minWidth: 0, maxWidth: 200 }}
+                  className={`flex-1 sm:max-w-md px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-red-400 transition-all duration-300 bg-white text-gray-900 placeholder-gray-300 shadow-inner font-semibold text-base sm:text-base ${
+                    incompleteFields.includes("email") || emailError
+                      ? "border-red-500"
+                      : "border-gray-400"
+                  }`}
+                  required
+                  style={{ minWidth: 0 }}
                 >
                   {emailDomains.map((domain) => (
                     <option key={domain} value={domain} className="truncate text-ellipsis">
