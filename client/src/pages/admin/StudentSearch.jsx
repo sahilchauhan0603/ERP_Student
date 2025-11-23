@@ -153,7 +153,7 @@ export default function StudentSearch() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -171,7 +171,7 @@ export default function StudentSearch() {
             <div className="w-full max-w-2xl">
               <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 border border-gray-200">
                 <div className="text-center mb-8">
-                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full mb-4">
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full mb-4 shadow-lg">
                     <svg
                       className="w-10 h-10 text-white"
                       fill="none"
@@ -216,7 +216,7 @@ export default function StudentSearch() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full cursor-pointer bg-gradient-to-r from-purple-500 to-pink-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-purple-600 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <>
@@ -283,7 +283,7 @@ export default function StudentSearch() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="cursor-pointer bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-purple-600 hover:to-pink-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   <svg
                     className="w-5 h-5"
@@ -328,7 +328,7 @@ export default function StudentSearch() {
               <div className="space-y-6">
                 {/* Personal Information Card */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                  <div className="bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-4">
+                  <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                       <svg
                         className="w-6 h-6"
@@ -360,10 +360,10 @@ export default function StudentSearch() {
                             <div
                               className={`absolute -top-2 -right-2 px-3 py-1 rounded-full text-xs font-bold shadow-lg ${
                                 studentData.status === "approved"
-                                  ? "bg-green-500 text-white"
+                                  ? "bg-green-600 text-white"
                                   : studentData.status === "declined"
-                                    ? "bg-red-500 text-white"
-                                    : "bg-yellow-500 text-white"
+                                    ? "bg-red-600 text-white"
+                                    : "bg-yellow-600 text-white"
                               }`}
                             >
                               {studentData.status?.toUpperCase() || "PENDING"}
@@ -450,7 +450,7 @@ export default function StudentSearch() {
 
                 {/* Parents Information Card */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4">
+                  <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                       <svg
                         className="w-6 h-6"
@@ -534,7 +534,7 @@ export default function StudentSearch() {
                 {/* Academic Records */}
                 {studentData.academicRecords && studentData.academicRecords.length > 0 && (
                   <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                    <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4">
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
                       <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <svg
                           className="w-6 h-6"
@@ -557,17 +557,17 @@ export default function StudentSearch() {
                         {studentData.academicRecords.map((record, index) => (
                           <div
                             key={index}
-                            className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border-2 border-green-200"
+                            className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border-2 border-blue-200"
                           >
                             {/* Semester Header */}
-                            <div className="flex justify-between items-center mb-4 pb-4 border-b border-green-300">
+                            <div className="flex justify-between items-center mb-4 pb-4 border-b border-blue-300">
                               <h3 className="text-xl font-bold text-gray-800">
                                 Semester {record.semester} - {record.academic_year}
                               </h3>
                               <span className={`px-4 py-1 rounded-full text-sm font-bold ${
                                 record.semester_result === 'pass' 
-                                  ? 'bg-green-500 text-white' 
-                                  : 'bg-red-500 text-white'
+                                  ? 'bg-green-600 text-white' 
+                                  : 'bg-red-600 text-white'
                               }`}>
                                 {record.semester_result?.toUpperCase() || 'N/A'}
                               </span>
@@ -666,7 +666,7 @@ export default function StudentSearch() {
                 {/* Internship Records */}
                 {studentData.internshipRecords && studentData.internshipRecords.length > 0 && (
                   <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                    <div className="bg-gradient-to-r from-orange-500 to-red-600 px-6 py-4">
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
                       <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <svg
                           className="w-6 h-6"
@@ -689,10 +689,10 @@ export default function StudentSearch() {
                         {studentData.internshipRecords.map((record, index) => (
                           <div
                             key={index}
-                            className="bg-gradient-to-br from-orange-50 to-red-50 rounded-lg p-6 border-2 border-orange-200"
+                            className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border-2 border-blue-200"
                           >
                             {/* Internship Header */}
-                            <div className="flex justify-between items-start mb-4 pb-4 border-b border-orange-300">
+                            <div className="flex justify-between items-start mb-4 pb-4 border-b border-blue-300">
                               <div>
                                 <h3 className="text-xl font-bold text-gray-800">
                                   {record.company_name}
@@ -700,13 +700,13 @@ export default function StudentSearch() {
                                 <p className="text-gray-600 font-medium">{record.position}</p>
                               </div>
                               <div className="flex flex-col gap-2 items-end">
-                                <span className="px-3 py-1 bg-orange-500 text-white rounded-full text-sm font-bold">
+                                <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-bold">
                                   {record.internship_type?.toUpperCase() || 'N/A'}
                                 </span>
                                 <span className={`px-3 py-1 rounded-full text-sm font-bold ${
-                                  record.status === 'completed' ? 'bg-green-500 text-white' :
-                                  record.status === 'ongoing' ? 'bg-blue-500 text-white' :
-                                  'bg-yellow-500 text-white'
+                                  record.status === 'completed' ? 'bg-green-600 text-white' :
+                                  record.status === 'ongoing' ? 'bg-blue-600 text-white' :
+                                  'bg-yellow-600 text-white'
                                 }`}>
                                   {record.status?.toUpperCase() || 'N/A'}
                                 </span>
@@ -794,7 +794,7 @@ export default function StudentSearch() {
                                 <span className="text-sm text-gray-600 font-semibold">Offer Letter:</span>
                                 <button
                                   onClick={() => openImageModal(record.offer_letter, `${record.company_name} - Offer Letter`)}
-                                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2 cursor-pointer"
+                                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2 cursor-pointer"
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -814,7 +814,7 @@ export default function StudentSearch() {
                 {/* Achievement Records */}
                 {studentData.achievementRecords && studentData.achievementRecords.length > 0 && (
                   <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                    <div className="bg-gradient-to-r from-yellow-500 to-orange-600 px-6 py-4">
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
                       <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <svg
                           className="w-6 h-6"
@@ -837,31 +837,31 @@ export default function StudentSearch() {
                         {studentData.achievementRecords.map((record, index) => (
                           <div
                             key={index}
-                            className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 border-2 border-yellow-200"
+                            className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border-2 border-blue-200"
                           >
                             {/* Achievement Header */}
-                            <div className="flex justify-between items-start mb-4 pb-4 border-b border-yellow-300">
+                            <div className="flex justify-between items-start mb-4 pb-4 border-b border-blue-300">
                               <div>
                                 <h3 className="text-xl font-bold text-gray-800">
                                   {record.title}
                                 </h3>
                                 <div className="flex gap-2 mt-2">
-                                  <span className="px-3 py-1 bg-yellow-500 text-white rounded-full text-sm font-bold">
+                                  <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-bold">
                                     {record.category?.toUpperCase() || 'N/A'}
                                   </span>
                                   {record.subcategory && (
-                                    <span className="px-3 py-1 bg-orange-500 text-white rounded-full text-sm font-bold">
+                                    <span className="px-3 py-1 bg-indigo-600 text-white rounded-full text-sm font-bold">
                                       {record.subcategory?.toUpperCase()}
                                     </span>
                                   )}
-                                  <span className="px-3 py-1 bg-purple-500 text-white rounded-full text-sm font-bold">
+                                  <span className="px-3 py-1 bg-blue-700 text-white rounded-full text-sm font-bold">
                                     {record.level?.toUpperCase() || 'N/A'}
                                   </span>
                                 </div>
                               </div>
                               {record.position_rank && (
                                 <div className="text-right">
-                                  <div className="text-3xl font-bold text-yellow-600">{record.position_rank}</div>
+                                  <div className="text-3xl font-bold text-blue-600">{record.position_rank}</div>
                                   {record.trophy_medal_received === 1 && (
                                     <span className="text-sm text-gray-600">🏆 Trophy Received</span>
                                   )}
@@ -965,7 +965,7 @@ export default function StudentSearch() {
                                   href={record.certificate_url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2"
+                                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2"
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -981,7 +981,7 @@ export default function StudentSearch() {
                                       href={url}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all flex items-center gap-2"
+                                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all flex items-center gap-2"
                                     >
                                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -1002,7 +1002,7 @@ export default function StudentSearch() {
                 {/* SAR Statistics Summary */}
                 {studentData.statistics && (
                   <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                    <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
                       <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <svg
                           className="w-6 h-6"
@@ -1022,20 +1022,20 @@ export default function StudentSearch() {
                     </div>
                     <div className="p-6">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                        <div className="bg-gradient-to-br from-green-100 to-emerald-100 p-6 rounded-xl border-2 border-green-300 text-center">
-                          <div className="text-4xl font-bold text-green-600 mb-2">
+                        <div className="bg-gradient-to-br from-blue-100 to-indigo-100 p-6 rounded-xl border-2 border-blue-300 text-center">
+                          <div className="text-4xl font-bold text-blue-700 mb-2">
                             {studentData.statistics.totalAcademicRecords || 0}
                           </div>
                           <div className="text-gray-700 font-semibold">Academic Semesters</div>
                         </div>
-                        <div className="bg-gradient-to-br from-orange-100 to-red-100 p-6 rounded-xl border-2 border-orange-300 text-center">
-                          <div className="text-4xl font-bold text-orange-600 mb-2">
+                        <div className="bg-gradient-to-br from-indigo-100 to-blue-100 p-6 rounded-xl border-2 border-indigo-300 text-center">
+                          <div className="text-4xl font-bold text-indigo-700 mb-2">
                             {studentData.statistics.totalInternships || 0}
                           </div>
                           <div className="text-gray-700 font-semibold">Internships</div>
                         </div>
-                        <div className="bg-gradient-to-br from-yellow-100 to-amber-100 p-6 rounded-xl border-2 border-yellow-300 text-center">
-                          <div className="text-4xl font-bold text-yellow-600 mb-2">
+                        <div className="bg-gradient-to-br from-blue-100 to-indigo-100 p-6 rounded-xl border-2 border-blue-300 text-center">
+                          <div className="text-4xl font-bold text-blue-700 mb-2">
                             {studentData.statistics.totalAchievements || 0}
                           </div>
                           <div className="text-gray-700 font-semibold">Achievements</div>
