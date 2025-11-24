@@ -53,6 +53,12 @@ const StudentDetailsDashboard = () => {
     final: { loading: false, error: null, success: false },
   });
   const [updatedDocuments, setUpdatedDocuments] = useState({});
+  
+  // Modal state for viewing images
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState("");
+  const [modalImageTitle, setModalImageTitle] = useState("");
+  
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { studentData, loading: contextLoading, error: contextError, hasPendingChanges, refreshStudentData } = useStudentData();
@@ -90,6 +96,70 @@ const StudentDetailsDashboard = () => {
       setLoading(contextLoading);
     }
   }, [studentData, contextLoading, contextError]);
+
+  // Image Modal Component
+  const ImageModal = () => {
+    if (!showImageModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/40 bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-lg overflow-hidden flex flex-col">
+          {/* Modal Header */}
+          <div className="flex justify-between items-center p-4 border-b bg-gray-50 flex-shrink-0">
+            <h3 className="text-lg font-semibold text-gray-800">
+              {modalImageTitle}
+            </h3>
+            <button
+              onClick={() => setShowImageModal(false)}
+              className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Modal Body - Scrollable */}
+          <div className="flex-1 overflow-auto p-4">
+            <img
+              src={modalImageUrl}
+              alt={modalImageTitle}
+              className="w-full h-auto object-contain mx-auto"
+              onError={(e) => {
+                e.target.src =
+                  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9zdmc+";
+              }}
+            />
+          </div>
+
+          {/* Modal Footer */}
+          <div className="flex justify-end gap-3 p-4 border-t bg-gray-50 flex-shrink-0">
+            <a
+              href={modalImageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Open in New Tab
+            </a>
+            <button
+              onClick={() => setShowImageModal(false)}
+              className="px-4 py-2 bg-gray-600 text-white cursor-pointer rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Function to open image modal
+  const openImageModal = (imageUrl, title) => {
+    setModalImageUrl(imageUrl);
+    setModalImageTitle(title);
+    setShowImageModal(true);
+  };
 
   const handleLogout = async () => {
     try {
@@ -735,6 +805,13 @@ const StudentDetailsDashboard = () => {
             >
               Download Document
             </a>
+          ) : isImage ? (
+            <button
+              onClick={() => openImageModal(url, title)}
+              className="mt-3 w-full text-center py-2 px-3 bg-gradient-to-r from-gray-600 to-gray-900 text-white text-sm font-medium rounded-md hover:from-gray-600 hover:to-gray-700 transition-all shadow-sm cursor-pointer"
+            >
+              View Document
+            </button>
           ) : (
             <a
               href={url}
@@ -1787,6 +1864,9 @@ const StudentDetailsDashboard = () => {
           declinedFields: declinedFields
         }} 
       /> */}
+      
+      {/* Image Modal */}
+      <ImageModal />
     </div>
   );
 };

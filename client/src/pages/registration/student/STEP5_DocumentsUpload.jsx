@@ -194,13 +194,13 @@ export default function DocumentsUpload({
                     href={URL.createObjectURL(formData.documents[name])}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mb-2 text-center py-1 px-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
+                    className="mb-2 text-center cursor-pointer py-1 px-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-md hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm"
                   >
                     View Document
                   </a>
                   <button
                     type="button"
-                    className="mt-2 px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+                    className="mt-2 px-2 py-1 text-xs cursor-pointer rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
                     onClick={() => handleRemoveFile(name)}
                   >
                     Cancel
