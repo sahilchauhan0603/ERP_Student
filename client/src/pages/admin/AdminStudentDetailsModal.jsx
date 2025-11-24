@@ -19,6 +19,7 @@ import {
   FiCalendar,
   FiClock,
   FiRefreshCw,
+  FiEye,
 } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { formatFamilyIncome } from "../../utils/formatters";
@@ -39,6 +40,7 @@ export default function AdminStudentDetailsModal({
   onClose,
   refresh,
   tableType,
+  openImageModal,
 }) {
   const [activeTab, setActiveTab] = useState(0);
   const [verifications, setVerifications] = useState({});
@@ -1043,22 +1045,25 @@ export default function AdminStudentDetailsModal({
                         value.toLowerCase().includes(".webp"));
 
                     return (
-                      <a
-                        href={value}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 flex items-center"
-                      >
-                        {isPDF ? (
-                          <>
-                            <FiDownload className="mr-1" /> Download Document
-                          </>
+                      <>
+                        {openImageModal ? (
+                          <button
+                            onClick={() => openImageModal(value, label)}
+                            className="text-blue-600 hover:text-blue-800 cursor-pointer flex items-center"
+                          >
+                            <FiEye className="mr-1" /> View Document
+                          </button>
                         ) : (
-                          <>
-                            <FiDownload className="mr-1" /> View Document
-                          </>
+                          <a
+                            href={value}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 flex items-center"
+                          >
+                            <FiEye className="mr-1" /> View Document
+                          </a>
                         )}
-                      </a>
+                      </>
                     );
                   })()
                 : displayValue || (
@@ -1114,7 +1119,7 @@ export default function AdminStudentDetailsModal({
         <div className="flex justify-end mb-4">
           <button
             onClick={() => handleSelectAll("personal")}
-            className="flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm hover:bg-blue-200"
+            className="flex cursor-pointer items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm hover:bg-blue-200"
           >
             <FiCheck className="mr-1" /> Verify All Personal Fields
           </button>
@@ -1270,7 +1275,7 @@ export default function AdminStudentDetailsModal({
           <div className="flex justify-end mb-4">
             <button
               onClick={() => handleSelectAll("academic")}
-              className="flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm hover:bg-blue-200"
+              className="flex items-center cursor-pointer px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm hover:bg-blue-200"
             >
               <FiCheck className="mr-1" /> Verify All Academic Fields
             </button>
@@ -1451,7 +1456,7 @@ export default function AdminStudentDetailsModal({
         <div className="flex justify-end mb-4">
           <button
             onClick={() => handleSelectAll("parent")}
-            className="flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm hover:bg-blue-200"
+            className="flex items-center cursor-pointer px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm hover:bg-blue-200"
           >
             <FiCheck className="mr-1" /> Verify All Parent Fields
           </button>
@@ -1635,7 +1640,7 @@ export default function AdminStudentDetailsModal({
           <div className="flex justify-end mb-4">
             <button
               onClick={() => handleSelectAll("documents")}
-              className="flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm hover:bg-blue-200"
+              className="flex cursor-pointer items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm hover:bg-blue-200"
             >
               <FiCheck className="mr-1" /> Verify All Documents
             </button>
@@ -1840,19 +1845,36 @@ export default function AdminStudentDetailsModal({
             <div className="flex space-x-4 whitespace-nowrap">
               {sectionDefs.map((section, index) => {
                 const hasDeclinedFields = declinedSections.has(section.key);
+                
+                // For pending tables, check if current section is verified before allowing next tabs
+                const isTabAccessible = tableType === "pending" 
+                  ? index === 0 || isSectionVerified(sectionDefs[index - 1].key)
+                  : true;
+                
+                const isDisabled = tableType === "pending" && !isTabAccessible;
 
                 return (
                   <button
                     key={section.key}
-                    onClick={() =>
-                      tableType !== "pending" && setActiveTab(index)
-                    }
-                    className={`py-4 px-1 cursor-pointer font-medium text-sm border-b-2 transition-colors flex items-center relative ${
+                    onClick={() => {
+                      if (tableType === "pending") {
+                        if (isTabAccessible) {
+                          setActiveTab(index);
+                        }
+                      } else {
+                        setActiveTab(index);
+                      }
+                    }}
+                    disabled={isDisabled}
+                    className={`py-4 px-1 font-medium text-sm border-b-2 transition-colors flex items-center relative ${
                       activeTab === index
                         ? "border-blue-500 text-blue-600"
-                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                        : isDisabled
+                        ? "border-transparent text-gray-300 cursor-not-allowed"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer"
                     }
                     ${hasDeclinedFields ? "border-red-400" : ""}`}
+                    title={isDisabled ? "Complete previous section verification first" : ""}
                   >
                     {section.icon}
                     <span className="flex items-center">
