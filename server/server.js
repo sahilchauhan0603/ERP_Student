@@ -74,5 +74,5 @@ app.use('/api/sar', require('./routes/sar'));
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  startScheduler();
+  // startScheduler();
 });
